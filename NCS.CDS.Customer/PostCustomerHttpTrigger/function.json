@@ -1,0 +1,19 @@
+﻿{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "name": "req",
+      "type": "httpTrigger",
+      "direction": "in",
+      "methods": [ "post" ]
+    },
+    {
+      "name": "$return",
+      "type": "http",
+      "direction": "out"
+    }
+  ],
+  "disabled": false,
+  "entryPoint": "NCS.CDS.Customer.PostCustomerHttpTrigger.Run",
+  "scriptFile": "..\\bin\\NCS.CDS.Customer.dll"
+} 
