@@ -6,12 +6,12 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.PatchCustomerHttpTrigger
+namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
 {
     public static class PatchCustomerHttpTrigger
     {
         [FunctionName("UpdateCustomer")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "customer/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "customers/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function Update Customer processed a request.");
 

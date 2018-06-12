@@ -5,7 +5,7 @@
       "name": "req",
       "type": "httpTrigger",
       "direction": "in",
-      "methods": [ "delete" ]
+      "methods": [ "patch" ]
     },
     {
       "name": "$return",
@@ -14,6 +14,6 @@
     }
   ],
   "disabled": false,
-  "entryPoint": "NCS.CDS.Customer.DeleteCustomerHttpTrigger.Run",
-  "scriptFile": "..\\bin\\NCS.CDS.Customer.dll"
+  "entryPoint": "NCS.DSS.Customer.PatchCustomerHttpTrigger.Run",
+  "scriptFile": "..\\bin\\NCS.DSS.Customer.dll"
 } 

@@ -6,12 +6,12 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.PutCustomerHttpTrigger
+namespace NCS.DSS.Customer.PutCustomerHttpTrigger
 {
     public static class PutCustomerHttpTrigger
     {
         [FunctionName("ReplaceCustomer")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "customer/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "customers/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function Replace Customer processed a request.");
 

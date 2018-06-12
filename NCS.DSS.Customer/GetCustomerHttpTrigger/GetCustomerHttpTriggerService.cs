@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.GetCustomerByIdHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 {
-    class GetCustomerByIdHttpTriggerService
+    class GetCustomerHttpTriggerService
     {
-        public async Task<List<Models.Customer>> GetCustomer(Guid customerId)
+        public async Task<List<Models.Customer>> GetCustomer()
         {
             var result = CreateTempCustomers();
-            result.FirstOrDefault(x => x.CustomerID == customerId);
             return await Task.FromResult(result);
         }
 

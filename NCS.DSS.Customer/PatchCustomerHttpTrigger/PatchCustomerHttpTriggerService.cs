@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.PatchCustomerHttpTrigger
+namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
 {
     class PatchCustomerHttpTriggerService
     {

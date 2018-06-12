@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.CDS.Customer", "NCS.CDS.Customer\NCS.CDS.Customer.csproj", "{240870A9-A13D-42C4-BF01-0A53339AB51F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.DSS.Customer", "NCS.DSS.Customer\NCS.DSS.Customer.csproj", "{240870A9-A13D-42C4-BF01-0A53339AB51F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

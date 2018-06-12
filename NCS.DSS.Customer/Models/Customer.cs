@@ -1,17 +1,27 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Description;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Host;
 
-namespace NCS.CDS.Customer.Models
+namespace NCS.DSS.Customer.Models
 {
     public class Customer
     {
+        [Required]
         public Guid CustomerID { get; set; }
 
         public DateTime DateOfRegistration { get; set; }
 
         public int TitleID { get; set; }
 
-        [StringLength(100)]
+        [StringLengthAttribute(100)]
         public string GivenName { get; set; }
 
         [StringLength(100)]

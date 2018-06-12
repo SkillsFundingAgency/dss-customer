@@ -6,12 +6,12 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.GetCustomerHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 {
     public static class GetCustomerHttpTrigger
     {
         [FunctionName("GetCustomer")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customer")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function GetCustomer processed a request.");
 
@@ -25,4 +25,5 @@ namespace NCS.CDS.Customer.GetCustomerHttpTrigger
             };
         }
     }
+
 }

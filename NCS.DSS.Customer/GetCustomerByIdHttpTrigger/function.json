@@ -2,10 +2,10 @@
   "bindings": [
     {
       "authLevel": "function",
-      "name": "req",
-      "type": "httpTrigger",
       "direction": "in",
-      "methods": [ "put" ]
+      "methods": [ "get" ],
+      "name": "req",
+      "type": "httpTrigger"
     },
     {
       "name": "$return",
@@ -14,6 +14,6 @@
     }
   ],
   "disabled": false,
-  "entryPoint": "NCS.CDS.Customer.PutCustomerHttpTrigger.Run",
-  "scriptFile": "..\\bin\\NCS.CDS.Customer.dll"
+  "entryPoint": "NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Run",
+  "scriptFile": "..\\bin\\NCS.DSS.Customer.dll"
 } 

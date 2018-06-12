@@ -8,12 +8,12 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 
-namespace NCS.CDS.Customer.GetCustomerByIdHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
 {
     public static class GetCustomerByIdHttpTrigger
     {
         [FunctionName("GetCustomerById")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customer/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function GetCustomerById processed a request.");
 

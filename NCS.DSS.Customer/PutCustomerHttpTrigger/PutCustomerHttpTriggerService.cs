@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NCS.CDS.Customer.DeleteCustomerHttpTrigger
+namespace NCS.DSS.Customer.PutCustomerHttpTrigger
 {
-    class DeleteCustomerHttpTriggerService
+    class PutCustomerHttpTriggerService
     {
         
     }

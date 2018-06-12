@@ -5,13 +5,16 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
+using NCS.DSS.Customer;
+using System.Web.Http.Description;
 
-namespace NCS.CDS.Customer.PostCustomerHttpTrigger
+namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
     public static class PostCustomerHttpTrigger
     {
         [FunctionName("AddCustomer")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customer/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        [ResponseType(typeof(Models.Customer))]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function Add Customer processed a request.");
 
