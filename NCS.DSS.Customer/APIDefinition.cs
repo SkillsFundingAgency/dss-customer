@@ -33,7 +33,7 @@ namespace NCS.DSS.Customer.APIDefinition
         
         [FunctionName(APIDefinitionName)]
         [ResponseType(typeof(void))]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", Route = APIDefRoute)]HttpRequestMessage req)
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = APIDefRoute)]HttpRequestMessage req)
         {
             var assembly = Assembly.GetExecutingAssembly();
 

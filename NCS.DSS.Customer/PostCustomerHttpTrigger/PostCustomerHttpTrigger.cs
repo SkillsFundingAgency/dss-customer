@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using NCS.DSS.Customer;
 using System.Web.Http.Description;
+using System;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
@@ -14,13 +15,13 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
     {
         [FunctionName("AddCustomer")]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function Add Customer processed a request.");
 
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("Added customer record with Id of : " + customerId)
+                Content = new StringContent("Added customer record with Id of : " + Guid.NewGuid())
             };
         }
     }
