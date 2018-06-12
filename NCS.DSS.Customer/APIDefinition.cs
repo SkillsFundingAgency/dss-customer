@@ -21,20 +21,14 @@ namespace NCS.DSS.Customer.APIDefinition
 {
     public static class APIDefinition
     {
-        const string APIDefinitionName = "API-Definition";
-        const string APIDefRoute = "customers/api-definition";
+        public const string APIDefinitionName = "API-Definition";
+        public const string APIDefRoute = "customers/api-definition";
+        public const string APIDescription = "Basic details of a National Careers Service Customer";
 
         public class Result<T>
         {
-            public Result(T value)
-            {
-                Value = value;
-            }
-
-            public T Value
-            {
-                get; set;
-            }
+            public Result(T value) { Value = value; }
+            public T Value{ get; set; }
         }
         
         [FunctionName(APIDefinitionName)]
@@ -48,6 +42,7 @@ namespace NCS.DSS.Customer.APIDefinition
             doc.info = new ExpandoObject();
             doc.info.title = assembly.GetName().Name;
             doc.info.version = "1.0.0";
+            doc.info.description = APIDescription;
             doc.host = req.RequestUri.Authority;
             doc.basePath = "/";
             doc.schemes = new[] { "https" };
@@ -55,6 +50,7 @@ namespace NCS.DSS.Customer.APIDefinition
             {
                 doc.schemes = new[] { "http" };
             }
+
             doc.definitions = new ExpandoObject();
             doc.paths = GeneratePaths(assembly, doc);
             doc.securityDefinitions = GenerateSecurityDefinitions();

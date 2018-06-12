@@ -14,7 +14,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
     {
         [FunctionName("AddCustomer")]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers/{customerId:guid}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function Add Customer processed a request.");
 
