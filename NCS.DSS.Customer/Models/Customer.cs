@@ -12,6 +12,7 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace NCS.DSS.Customer.Models
 {
+
     public class Customer
     {
         [Required]
