@@ -11,7 +11,7 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger
 {
     public static class DeleteCustomerHttpTrigger
     {
-        [FunctionName("DeleteCustomers")]
+        [FunctionName("DELETE")]
         [ResponseType(typeof(Models.Customer))]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {

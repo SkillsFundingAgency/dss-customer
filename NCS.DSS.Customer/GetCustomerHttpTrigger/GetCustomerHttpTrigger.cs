@@ -11,7 +11,7 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 {
     public static class GetCustomerHttpTrigger
     {
-        [FunctionName("GetCustomer")]
+        [FunctionName("GET")]
         [ResponseType(typeof(Models.Customer))]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers")]HttpRequestMessage req, TraceWriter log)
         {

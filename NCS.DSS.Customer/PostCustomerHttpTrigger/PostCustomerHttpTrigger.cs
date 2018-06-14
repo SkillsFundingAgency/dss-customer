@@ -13,7 +13,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
     public static class PostCustomerHttpTrigger
     {
-        [FunctionName("AddCustomer")]
+        [FunctionName("POST")]
         [ResponseType(typeof(Models.Customer))]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers")]HttpRequestMessage req, TraceWriter log)
         {

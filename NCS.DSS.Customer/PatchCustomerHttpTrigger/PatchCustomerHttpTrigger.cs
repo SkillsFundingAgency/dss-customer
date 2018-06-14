@@ -11,7 +11,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
 {
     public static class PatchCustomerHttpTrigger
     {
-        [FunctionName("UpdateCustomer")]
+        [FunctionName("PATCH")]
         [ResponseType(typeof(Models.Customer))]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {

@@ -11,7 +11,7 @@ namespace NCS.DSS.Customer.PutCustomerHttpTrigger
 {
     public static class PutCustomerHttpTrigger
     {
-        [FunctionName("ReplaceCustomer")]
+        [FunctionName("PUT")]
         [ResponseType(typeof(Models.Customer))]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
