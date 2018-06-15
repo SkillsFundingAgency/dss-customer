@@ -19,7 +19,7 @@ namespace NCS.DSS.Diversity.APIDefinition
 {
     public static class ApiDefinition
     {
-        public const string APITitle = "Customer";
+        public const string APITitle = "Customers";
         public const string APIDefinitionName = "API-Definition";
         public const string APIDefRoute = APITitle + "/" + APIDefinitionName;
         public const string APIDescription = "Basic details of a National Careers Service " + APITitle + " Resource";
