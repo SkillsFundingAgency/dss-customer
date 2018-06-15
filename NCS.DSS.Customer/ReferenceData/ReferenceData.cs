@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NCS.DSS.Customer.ReferenceData
+namespace NCS.DSS.Customer.Data
 {
     public class ReferenceData
-{
+    {
         #region Constructor
         public ReferenceData()
         {

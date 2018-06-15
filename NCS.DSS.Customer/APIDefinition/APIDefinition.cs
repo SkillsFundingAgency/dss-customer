@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,20 +15,21 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 
-namespace NCS.DSS.Customer.APIDefinition
+namespace NCS.DSS.Diversity.APIDefinition
 {
-    public static class APIDefinition
+    public static class ApiDefinition
     {
+        public const string APITitle = "Customer";
         public const string APIDefinitionName = "API-Definition";
-        public const string APIDefRoute = "customers/api-definition";
-        public const string APIDescription = "Basic details of a National Careers Service Customer";
+        public const string APIDefRoute = APITitle + "/" + APIDefinitionName;
+        public const string APIDescription = "Basic details of a National Careers Service " + APITitle + " Resource";
 
         public class Result<T>
         {
             public Result(T value) { Value = value; }
-            public T Value{ get; set; }
+            public T Value { get; set; }
         }
-        
+
         [FunctionName(APIDefinitionName)]
         [ResponseType(typeof(void))]
         public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = APIDefRoute)]HttpRequestMessage req)
@@ -40,7 +39,7 @@ namespace NCS.DSS.Customer.APIDefinition
             dynamic doc = new ExpandoObject();
             doc.swagger = "2.0";
             doc.info = new ExpandoObject();
-            doc.info.title = assembly.GetName().Name;
+            doc.info.title = APITitle;
             doc.info.version = "1.0.0";
             doc.info.description = APIDescription;
             doc.host = req.RequestUri.Authority;
@@ -84,11 +83,14 @@ namespace NCS.DSS.Customer.APIDefinition
             dynamic paths = new ExpandoObject();
             var methods = assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())
-                .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Length > 0)
-                .ToArray();
+                .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Length > 0).ToArray();
             foreach (MethodInfo methodInfo in methods)
             {
-                string route = "/api/";
+                //hide any disabled methods
+                if (methodInfo.GetCustomAttributes(typeof(DisableAttribute), true).Any())
+                    continue;
+
+                var route = "/api/";
 
                 var functionAttr = (FunctionNameAttribute)methodInfo.GetCustomAttributes(typeof(FunctionNameAttribute), false)
                     .Single();
@@ -130,6 +132,8 @@ namespace NCS.DSS.Customer.APIDefinition
                     operation.description = GetFunctionDescription(methodInfo, functionAttr.Name);
 
                     operation.responses = GenerateResponseParameterSignature(methodInfo, doc);
+                    operation.tags = new[] { APITitle };
+
                     dynamic keyQuery = new ExpandoObject();
                     keyQuery.apikeyQuery = new string[0];
                     operation.security = new ExpandoObject[] { keyQuery };
@@ -178,7 +182,7 @@ namespace NCS.DSS.Customer.APIDefinition
         {
             dynamic responses = new ExpandoObject();
             dynamic responseDef = new ExpandoObject();
-            responseDef.description = "OK";
+
 
             var returnType = methodInfo.ReturnType;
             if (returnType.IsGenericType)
@@ -237,6 +241,7 @@ namespace NCS.DSS.Customer.APIDefinition
                     }
                 }
             }
+            responseDef.description = "OK";
             AddToExpando(responses, "200", responseDef);
             return responses;
         }

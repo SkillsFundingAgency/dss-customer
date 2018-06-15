@@ -22,7 +22,7 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(values),
+                Content = new StringContent(JsonConvert.SerializeObject(values, Formatting.Indented),
                     System.Text.Encoding.UTF8, "application/json")
             };
         }

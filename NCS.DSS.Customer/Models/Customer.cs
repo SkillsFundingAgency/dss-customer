@@ -9,6 +9,7 @@ using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using NCS.DSS.Customer.Data;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -66,6 +67,9 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         public Guid LastModifiedTouchpointID { get; set; }
+
+        [Display(Description = "Reference Data applicable to the Customer Resource")]
+        public ReferenceData ReferenceData { get; set; }
 
     }
 }

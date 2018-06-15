@@ -13,7 +13,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
 {
     public static class GetCustomerByIdHttpTrigger
     {
-        [FunctionName("GET By ID")]
+        [FunctionName("GETByID")]
         [ResponseType(typeof(Models.Customer))]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {

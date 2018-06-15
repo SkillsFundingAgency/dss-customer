@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http.Description;
 
-namespace NCS.DSS.Customer.ReferenceData
+namespace NCS.DSS.Customer.Data
 {
     public static class ReferenceDataMethods
     {
