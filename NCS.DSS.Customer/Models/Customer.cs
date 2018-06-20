@@ -9,11 +9,10 @@ using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using NCS.DSS.Customer.Data;
+using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {
-
     public class Customer
     {
         [Required]
@@ -38,7 +37,7 @@ namespace NCS.DSS.Customer.Models
         public DateTime DateofBirth { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values.")]
-        public int GenderID { get; set; }
+        public Gender GenderID { get; set; }
 
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [MaxLengthAttribute(10)]
@@ -54,10 +53,10 @@ namespace NCS.DSS.Customer.Models
         public DateTime DateOfAccountClosure { get; set; }
 
         [Display(Description = "Reason for why the customer closed their account.  See DSS Reference Data Resource for values")]
-        public int ReasonForClosureID { get; set; }
+        public ReasonForClosure ReasonForClosureID { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]
-        public int IntroducedByID { get; set; }
+        public IntroducedBy IntroducedByID { get; set; }
 
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         public string IntroducedByAdditionalInfo { get; set; }
@@ -67,9 +66,6 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         public Guid LastModifiedTouchpointID { get; set; }
-
-        [Display(Description = "Reference Data applicable to the Customer Resource")]
-        public ReferenceData ReferenceData { get; set; }
 
     }
 }

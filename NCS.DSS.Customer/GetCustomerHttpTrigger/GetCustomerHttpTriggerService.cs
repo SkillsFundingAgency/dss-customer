@@ -23,49 +23,43 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "Burns",
                     GivenName = "Montgomery",
-                    DateofBirth = Convert.ToDateTime("01/04/1940"),
-                    ReferenceData = new Data.ReferenceData()
-                    
+                    DateofBirth = Convert.ToDateTime("01/04/1940")
                 },
                 new Models.Customer
                 {
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "America",
                     GivenName = "Captain",
-                    DateofBirth = Convert.ToDateTime("01/04/1920"),
-                    ReferenceData = new Data.ReferenceData()
+                    DateofBirth = Convert.ToDateTime("01/04/1920")
+                    
                 },
                 new Models.Customer
                 {
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "Man",
                     GivenName = "Iron",
-                    DateofBirth = Convert.ToDateTime("01/04/1940"),
-                    ReferenceData = new Data.ReferenceData()
+                    DateofBirth = Convert.ToDateTime("01/04/1940")
                 },
                 new Models.Customer
                 {
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "Trump",
                     GivenName = "Donald",
-                    DateofBirth = Convert.ToDateTime("01/04/1950"),
-                    ReferenceData = new Data.ReferenceData()
+                    DateofBirth = Convert.ToDateTime("01/04/1950")
                 },
                 new Models.Customer
                 {
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "Mao",
                     GivenName = "Chairman",
-                    DateofBirth = Convert.ToDateTime("01/04/1897"),
-                    ReferenceData = new Data.ReferenceData()
+                    DateofBirth = Convert.ToDateTime("01/04/1897")
                 },
                 new Models.Customer
                 {
                     CustomerID = Guid.NewGuid(),
                     FamilyName = "Putin",
                     GivenName = "Vladimir",
-                    DateofBirth = Convert.ToDateTime("01/04/1957"),
-                    ReferenceData = new Data.ReferenceData()
+                    DateofBirth = Convert.ToDateTime("01/04/1957")
                 }
             };
 

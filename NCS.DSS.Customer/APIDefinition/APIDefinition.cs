@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Dynamic;
 using System.Globalization;
@@ -14,8 +15,9 @@ using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using NCS.DSS.Customer.Annotations;
 
-namespace NCS.DSS.Diversity.APIDefinition
+namespace NCS.DSS.Customer.APIDefinition
 {
     public static class ApiDefinition
     {
@@ -121,7 +123,7 @@ namespace NCS.DSS.Diversity.APIDefinition
                 foreach (string verb in verbs)
                 {
                     dynamic operation = new ExpandoObject();
-                    operation.operationId = ToTitleCase(functionAttr.Name) + ToTitleCase(verb);
+                    operation.operationId = ToTitleCase(functionAttr.Name);
                     operation.produces = new[] { "application/json" };
                     operation.consumes = new[] { "application/json" };
                     operation.parameters = GenerateFunctionParametersSignature(methodInfo, route, doc);
@@ -241,8 +243,21 @@ namespace NCS.DSS.Diversity.APIDefinition
                     }
                 }
             }
-            responseDef.description = "OK";
-            AddToExpando(responses, "200", responseDef);
+
+            // automatically get data(http code, description and show schema) from the new custom response class
+            var responseCodes = methodInfo.GetCustomAttributes(typeof(CustomerResponse), false);
+
+            foreach (var response in responseCodes)
+            {
+                var customerResponse = (CustomerResponse)response;
+
+                if (!customerResponse.ShowSchema)
+                    responseDef = new ExpandoObject();
+
+                responseDef.description = customerResponse.Description;
+                AddToExpando(responses, customerResponse.HttpStatusCode.ToString(), responseDef);
+            }
+
             return responses;
         }
 
@@ -354,6 +369,22 @@ namespace NCS.DSS.Diversity.APIDefinition
                 }
                 dynamic propDef = new ExpandoObject();
                 propDef.description = GetPropertyDescription(property);
+
+                var stringAttribute = (StringLengthAttribute)property.GetCustomAttributes(typeof(StringLengthAttribute), false).FirstOrDefault();
+
+                if (stringAttribute != null)
+                {
+                    propDef.maxLength = stringAttribute.MaximumLength;
+                    propDef.minLength = stringAttribute.MinimumLength;
+                }
+
+                var regexAttribute = (RegularExpressionAttribute)property.GetCustomAttributes(typeof(RegularExpressionAttribute), false).FirstOrDefault();
+
+                if (regexAttribute != null)
+                {
+                    propDef.pattern = regexAttribute.Pattern;
+                }
+
                 SetParameterType(property.PropertyType, propDef, definitions);
                 AddToExpando(objDef.properties, property.Name, propDef);
             }
@@ -426,7 +457,27 @@ namespace NCS.DSS.Diversity.APIDefinition
             else if (inputType.IsEnum)
             {
                 opParam.type = "string";
-                opParam.@enum = Enum.GetNames(inputType);
+
+                var enumValues = new List<string>();
+
+                foreach (var item in Enum.GetValues(inputType))
+                {
+                    var memInfo = inputType.GetMember(inputType.GetEnumName(item));
+                    var descriptionAttributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+                    var description = string.Empty;
+
+                    if (descriptionAttributes.Length > 0)
+                        description = ((DescriptionAttribute)descriptionAttributes[0]).Description;
+
+                    if (string.IsNullOrEmpty(description))
+                        description = item.ToString();
+
+                    enumValues.Add(description);
+                }
+
+                opParam.@enum = enumValues.ToArray();
+
             }
             else if (definitions != null)
             {

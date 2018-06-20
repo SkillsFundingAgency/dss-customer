@@ -8,6 +8,12 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
     class PostCustomerHttpTriggerService
     {
-        
+        public Guid? Create(Models.Customer customer)
+        {
+            if (customer == null)
+                return null;
+
+            return Guid.NewGuid();
+        }
     }
 }
