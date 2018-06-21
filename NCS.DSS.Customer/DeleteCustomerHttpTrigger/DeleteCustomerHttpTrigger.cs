@@ -17,6 +17,7 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger
         [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to Delete Customer", ShowSchema = false)]
         [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
+        [Disable]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function GetCustomer processed a request.");
