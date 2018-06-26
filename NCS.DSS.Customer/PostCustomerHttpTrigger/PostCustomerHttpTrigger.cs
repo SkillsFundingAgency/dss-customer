@@ -9,31 +9,35 @@ using NCS.DSS.Customer;
 using System.Web.Http.Description;
 using System;
 using NCS.DSS.Customer.Annotations;
+using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
     public static class PostCustomerHttpTrigger
     {
         [FunctionName("POST")]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Created", ShowSchema = true)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to create Customer", ShowSchema = false)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Added", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Post request is malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function Add Customer processed a request.");
 
             // Get request body
             var customer = await req.Content.ReadAsAsync<Models.Customer>();
+            var service = new PostCustomerHttpTriggerService();          
 
-            var service = new PostCustomerHttpTriggerService();
             var customerId = service.Create(customer);
 
             return customerId == null
                 ? new HttpResponseMessage(HttpStatusCode.BadRequest)
                 : new HttpResponseMessage(HttpStatusCode.Created)
                 {
-                    Content = new StringContent("Created Customer record with Id of : " + customerId)
+                    Content = new StringContent("Successfully created new customer with ID of : " + customerId)
                 };
         }
     }

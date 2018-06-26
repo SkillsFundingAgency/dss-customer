@@ -13,9 +13,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
     public static class PatchCustomerHttpTrigger
     {
         [FunctionName("PATCH")]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Updated", ShowSchema = true)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to update Customer", ShowSchema = false)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Patched", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Patch request is malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {

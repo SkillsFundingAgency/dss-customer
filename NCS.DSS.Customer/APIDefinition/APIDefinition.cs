@@ -245,17 +245,17 @@ namespace NCS.DSS.Customer.APIDefinition
             }
 
             // automatically get data(http code, description and show schema) from the new custom response class
-            var responseCodes = methodInfo.GetCustomAttributes(typeof(CustomerResponse), false);
+            var responseCodes = methodInfo.GetCustomAttributes(typeof(Response), false);
 
             foreach (var response in responseCodes)
             {
-                var customerResponse = (CustomerResponse)response;
+                var CustomerResponse = (Response)response;
 
-                if (!customerResponse.ShowSchema)
+                if (!CustomerResponse.ShowSchema)
                     responseDef = new ExpandoObject();
 
-                responseDef.description = customerResponse.Description;
-                AddToExpando(responses, customerResponse.HttpStatusCode.ToString(), responseDef);
+                responseDef.description = CustomerResponse.Description;
+                AddToExpando(responses, CustomerResponse.HttpStatusCode.ToString(), responseDef);
             }
 
             return responses;

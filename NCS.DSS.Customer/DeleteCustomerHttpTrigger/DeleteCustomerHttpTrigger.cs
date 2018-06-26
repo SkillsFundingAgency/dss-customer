@@ -13,11 +13,12 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger
     public static class DeleteCustomerHttpTrigger
     {
         [FunctionName("DELETE")]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Deleted", ShowSchema = true)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to Delete Customer", ShowSchema = false)]
-        [CustomerResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Deleted", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Delete request is malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        [Disable]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function GetCustomer processed a request.");

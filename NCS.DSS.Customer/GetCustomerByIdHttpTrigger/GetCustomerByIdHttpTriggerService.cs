@@ -11,7 +11,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
         public async Task<List<Models.Customer>> GetCustomer(Guid customerId)
         {
             var result = CreateTempCustomers();
-            result.FirstOrDefault(x => x.CustomerID == customerId);
+            result.Find(x => x.CustomerID == customerId);
             return await Task.FromResult(result);
         }
 

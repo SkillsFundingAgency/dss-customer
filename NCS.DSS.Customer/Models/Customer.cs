@@ -25,9 +25,9 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime DateOfRegistration { get; set; }
 
-        [Display(Description = "See DSS Reference Data Resource for values")]
-        [Example(Description = "2")]
-        public int TitleID { get; set; }
+        [Display(Description = "Customers given title")]
+        [Example(Description = "1")]
+        public Title Title { get; set; }
 
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
@@ -43,9 +43,9 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime DateofBirth { get; set; }
 
-        [Display(Description = "See DSS Reference Data Resource for values.")]
-        
-        public Gender GenderID { get; set; }
+        [Display(Description = "Customers gender")]
+        [Example(Description = "3")]
+        public Gender Gender { get; set; }
  
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
@@ -66,11 +66,11 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Reason for why the customer closed their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
-        public ReasonForClosure ReasonForClosureID { get; set; }
+        public ReasonForClosure ReasonForClosure { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]
         [Example(Description = "12345")]
-        public IntroducedBy IntroducedByID { get; set; }
+        public IntroducedBy IntroducedBy { get; set; }
 
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
