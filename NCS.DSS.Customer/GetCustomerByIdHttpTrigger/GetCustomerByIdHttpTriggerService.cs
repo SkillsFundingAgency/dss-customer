@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
 {
     class GetCustomerByIdHttpTriggerService
     {
-        public async Task<List<Models.Customer>> GetCustomer(Guid customerId)
+        public List<Models.Customer> GetCustomer(Guid customerId)
         {
-            var result = CreateTempCustomers();
-            result.Find(x => x.CustomerID == customerId);
-            return await Task.FromResult(result);
+            var result = CreateTempCustomers().Where(x => x.CustomerID == customerId).ToList();
+            return result;
         }
 
         public List<Models.Customer> CreateTempCustomers()

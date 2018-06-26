@@ -34,7 +34,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
                 };
             }
             var service = new GetCustomerByIdHttpTriggerService();
-            var values = await service.GetCustomer(customerGuid);
+            var values = service.GetCustomer(customerGuid);
 
 
             return new HttpResponseMessage(HttpStatusCode.OK)
