@@ -21,7 +21,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
         {
             log.Info("C# HTTP trigger function GetCustomerById processed a request.");
 
@@ -36,10 +36,9 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
             var service = new GetCustomerByIdHttpTriggerService();
             var values = service.GetCustomer(customerGuid);
 
-
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(values),
+                Content = new StringContent(JsonConvert.SerializeObject(values, Formatting.Indented),
                     System.Text.Encoding.UTF8, "application/json")
             };
         }
