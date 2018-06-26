@@ -60,13 +60,13 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "1")]
         public bool OptInMarketResearch { get; set; }
 
-        [Display(Description = "Date the customer closed their account")]
+        [Display(Description = "Date the customer terminated their account")]
         [Example(Description = "2018-06-21T14:45:00")]
-        public DateTime DateOfAccountClosure { get; set; }
+        public DateTime DateOfTermination { get; set; }
 
-        [Display(Description = "Reason for why the customer closed their account.  See DSS Reference Data Resource for values")]
+        [Display(Description = "Reason for why the customer terminated their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
-        public ReasonForClosure ReasonForClosure { get; set; }
+        public ReasonForTermination ReasonForTermination { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]
         [Example(Description = "12345")]

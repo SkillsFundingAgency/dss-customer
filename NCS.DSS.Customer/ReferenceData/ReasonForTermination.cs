@@ -2,7 +2,7 @@
 
 namespace NCS.DSS.Customer.ReferenceData
 {
-    public enum ReasonForClosure
+    public enum ReasonForTermination
     {
         [Description("Customer Choice")]
         CustomerChoice = 1,
