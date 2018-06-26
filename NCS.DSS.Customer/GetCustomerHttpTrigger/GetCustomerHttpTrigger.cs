@@ -19,6 +19,7 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
+        [Disable]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function GetCustomer processed a request.");
