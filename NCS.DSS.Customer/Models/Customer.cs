@@ -31,12 +31,12 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
-        [MaxLength(100)]
+        [StringLength(100)]
         public string GivenName { get; set; }
 
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
-        [MaxLengthAttribute(100)]
+        [StringLength(100)]
         public string FamilyName { get; set; }
 
         [Display(Description = "Customers date of birth")]
@@ -49,15 +49,15 @@ namespace NCS.DSS.Customer.Models
  
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
-        [MaxLength(10)]
+        [StringLength(10)]
         public string UniqueLearnerNumber { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in User Research or not")]
-        [Example(Description = "1")]
+        [Example(Description = "false")]
         public bool OptInUserResearch { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in Market Research or not")]
-        [Example(Description = "1")]
+        [Example(Description = "true")]
         public bool OptInMarketResearch { get; set; }
 
         [Display(Description = "Date the customer terminated their account")]
