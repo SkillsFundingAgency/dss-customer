@@ -12,31 +12,52 @@
             "type": "string"
         }
     },
-    "variables": {},
-    "resources": [
-        {
-            "name": "[parameters('functionAppName')]",
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
-            "location": "[resourceGroup().location]",
-            "kind": "functionapp",
-            "properties": {
-                "serverFarmId": "[parameters('appServicePlanId')]",
-                "siteConfig": {
-                    "alwaysOn": true,
-                    "appSettings": [
-                        {
-                            "name": "EnvironmentName",
-                            "value": "[toUpper(parameters('configEnvironmentName'))]"
-                        },
-                        {
-                            "name": "MSDEPLOY_RENAME_LOCKED_FILES",
-                            "value": "1"
-                        }
-                    ]
-                }
+  "variables": {
+    "appInsightsName": "[concat('dss-', parameters('configEnvironmentName'), '-', split(parameters('functionAppName'), '-')[2], '-ai')]"
+  },
+  "resources": [
+    {
+      "name": "[parameters('functionAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2016-08-01",
+      "dependsOn": [ "[variables('appInsightsName')]" ],
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "properties": {
+        "serverFarmId": "[parameters('appServicePlanId')]",
+        "siteConfig": {
+          "alwaysOn": true,
+          "appSettings": [
+            {
+              "name": "EnvironmentName",
+              "value": "[toUpper(parameters('configEnvironmentName'))]"
+            },
+            {
+              "name": "MSDEPLOY_RENAME_LOCKED_FILES",
+              "value": "1"
+            },
+            {
+              "name": "ApplicationInsights:InstrumentationKey",
+              "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             }
+          ]
         }
-    ],
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('appInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[resourceGroup().location]",
+      "kind": "web",
+      "tags": {
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]": "Resource"
+      },
+      "properties": {
+        "Application_Type": "web"
+      },
+      "outputs": {}
+    }
+  ],
     "outputs": {}
 }
