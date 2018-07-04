@@ -55,8 +55,7 @@
       },
       "properties": {
         "Application_Type": "web"
-      },
-      "outputs": {}
+      }
     }
   ],
     "outputs": {}
