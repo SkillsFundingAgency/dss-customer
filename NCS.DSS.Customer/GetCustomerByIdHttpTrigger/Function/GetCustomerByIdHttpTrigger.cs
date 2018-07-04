@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Customer.Annotations;
+using NCS.DSS.Customer.Cosmos.Helper;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
@@ -33,6 +34,20 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
                         System.Text.Encoding.UTF8, "application/json")
                 };
             }
+
+            var resourceHelper = new ResourceHelper();
+            var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
+
+            if (!doesCustomerExist)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NoContent)
+                {
+                    Content = new StringContent("Unable to find a customer with Id of : " +
+                                                JsonConvert.SerializeObject(customerGuid),
+                        System.Text.Encoding.UTF8, "application/json")
+                };
+            }
+
             var service = new GetCustomerByIdHttpTriggerService();
             var values = service.GetCustomer(customerGuid);
 

@@ -19,6 +19,7 @@ namespace NCS.DSS.Customer.Models
         [Required]
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
         public Guid CustomerID { get; set; }
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]

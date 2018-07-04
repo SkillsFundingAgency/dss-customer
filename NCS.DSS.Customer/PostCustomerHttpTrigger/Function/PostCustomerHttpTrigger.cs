@@ -10,6 +10,7 @@ using System.Web.Http.Description;
 using System;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.ReferenceData;
+using System.Dynamic;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
@@ -25,19 +26,18 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
         [ResponseType(typeof(Models.Customer))]
         public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, TraceWriter log)
         {
-            log.Info("C# HTTP trigger function Add Customer processed a request.");
 
-            // Get request body
-            var customer = await req.Content.ReadAsAsync<Models.Customer>();
-            var service = new PostCustomerHttpTriggerService();          
-
-            var customerId = service.Create(customer);
+            var customerData = await req.Content.ReadAsAsync<Models.Customer>();
+            var service = new PostCustomerHttpTriggerService();
+            var customerId = service.CreateNewCustomer().CustomerID;
+            customerData.CustomerID = customerId; 
+            var cusJson = JsonConvert.SerializeObject(customerData, Formatting.Indented);
 
             return customerId == null
                 ? new HttpResponseMessage(HttpStatusCode.BadRequest)
                 : new HttpResponseMessage(HttpStatusCode.Created)
                 {
-                    Content = new StringContent("Successfully created new customer with ID of : " + customerId)
+                    Content = new StringContent("New customer ID created : " + customerId + Environment.NewLine + Environment.NewLine + cusJson)
                 };
         }
     }
