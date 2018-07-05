@@ -13,7 +13,7 @@
         }
     },
   "variables": {
-    "appInsightsName": "[concat('dss-', parameters('configEnvironmentName'), '-', split(parameters('functionAppName'), '-')[2], '-ai')]"
+    "appInsightsName": "[concat('dss-', toLower(parameters('configEnvironmentName')), '-', split(parameters('functionAppName'), '-')[2], '-ai')]"
   },
   "resources": [
     {
@@ -37,7 +37,7 @@
               "value": "1"
             },
             {
-              "name": "ApplicationInsights:InstrumentationKey",
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             }
           ]
