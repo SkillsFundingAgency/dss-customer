@@ -1,0 +1,14 @@
+{
+  "Databases": [
+    {
+      "DatabaseName": "addresses",
+      "Collections": [
+        {
+          "CollectionName": "addresses",
+          "OfferThroughput": 1000,
+          "StoredProcedures": []
+        }
+      ]
+    }
+  ]
+}
