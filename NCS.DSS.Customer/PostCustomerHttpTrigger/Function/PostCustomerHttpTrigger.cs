@@ -26,7 +26,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
         [ResponseType(typeof(Models.Customer))]
         public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, TraceWriter log)
         {
-
             var customerData = await req.Content.ReadAsAsync<Models.Customer>();
             var service = new PostCustomerHttpTriggerService();
             var customerId = service.CreateNewCustomer().CustomerID;
