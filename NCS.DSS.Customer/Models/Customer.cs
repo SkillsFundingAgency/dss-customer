@@ -19,6 +19,7 @@ namespace NCS.DSS.Customer.Models
         [Required]
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
         public Guid CustomerID { get; set; }
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]
@@ -31,12 +32,12 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
-        [StringLength(100)]
+        [MaxLength(100)]
         public string GivenName { get; set; }
 
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
-        [StringLength(100)]
+        [MaxLengthAttribute(100)]
         public string FamilyName { get; set; }
 
         [Display(Description = "Customers date of birth")]
@@ -46,18 +47,18 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Customers gender")]
         [Example(Description = "3")]
         public Gender Gender { get; set; }
- 
+
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
-        [StringLength(10)]
+        [MaxLength(10)]
         public string UniqueLearnerNumber { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in User Research or not")]
-        [Example(Description = "false")]
+        [Example(Description = "true/false")]
         public bool OptInUserResearch { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in Market Research or not")]
-        [Example(Description = "true")]
+        [Example(Description = "true/false")]
         public bool OptInMarketResearch { get; set; }
 
         [Display(Description = "Date the customer terminated their account")]
