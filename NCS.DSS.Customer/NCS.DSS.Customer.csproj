@@ -22,8 +22,4 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SearchCustomerHttpTrigger\Function\" />
-    <Folder Include="SearchCustomerHttpTrigger\Service\" />
-  </ItemGroup>
 </Project>
