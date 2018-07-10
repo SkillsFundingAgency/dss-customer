@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
@@ -36,19 +38,25 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             return customerExists;
         }
 
-        public async Task<ResourceResponse<Document>> GetCustomerAsync(Guid customerId)
+        public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {
-            var documentUri = _documentDbHelper.CreateDocumentUri(customerId);
+            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
 
             var client = _databaseClient.CreateDocumentClient();
 
-            if (client == null)
+            var CustomerByIdQuery = client
+                ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerID == customerId)
+                .AsDocumentQuery();
+
+            if (CustomerByIdQuery == null)
                 return null;
 
-            var response = await client.ReadDocumentAsync(documentUri);
+            var Customer = await CustomerByIdQuery.ExecuteNextAsync<Models.Customer>();
 
-            return response;
+            return Customer?.FirstOrDefault();
         }
+
                 
         public async Task<ResourceResponse<Document>> CreateCustomerAsync(Models.Customer customer)
         {

@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 
-namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
-    class GetCustomerByIdHttpTriggerService
+    class GetCustomerByIdHttpTriggerService : IGetCustomerByIdHttpTriggerService
     {
-        public List<Models.Customer> GetCustomer(Guid customerId)
+        public async Task<Models.Customer> GetCustomer(Guid customerId)
         {
-            var result = CreateTempCustomers().Where(x => x.CustomerID == customerId).ToList();
-            return result;
+            var documentDbProvider = new DocumentDBProvider();
+            var customer = await documentDbProvider.GetCustomerByIdAsync(customerId);
+
+            return customer;
         }
 
         public List<Models.Customer> CreateTempCustomers()
@@ -65,8 +68,6 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
 
             return CustList;
         }
-
-
 
     }
 }

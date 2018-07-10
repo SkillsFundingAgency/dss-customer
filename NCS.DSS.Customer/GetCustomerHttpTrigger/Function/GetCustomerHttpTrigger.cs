@@ -9,6 +9,7 @@ using System.Web.Http.Description;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.AppInsights;
 using Microsoft.Extensions.Logging;
+using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
 
 namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 {

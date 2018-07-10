@@ -11,6 +11,8 @@ using System;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.ReferenceData;
 using System.Dynamic;
+using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
+using Newtonsoft.Json.Linq;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
@@ -28,15 +30,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
         {
             var customerData = await req.Content.ReadAsAsync<Models.Customer>();
             var service = new PostCustomerHttpTriggerService();
-            var customerId = service.CreateNewCustomer().CustomerID;
-            customerData.CustomerID = customerId; 
+            var customerId = service.CreateNewCustomerAsync(customerData);
             var cusJson = JsonConvert.SerializeObject(customerData, Formatting.Indented);
 
             return customerId == null
                 ? new HttpResponseMessage(HttpStatusCode.BadRequest)
                 : new HttpResponseMessage(HttpStatusCode.Created)
                 {
-                    Content = new StringContent("New customer ID created : " + customerId + Environment.NewLine + Environment.NewLine + cusJson)
+                    Content = new StringContent(cusJson)
                 };
         }
     }

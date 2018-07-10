@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NCS.DSS.Customer.GetCustomerHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Service
 {
     class GetCustomerHttpTriggerService
     {

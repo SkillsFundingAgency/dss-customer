@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
