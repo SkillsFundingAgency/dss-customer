@@ -16,8 +16,9 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Customer.Annotations;
+using NCS.DSS.Customer.Ioc;
 
-namespace NCS.DSS.Customer.APIDefinition
+namespace NCS.DSS.Address.APIDefinition
 {
     public static class ApiDefinition
     {
@@ -249,13 +250,13 @@ namespace NCS.DSS.Customer.APIDefinition
 
             foreach (var response in responseCodes)
             {
-                var CustomerResponse = (Response)response;
+                var customerResponse = (Response)response;
 
-                if (!CustomerResponse.ShowSchema)
+                if (!customerResponse.ShowSchema)
                     responseDef = new ExpandoObject();
 
-                responseDef.description = CustomerResponse.Description;
-                AddToExpando(responses, CustomerResponse.HttpStatusCode.ToString(), responseDef);
+                responseDef.description = customerResponse.Description;
+                AddToExpando(responses, customerResponse.HttpStatusCode.ToString(), responseDef);
             }
 
             return responses;
@@ -269,9 +270,9 @@ namespace NCS.DSS.Customer.APIDefinition
                 if (parameter.ParameterType == typeof(HttpRequestMessage)) continue;
                 if (parameter.ParameterType == typeof(TraceWriter)) continue;
                 if (parameter.ParameterType == typeof(Microsoft.Extensions.Logging.ILogger)) continue;
+                if (parameter.GetCustomAttributes().Any(attr => attr is InjectAttribute)) continue;
 
                 bool hasUriAttribute = parameter.GetCustomAttributes().Any(attr => attr is FromUriAttribute);
-
 
                 if (route.Contains('{' + parameter.Name))
                 {
@@ -477,7 +478,6 @@ namespace NCS.DSS.Customer.APIDefinition
                 }
 
                 opParam.@enum = enumValues.ToArray();
-
             }
             else if (definitions != null)
             {
