@@ -25,7 +25,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", 
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", 
             Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IGetCustomerByIdHttpTriggerService getCustomerByIdService)
@@ -38,7 +38,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
             if (!resourceHelper.DoesCustomerExist(customerGuid))
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var customer = getCustomerByIdService.GetCustomerAsync(customerGuid);
+            var customer = await getCustomerByIdService.GetCustomerAsync(customerGuid);
 
             return customer == null ?
                 HttpResponseMessageHelper.NoContent(customerGuid) :
