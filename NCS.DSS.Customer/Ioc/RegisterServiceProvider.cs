@@ -7,6 +7,7 @@ using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 
 namespace NCS.DSS.Customer.Ioc
@@ -21,6 +22,7 @@ namespace NCS.DSS.Customer.Ioc
             services.AddTransient<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
             services.AddTransient<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
             services.AddTransient<IGetCustomerHttpTriggerService, GetCustomerHttpTriggerService >();
+            services.AddTransient<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();
 
             services.AddTransient<IResourceHelper, ResourceHelper>();
             services.AddTransient<IValidate, Validate>();

@@ -10,7 +10,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
     class PostCustomerHttpTriggerService : IPostCustomerHttpTriggerService
     {
-        public async Task<Guid?> CreateNewCustomerAsync(Models.Customer customer)
+        public async Task<Models.Customer> CreateNewCustomerAsync(Models.Customer customer)
         {
             if (customer == null)
                 return null;
@@ -22,7 +22,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 
             var response = await documentDbProvider.CreateCustomerAsync(customer);
 
-            return response.StatusCode == HttpStatusCode.Created ? CustomerID : (Guid?)null;
+            return response.StatusCode == HttpStatusCode.Created ? (dynamic) response.Resource : (Guid?) null;
 
         }
     }

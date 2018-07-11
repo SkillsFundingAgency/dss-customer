@@ -12,6 +12,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Web.Http;
 using System.Linq;
+using NCS.DSS.Customer.Ioc;
+using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.SearchCustomerHttpTrigger
 {
@@ -24,17 +29,18 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
-            Route = "CustomerSearch")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+            Route = "CustomerSearch/{qQuery}")]HttpRequestMessage req, ILogger logger, string qQuery,
+            [Inject]IResourceHelper resourceHelper,
+            [Inject]ISearchCustomerHttpTriggerService SearchCustomerService)
         {
-            var service = new SearchCustomerHttpTriggerService();
-            var values = service.SearchCustomer(req);
+            logger.LogInformation("C# HTTP trigger function GetCustomerById processed a request.");
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(values, Formatting.Indented),
-                    System.Text.Encoding.UTF8, "application/json")
-            };
+            var customer = await SearchCustomerService.SearchCustomerAsync(qQuery);
+
+            return customer == null ?
+                HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :
+                HttpResponseMessageHelper.Ok(customer);
         }
 
     }

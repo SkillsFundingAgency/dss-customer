@@ -45,6 +45,31 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
         }
 
+        public async Task<List<Models.Customer>> SearchAllCustomer(string q)
+        {
+            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            if (client == null)
+                return null;
+
+            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri)
+                .Where(x => x.GivenName.Contains(q) || x.FamilyName.Contains(q))
+                .AsDocumentQuery();
+
+            var customers = new List<Models.Customer>();
+
+            while (queryCust.HasMoreResults)
+            {
+                var response = await queryCust.ExecuteNextAsync<Models.Customer>();
+                customers.AddRange(response);
+            }
+
+            return customers.Any() ? customers : null;
+        }
+
+
 
         public async Task<List<Models.Customer>> GetAllCustomer()
         {
@@ -91,7 +116,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 
         public async Task<ResourceResponse<Document>> CreateCustomerAsync(Models.Customer customer)
         {
-
             var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
 
             var client = _databaseClient.CreateDocumentClient();

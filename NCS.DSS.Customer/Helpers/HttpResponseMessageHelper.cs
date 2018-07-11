@@ -80,6 +80,15 @@ namespace NCS.DSS.Customer.Helpers
             };
         }
 
+        public static HttpResponseMessage BadRequest()
+        {
+            return new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject("Customer not created!"),
+                    Encoding.UTF8, "application/json")
+            };
+        }
+
         #endregion
 
         #region UnprocessableEntity(422)

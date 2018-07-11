@@ -13,6 +13,11 @@ using NCS.DSS.Customer.ReferenceData;
 using System.Dynamic;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using Newtonsoft.Json.Linq;
+using NCS.DSS.Customer.Ioc;
+using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Validation;
+using System.Linq;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 {
@@ -26,19 +31,40 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, TraceWriter log,
+            [Inject]IResourceHelper resourceHelper,
+            [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
+            [Inject]IValidate validate,
+            [Inject]IPostCustomerHttpTriggerService customerPostService
+            )
         {
-            var customerData = await req.Content.ReadAsAsync<Models.Customer>();
-            var service = new PostCustomerHttpTriggerService();
-            var customerId = service.CreateNewCustomerAsync(customerData);
-            var cusJson = JsonConvert.SerializeObject(customerData, Formatting.Indented);
 
-            return customerId == null
-                ? new HttpResponseMessage(HttpStatusCode.BadRequest)
-                : new HttpResponseMessage(HttpStatusCode.Created)
-                {
-                    Content = new StringContent(cusJson)
-                };
+            Models.Customer customerRequest;
+
+            try
+            {
+                customerRequest = await httpRequestMessageHelper.GetCustomerFromRequest<Models.Customer>(req);
+            }
+            catch (JsonSerializationException ex)
+            {
+                return HttpResponseMessageHelper.UnprocessableEntity(ex);
+            }
+
+            if (customerRequest == null)
+                return HttpResponseMessageHelper.UnprocessableEntity(req);
+
+            var errors = validate.ValidateResource(customerRequest);
+
+            if (errors != null && errors.Any())
+                return HttpResponseMessageHelper.UnprocessableEntity(errors);
+
+            
+            var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
+
+            return customer == null
+                ? HttpResponseMessageHelper.BadRequest()
+                : HttpResponseMessageHelper.Created(customer);
+
         }
     }
 }
