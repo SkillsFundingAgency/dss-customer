@@ -25,18 +25,49 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public bool DoesCustomerResourceExist(Guid customerId)
         {
+            try
+            {
+                var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+
+                var client = _databaseClient.CreateDocumentClient();
+
+                if (client == null)
+                    return false;
+
+                var query = client.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 });
+                var customerExists = query.Where(x => x.CustomerID == customerId).AsEnumerable().Any();
+
+                return customerExists;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        public async Task<List<Models.Customer>> GetAllCustomer()
+        {
             var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
 
             var client = _databaseClient.CreateDocumentClient();
 
             if (client == null)
-                return false;
+                return null;
 
-            var query = client.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 });
-            var customerExists = query.Where(x => x.CustomerID == customerId).AsEnumerable().Any();
+            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri).AsDocumentQuery();
 
-            return customerExists;
+            var customers = new List<Models.Customer>();
+
+            while (queryCust.HasMoreResults)
+            {
+                var response = await queryCust.ExecuteNextAsync<Models.Customer>();
+                customers.AddRange(response);
+            }
+
+            return customers.Any() ? customers: null;
         }
+
 
         public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {

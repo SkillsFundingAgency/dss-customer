@@ -20,6 +20,7 @@ namespace NCS.DSS.Customer.Ioc
             services.AddTransient<IGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService>();
             services.AddTransient<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
             services.AddTransient<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
+            services.AddTransient<IGetCustomerHttpTriggerService, GetCustomerHttpTriggerService >();
 
             services.AddTransient<IResourceHelper, ResourceHelper>();
             services.AddTransient<IValidate, Validate>();

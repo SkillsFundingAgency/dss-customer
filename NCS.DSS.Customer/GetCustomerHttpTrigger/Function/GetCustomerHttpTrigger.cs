@@ -10,9 +10,15 @@ using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.AppInsights;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
+using NCS.DSS.Customer.Ioc;
+using NCS.DSS.Customer.Helpers;
+using System;
 
 namespace NCS.DSS.Customer.GetCustomerHttpTrigger
 {
+
     public static class GetCustomerHttpTrigger
     {
         [FunctionName("GET")]
@@ -22,18 +28,19 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        [Disable]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers")]HttpRequestMessage req, TraceWriter log)
-        {        
-            var service = new GetCustomerHttpTriggerService();
-            var values = await service.GetCustomer();
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+            Route = "Customers")]HttpRequestMessage req, TraceWriter log,
+                [Inject]IResourceHelper resourceHelper,
+                [Inject]IGetCustomerHttpTriggerService getAllCustomerService)
+        {
+            log.Info("C# HTTP trigger function GetCustomerById processed a request.");
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(values, Formatting.Indented),
-                    System.Text.Encoding.UTF8, "application/json")
-            };
+            var customer = getAllCustomerService.GetAllCustomerAsync();
+
+            return customer == null ?
+                HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :
+                HttpResponseMessageHelper.Ok(customer);
+
         }
     }
-
 }
