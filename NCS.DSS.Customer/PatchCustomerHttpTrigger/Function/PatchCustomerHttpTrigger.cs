@@ -47,18 +47,18 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
             var errors = validate.ValidateResource(customerPatch);
 
             if (errors != null && errors.Any())
-                return HttpResponseMessageHelper.UnprocessableEntity("Validation error(s) : ", errors);
+                return HttpResponseMessageHelper.UnprocessableEntity(errors);
 
             var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
-                return HttpResponseMessageHelper.NoContent("Unable to find a customer with Id of : ", customerGuid);
+                return HttpResponseMessageHelper.NoContent(customerGuid);
 
             var customer = await customerPatchService.GetCustomerByIdAsync(customerGuid);
             var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatch);
             
             return updatedCustomer == null ?
-                HttpResponseMessageHelper.BadRequest("Unable to find update customer with Id of : ", customerGuid) :
+                HttpResponseMessageHelper.BadRequest(customerGuid) :
                 HttpResponseMessageHelper.Ok(updatedCustomer);
 
         }

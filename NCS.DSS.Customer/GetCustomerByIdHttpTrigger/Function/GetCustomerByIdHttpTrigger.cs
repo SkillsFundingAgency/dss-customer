@@ -38,12 +38,12 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
             var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
-                return HttpResponseMessageHelper.NoContent("Unable to find customer with Id of : ", customerGuid);
+                return HttpResponseMessageHelper.NoContent(customerGuid);
 
             var customer = getCustomerByIdService.GetCustomerAsync(customerGuid);
 
             return customer == null ?
-                HttpResponseMessageHelper.NoContent("Unable to find customer with Id of ", customerGuid) :
+                HttpResponseMessageHelper.NoContent(customerGuid) :
                 HttpResponseMessageHelper.Ok(customer);
 
         }
