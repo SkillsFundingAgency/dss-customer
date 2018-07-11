@@ -9,6 +9,11 @@ using System.Web.Http.Description;
 using NCS.DSS.Customer.Annotations;
 using System;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Ioc;
+using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.Validation;
+using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
+using System.Linq;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
 {
@@ -22,36 +27,40 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
+            Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId,
+            [Inject]IResourceHelper resourceHelper,
+            [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
+            [Inject]IValidate validate,
+            [Inject]IPatchCustomerHttpTriggerService customerPatchService)
         {
-            log.Info("C# HTTP trigger function Update Customer processed a request.");
-
             if (!Guid.TryParse(customerId, out var customerGuid))
-            {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(customerId),
-                        System.Text.Encoding.UTF8, "application/json")
-                };
-            }
+                return HttpResponseMessageHelper.BadRequest(customerGuid);
 
-            var resourceHelper = new ResourceHelper();
+            var customerPatch = await httpRequestMessageHelper.GetCustomerFromRequest<Models.CustomerPatch>(req);
+            customerPatch.CustomerID = customerGuid;
+
+            if(customerPatch == null)
+                return HttpResponseMessageHelper.UnprocessableEntity(req);
+
+            // validate the request
+            var errors = validate.ValidateResource(customerPatch);
+
+            if (errors != null && errors.Any())
+                return HttpResponseMessageHelper.UnprocessableEntity("Validation error(s) : ", errors);
+
             var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
-            {
-                return new HttpResponseMessage(HttpStatusCode.NoContent)
-                {
-                    Content = new StringContent("Unable to find a customer with Id of : " +
-                                                JsonConvert.SerializeObject(customerGuid),
-                        System.Text.Encoding.UTF8, "application/json")
-                };
-            }
+                return HttpResponseMessageHelper.NoContent("Unable to find a customer with Id of : ", customerGuid);
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("Updated customer record with Id of : " + customerId)
-            };
+            var customer = await customerPatchService.GetCustomerByIdAsync(customerGuid);
+            var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatch);
+            
+            return updatedCustomer == null ?
+                HttpResponseMessageHelper.BadRequest("Unable to find update customer with Id of : ", customerGuid) :
+                HttpResponseMessageHelper.Ok(updatedCustomer);
+
         }
     }
 }

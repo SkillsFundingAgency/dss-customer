@@ -4,6 +4,7 @@ using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -18,6 +19,7 @@ namespace NCS.DSS.Customer.Ioc
 
             services.AddTransient<IGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService>();
             services.AddTransient<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
+            services.AddTransient<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
 
             services.AddTransient<IResourceHelper, ResourceHelper>();
             services.AddTransient<IValidate, Validate>();

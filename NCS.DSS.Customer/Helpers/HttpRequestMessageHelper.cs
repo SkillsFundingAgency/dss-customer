@@ -6,9 +6,9 @@ namespace NCS.DSS.Customer.Helpers
 {
     public class HttpRequestMessageHelper : IHttpRequestMessageHelper
     {
-        public async Task<Models.Customer> GetCustomerFromRequest(HttpRequestMessage req)
+        public async Task<T> GetCustomerFromRequest<T>(HttpRequestMessage req)
         {
-            return await req.Content.ReadAsAsync<Models.Customer>();
+            return await req.Content.ReadAsAsync<T>();
         }
     }
 }

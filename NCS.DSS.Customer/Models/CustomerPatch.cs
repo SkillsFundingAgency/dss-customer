@@ -14,9 +14,8 @@ using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {
-    public class Customer
+    public class CustomerPatch
     {
-        [Required]
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
@@ -47,7 +46,7 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Customers gender")]
         [Example(Description = "3")]
         public Gender Gender { get; set; }
- 
+
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
         [MaxLength(10)]
@@ -84,32 +83,6 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid LastModifiedTouchpointID { get; set; }
-
-
-        public void Patch(CustomerPatch customerPatch)
-        {
-            if (customerPatch == null)
-                return;
-
-            CustomerID = customerPatch.CustomerID;
-            DateOfRegistration = customerPatch.DateOfRegistration;
-            Title = customerPatch.Title;
-            GivenName = customerPatch.GivenName;
-            FamilyName = customerPatch.FamilyName;
-            DateofBirth = customerPatch.DateofBirth;
-            Gender = customerPatch.Gender;
-            UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
-            OptInUserResearch = customerPatch.OptInUserResearch;
-            OptInMarketResearch = customerPatch.OptInMarketResearch;
-            DateOfTermination = customerPatch.DateOfTermination;
-            ReasonForTermination = customerPatch.ReasonForTermination;
-            IntroducedBy = customerPatch.IntroducedBy;
-            IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
-            LastModifiedDate = customerPatch.LastModifiedDate;
-            LastModifiedTouchpointID = customerPatch.LastModifiedTouchpointID;
-        }
-
-
 
     }
 }

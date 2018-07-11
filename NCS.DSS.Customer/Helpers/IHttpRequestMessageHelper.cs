@@ -5,6 +5,6 @@ namespace NCS.DSS.Customer.Helpers
 {
     public interface IHttpRequestMessageHelper
     {
-        Task<Models.Customer> GetCustomerFromRequest(HttpRequestMessage req);
+        Task<T> GetCustomerFromRequest<T>(HttpRequestMessage req);
     }
 }

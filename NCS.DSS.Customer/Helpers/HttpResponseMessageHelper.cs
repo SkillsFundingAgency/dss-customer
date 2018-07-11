@@ -96,6 +96,15 @@ namespace NCS.DSS.Customer.Helpers
             };
         }
 
+        public static HttpResponseMessage UnprocessableEntity(HttpRequestMessage req)
+        {
+            return new HttpResponseMessage((HttpStatusCode)422)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(req),
+                    System.Text.Encoding.UTF8, "application/json")
+            };
+        }
+
         #endregion
 
     }

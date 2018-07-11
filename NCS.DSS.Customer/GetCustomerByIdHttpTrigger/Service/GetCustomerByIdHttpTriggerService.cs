@@ -8,9 +8,9 @@ using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
-    class GetCustomerByIdHttpTriggerService : IGetCustomerByIdHttpTriggerService
+    public class GetCustomerByIdHttpTriggerService : IGetCustomerByIdHttpTriggerService
     {
-        public async Task<Models.Customer> GetCustomer(Guid customerId)
+        public async Task<Models.Customer> GetCustomerAsync(Guid customerId)
         {
             var documentDbProvider = new DocumentDBProvider();
             var customer = await documentDbProvider.GetCustomerByIdAsync(customerId);

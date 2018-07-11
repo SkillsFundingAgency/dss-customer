@@ -5,6 +5,6 @@ namespace NCS.DSS.Customer.Validation
 {
     public interface IValidate
     {
-        List<ValidationResult> ValidateResource(Models.Customer customer);
+        List<ValidationResult> ValidateResource<T>(T resource);
     }
 }

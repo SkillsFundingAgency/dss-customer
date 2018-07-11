@@ -5,12 +5,12 @@ namespace NCS.DSS.Customer.Validation
 {
     public class Validate : IValidate
     {
-        public List<ValidationResult> ValidateResource(Models.Customer customer)
+        public List<ValidationResult> ValidateResource<T>(T resource)
         {
-            var context = new ValidationContext(customer, null, null);
+            var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
-            var isValid = Validator.TryValidateObject(customer, context, results, true);
+            var isValid = Validator.TryValidateObject(resource, context, results, true);
 
             return isValid ? null : results;
         }

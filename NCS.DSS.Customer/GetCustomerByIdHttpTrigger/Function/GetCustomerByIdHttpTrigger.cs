@@ -10,6 +10,8 @@ using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
+using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.Ioc;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
@@ -23,40 +25,27 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", 
+            Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId,
+            [Inject]IResourceHelper resourceHelper,
+            [Inject]IGetCustomerByIdHttpTriggerService getCustomerByIdService)
         {
             log.Info("C# HTTP trigger function GetCustomerById processed a request.");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
-            {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(customerId),
-                        System.Text.Encoding.UTF8, "application/json")
-                };
-            }
+                return HttpResponseMessageHelper.BadRequest(customerGuid);
 
-            var resourceHelper = new ResourceHelper();
             var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
-            {
-                return new HttpResponseMessage(HttpStatusCode.NoContent)
-                {
-                    Content = new StringContent("Unable to find a customer with Id of : " +
-                                                JsonConvert.SerializeObject(customerGuid),
-                        System.Text.Encoding.UTF8, "application/json")
-                };
-            }
+                return HttpResponseMessageHelper.NoContent("Unable to find customer with Id of : ", customerGuid);
 
-            var service = new GetCustomerByIdHttpTriggerService();
-            var values = service.GetCustomer(customerGuid);
+            var customer = getCustomerByIdService.GetCustomerAsync(customerGuid);
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(values, Formatting.Indented),
-                    System.Text.Encoding.UTF8, "application/json")
-            };
+            return customer == null ?
+                HttpResponseMessageHelper.NoContent("Unable to find customer with Id of ", customerGuid) :
+                HttpResponseMessageHelper.Ok(customer);
+
         }
     }
 }
