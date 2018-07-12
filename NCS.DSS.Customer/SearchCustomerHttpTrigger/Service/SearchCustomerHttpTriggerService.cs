@@ -12,9 +12,9 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Service
         public async Task<List<Models.Customer>> SearchCustomerAsync(string qQuery)
         {
             var documentDbProvider = new DocumentDBProvider();
-            var customer = documentDbProvider.SearchAllCustomer(qQuery);
+            var customer = await documentDbProvider.SearchAllCustomer(qQuery);
 
-            return await customer;
+            return customer;
         }
 
 

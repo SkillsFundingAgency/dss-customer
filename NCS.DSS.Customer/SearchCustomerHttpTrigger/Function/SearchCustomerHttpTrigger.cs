@@ -29,7 +29,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
             Route = "CustomerSearch/{qQuery}")]HttpRequestMessage req, ILogger logger, string qQuery,
             [Inject]IResourceHelper resourceHelper,
             [Inject]ISearchCustomerHttpTriggerService SearchCustomerService)
