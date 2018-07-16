@@ -16,15 +16,14 @@ namespace NCS.DSS.Customer.Models
 {
     public class Customer
     {
-        [Required]
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
-        public Guid CustomerID { get; set; }
+        public Guid? CustomerID { get; set; }
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]
         [Example(Description = "2018-06-21T14:45:00")]
-        public DateTime DateOfRegistration { get; set; }
+        public DateTime? DateOfRegistration { get; set; }
 
         [Display(Description = "Customers given title")]
         [Example(Description = "1")]
@@ -42,7 +41,7 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers date of birth")]
         [Example(Description = "2018-06-21T14:45:00")]
-        public DateTime DateofBirth { get; set; }
+        public DateTime? DateofBirth { get; set; }
 
         [Display(Description = "Customers gender")]
         [Example(Description = "3")]
@@ -55,15 +54,15 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in User Research or not")]
         [Example(Description = "true/false")]
-        public bool OptInUserResearch { get; set; }
+        public bool? OptInUserResearch { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in Market Research or not")]
         [Example(Description = "true/false")]
-        public bool OptInMarketResearch { get; set; }
+        public bool? OptInMarketResearch { get; set; }
 
         [Display(Description = "Date the customer terminated their account")]
         [Example(Description = "2018-06-21T14:45:00")]
-        public DateTime DateOfTermination { get; set; }
+        public DateTime? DateOfTermination { get; set; }
 
         [Display(Description = "Reason for why the customer terminated their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
@@ -79,11 +78,11 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Date and time of the last modification to the record")]
         [Example(Description = "2018-06-21T14:45:00")]
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
 
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid LastModifiedTouchpointID { get; set; }
+        public Guid? LastModifiedTouchpointID { get; set; }
 
 
         public void Patch(CustomerPatch customerPatch)
@@ -91,22 +90,53 @@ namespace NCS.DSS.Customer.Models
             if (customerPatch == null)
                 return;
 
-            CustomerID = customerPatch.CustomerID;
-            DateOfRegistration = customerPatch.DateOfRegistration;
-            Title = customerPatch.Title;
-            GivenName = customerPatch.GivenName;
-            FamilyName = customerPatch.FamilyName;
-            DateofBirth = customerPatch.DateofBirth;
-            Gender = customerPatch.Gender;
-            UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
-            OptInUserResearch = customerPatch.OptInUserResearch;
-            OptInMarketResearch = customerPatch.OptInMarketResearch;
-            DateOfTermination = customerPatch.DateOfTermination;
-            ReasonForTermination = customerPatch.ReasonForTermination;
-            IntroducedBy = customerPatch.IntroducedBy;
-            IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
-            LastModifiedDate = customerPatch.LastModifiedDate;
-            LastModifiedTouchpointID = customerPatch.LastModifiedTouchpointID;
+            if (customerPatch.CustomerID.HasValue)
+                this.CustomerID = customerPatch.CustomerID;
+
+            if (customerPatch.DateOfRegistration.HasValue)
+                this.DateOfRegistration = customerPatch.DateOfRegistration;
+
+            if (customerPatch.Title != 0)
+                this.Title = customerPatch.Title;
+
+            if (!string.IsNullOrEmpty(customerPatch.GivenName))
+                this.GivenName = customerPatch.GivenName;
+
+            if (!string.IsNullOrEmpty(customerPatch.FamilyName))
+                this.FamilyName = customerPatch.FamilyName;
+
+            if (customerPatch.DateofBirth.HasValue)
+                this.DateofBirth = customerPatch.DateofBirth;
+
+            if (customerPatch.Gender != 0)
+                this.Gender = customerPatch.Gender;
+
+            if (!string.IsNullOrEmpty(customerPatch.UniqueLearnerNumber))
+                this.UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
+
+            if (customerPatch.OptInUserResearch.HasValue)
+                this.OptInUserResearch = customerPatch.OptInUserResearch;
+
+            if (customerPatch.OptInMarketResearch.HasValue)
+                this.OptInMarketResearch = customerPatch.OptInMarketResearch;
+
+            if (customerPatch.DateOfTermination.HasValue)
+                this.DateOfTermination = customerPatch.DateOfTermination;
+
+            if (customerPatch.ReasonForTermination != 0)
+                this.ReasonForTermination = customerPatch.ReasonForTermination;
+
+            if (customerPatch.IntroducedBy != 0)
+                this.IntroducedBy = customerPatch.IntroducedBy;
+
+            if (!string.IsNullOrEmpty(IntroducedByAdditionalInfo))
+                this.IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
+
+            if (customerPatch.LastModifiedDate.HasValue)
+                this.LastModifiedDate = customerPatch.LastModifiedDate;
+
+            if (customerPatch.LastModifiedTouchpointID.HasValue)
+                this.LastModifiedTouchpointID = customerPatch.LastModifiedTouchpointID;
         }
 
 

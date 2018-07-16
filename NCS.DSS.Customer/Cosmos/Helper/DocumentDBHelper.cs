@@ -26,7 +26,7 @@ namespace NCS.DSS.Customer.Cosmos.Helper
         }
 
 
-        public Uri CreateDocumentUri(Guid customerId)
+        public Uri CreateDocumentUri(Guid? customerId)
         {
             if (_documentUri != null)
                 return _documentUri;
