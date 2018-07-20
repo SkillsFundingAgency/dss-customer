@@ -35,8 +35,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
             [Inject]IResourceHelper resourceHelper,
             [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
             [Inject]IValidate validate,
-            [Inject]IPostCustomerHttpTriggerService customerPostService
-            )
+            [Inject]IPostCustomerHttpTriggerService customerPostService)
         {
 
             Models.Customer customerRequest;
@@ -45,7 +44,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
             {
                 customerRequest = await httpRequestMessageHelper.GetCustomerFromRequest<Models.Customer>(req);
             }
-            catch (JsonSerializationException ex)
+            catch (JsonException ex)
             {
                 return HttpResponseMessageHelper.UnprocessableEntity(ex);
             }
@@ -57,7 +56,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger
 
             if (errors != null && errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
-
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 

@@ -1,21 +1,21 @@
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
 using NCS.DSS.Customer.Annotations;
-using System;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.Helpers;
-using NCS.DSS.Customer.Validation;
+using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
-using System.Linq;
+using NCS.DSS.Customer.Validation;
+using Newtonsoft.Json;
 
-namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
+namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
     public static class PatchCustomerHttpTrigger
     {
@@ -37,14 +37,24 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
 
-            var customerPatch = await httpRequestMessageHelper.GetCustomerFromRequest<Models.CustomerPatch>(req);
-            customerPatch.CustomerID = customerGuid;
+            Models.CustomerPatch customerPatchRequest;
 
-            if(customerPatch == null)
+            try
+            {
+                customerPatchRequest = await httpRequestMessageHelper.GetCustomerFromRequest<Models.CustomerPatch>(req);
+            }
+            catch (JsonException ex)
+            {
+                return HttpResponseMessageHelper.UnprocessableEntity(ex);
+            }
+
+            if (customerPatchRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
+            customerPatchRequest.CustomerID = customerGuid;
+
             // validate the request
-            var errors = validate.ValidateResource(customerPatch);
+            var errors = validate.ValidateResource(customerPatchRequest);
 
             if (errors != null && errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
@@ -55,7 +65,11 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
             var customer = await customerPatchService.GetCustomerByIdAsync(customerGuid);
-            var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatch);
+
+            if (customer == null)
+                return HttpResponseMessageHelper.NoContent(customerGuid);
+
+            var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatchRequest);
             
             return updatedCustomer == null ?
                 HttpResponseMessageHelper.BadRequest(customerGuid) :
