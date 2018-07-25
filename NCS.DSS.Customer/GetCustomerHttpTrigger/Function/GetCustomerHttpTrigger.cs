@@ -1,21 +1,18 @@
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using System.Net.Http;
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http.Description;
-using NCS.DSS.Customer.Annotations;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
-using NCS.DSS.Customer.Ioc;
+using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Helpers;
-using System;
+using NCS.DSS.Customer.Ioc;
 
-namespace NCS.DSS.Customer.GetCustomerHttpTrigger
+namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Function
 {
     public static class GetCustomerHttpTrigger
     {
@@ -27,12 +24,19 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
         [Disable]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
-            Route = "Customers")]HttpRequestMessage req, ILogger logger,
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers")]HttpRequestMessage req, ILogger log,
                 [Inject]IResourceHelper resourceHelper,
+                [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
                 [Inject]IGetCustomerHttpTriggerService getAllCustomerService)
         {
-            logger.LogInformation("C# HTTP trigger function GetCustomerById processed a request.");
+            var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
+            if (touchpointId == null)
+            {
+                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request headerr");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
+            log.LogInformation("C# HTTP trigger function GetCustomer processed a request. By Touchpoint " + touchpointId);
 
             var customer = await getAllCustomerService.GetAllCustomerAsync();
 
