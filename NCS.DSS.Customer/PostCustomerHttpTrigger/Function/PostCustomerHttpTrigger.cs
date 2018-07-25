@@ -55,6 +55,8 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             if (customerRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
+            customerRequest.LastModifiedTouchpointID = touchpointId;
+
             var errors = validate.ValidateResource(customerRequest);
 
             if (errors != null && errors.Any())
