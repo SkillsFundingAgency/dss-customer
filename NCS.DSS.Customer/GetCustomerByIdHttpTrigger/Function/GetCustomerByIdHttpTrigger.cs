@@ -31,7 +31,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
             if (touchpointId == null)
             {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request headerr");
+                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return HttpResponseMessageHelper.BadRequest();
             }
 

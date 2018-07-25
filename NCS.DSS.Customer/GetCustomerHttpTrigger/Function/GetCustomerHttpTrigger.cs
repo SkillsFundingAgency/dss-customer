@@ -26,18 +26,8 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Function
         [Disable]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers")]HttpRequestMessage req, ILogger log,
                 [Inject]IResourceHelper resourceHelper,
-                [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
                 [Inject]IGetCustomerHttpTriggerService getAllCustomerService)
         {
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
-            if (touchpointId == null)
-            {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request headerr");
-                return HttpResponseMessageHelper.BadRequest();
-            }
-
-            log.LogInformation("C# HTTP trigger function GetCustomer processed a request. By Touchpoint " + touchpointId);
-
             var customer = await getAllCustomerService.GetAllCustomerAsync();
 
             return customer == null ?
