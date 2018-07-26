@@ -26,7 +26,7 @@ namespace NCS.DSS.Customer.Validation
                 return;
 
             if (customerResource.DateOfRegistration.HasValue && customerResource.DateOfRegistration.Value > DateTime.Now)
-                results.Add(new ValidationResult("Date of Registration must be less the current date", new[] { "DateOfRegistration" }));
+                results.Add(new ValidationResult("Date of Registration must be less the current date/time", new[] { "DateOfRegistration" }));
 
             if (customerResource.DateofBirth.HasValue && customerResource.DateofBirth.Value > DateTime.Now.AddYears(-13))
                 results.Add(new ValidationResult("Customer must be at least 13 years old to use this service.", new[] { "DateofBirth" }));
@@ -37,7 +37,10 @@ namespace NCS.DSS.Customer.Validation
             if (customerResource.Gender.HasValue && !Enum.IsDefined(typeof(Gender), customerResource.Gender.Value))
                 results.Add(new ValidationResult("Please supply a valid Gender", new[] { "Gender" }));
 
-            if(customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
+            if (customerResource.DateOfTermination.HasValue && customerResource.DateOfTermination.Value > DateTime.Now)
+                results.Add(new ValidationResult("Date Of Termination must be less the current date/time", new[] { "DateOfTermination" }));
+
+            if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
                 results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
 
             if (customerResource.ReasonForTermination.HasValue && !Enum.IsDefined(typeof(ReasonForTermination), customerResource.ReasonForTermination.Value))
