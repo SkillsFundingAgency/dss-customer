@@ -18,13 +18,15 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers given title")]
         [Example(Description = "1")]
-        public Title Title { get; set; }
+        public Title? Title { get; set; }
 
+        [Required]
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
         [StringLength(100)]
         public string GivenName { get; set; }
 
+        [Required]
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
         [StringLength(100)]
@@ -36,7 +38,7 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers gender")]
         [Example(Description = "3")]
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
  
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
@@ -57,11 +59,11 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Reason for why the customer terminated their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
-        public ReasonForTermination ReasonForTermination { get; set; }
+        public ReasonForTermination? ReasonForTermination { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]
         [Example(Description = "12345")]
-        public IntroducedBy IntroducedBy { get; set; }
+        public IntroducedBy? IntroducedBy { get; set; }
 
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
@@ -76,14 +78,10 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? LastModifiedTouchpointId { get; set; }
 
-
         public void Patch(CustomerPatch customerPatch)
         {
             if (customerPatch == null)
                 return;
-
-            if (customerPatch.CustomerID.HasValue)
-                this.CustomerId = customerPatch.CustomerID;
 
             if (customerPatch.DateOfRegistration.HasValue)
                 this.DateOfRegistration = customerPatch.DateOfRegistration;
@@ -127,8 +125,39 @@ namespace NCS.DSS.Customer.Models
             if (customerPatch.LastModifiedDate.HasValue)
                 this.LastModifiedDate = customerPatch.LastModifiedDate;
 
-            if (customerPatch.LastModifiedTouchpointID.HasValue)
-                this.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointID;
+            if (customerPatch.LastModifiedTouchpointId.HasValue)
+                this.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointId;
+        }
+
+        public void SetDefaultValues()
+        {
+            var customerId = Guid.NewGuid();
+            CustomerId = customerId;
+
+            if (!DateOfRegistration.HasValue)
+                DateOfRegistration = DateTime.Now;
+
+            if (!LastModifiedDate.HasValue)
+                LastModifiedDate = DateTime.Now;
+
+            if (!OptInUserResearch.HasValue)
+                OptInUserResearch = false;
+
+            if (!OptInMarketResearch.HasValue)
+                OptInMarketResearch = false;
+
+            if (Title == null)
+                Title = ReferenceData.Title.NotProvided;
+
+            if (Gender == null)
+                Gender = ReferenceData.Gender.NotProvided;
+
+            if (DateOfTermination.HasValue && ReasonForTermination == null)
+                ReasonForTermination = ReferenceData.ReasonForTermination.Other;
+
+            if (IntroducedBy == null)
+                IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
+
         }
 
     }

@@ -15,6 +15,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             if (customer == null)
                 return null;
 
+            customerPatch.SetDefaultValues();
+
             customer.Patch(customerPatch);
 
             var documentDbProvider = new DocumentDBProvider();

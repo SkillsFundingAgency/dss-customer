@@ -60,8 +60,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (customerPatchRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
-            customerPatchRequest.CustomerID = customerGuid;
-            customerPatchRequest.LastModifiedTouchpointID = touchpointId;
+            customerPatchRequest.LastModifiedTouchpointId = touchpointId;
 
             // validate the request
             var errors = validate.ValidateResource(customerPatchRequest);
