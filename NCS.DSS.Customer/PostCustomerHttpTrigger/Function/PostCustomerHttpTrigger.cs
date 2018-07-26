@@ -58,8 +58,11 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             customerRequest.LastModifiedTouchpointId = touchpointId;
 
             var errors = validate.ValidateResource(customerRequest);
+            var customerErrors = customerRequest.ValidateCustomerRules();
 
-            if (errors != null && errors.Any())
+            errors.AddRange(customerErrors);
+
+            if (errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);

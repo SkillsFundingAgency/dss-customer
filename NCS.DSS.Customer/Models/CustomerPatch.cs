@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.ReferenceData;
@@ -14,7 +15,7 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Customers given title")]
         [Example(Description = "1")]
-        public Title Title { get; set; }
+        public Title? Title { get; set; }
 
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
@@ -80,5 +81,31 @@ namespace NCS.DSS.Customer.Models
             if (DateOfTermination.HasValue && ReasonForTermination == null)
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
         }
+
+        public List<ValidationResult> ValidateCustomerRules()
+        {
+            var errors = new List<ValidationResult>();
+
+            if (DateOfRegistration != null && DateOfRegistration > DateTime.Now)
+                errors.Add(new ValidationResult("Date of Registration must be less the current date", new[] { "DateOfRegistration" }));
+
+            if (DateofBirth != null && DateofBirth.Value <= DateTime.Now.AddYears(-13))
+                errors.Add(new ValidationResult("Customer must be at least 13 years old to use this service.", new[] { "DateofBirth" }));
+
+            if (Title != null && Enum.IsDefined(typeof(Title), Title.Value))
+                errors.Add(new ValidationResult("Please supply a valid Title", new[] { "Title" }));
+
+            if (Gender != null && Enum.IsDefined(typeof(Gender), Gender.Value))
+                errors.Add(new ValidationResult("Please supply a valid Gender", new[] { "Gender" }));
+
+            if (ReasonForTermination != null && Enum.IsDefined(typeof(ReasonForTermination), ReasonForTermination.Value))
+                errors.Add(new ValidationResult("Please supply a valid Reason For Termination", new[] { "ReasonForTermination" }));
+
+            if (IntroducedBy != null && Enum.IsDefined(typeof(IntroducedBy), IntroducedBy.Value))
+                errors.Add(new ValidationResult("Please supply a valid Introduced By value", new[] { "IntroducedBy" }));
+
+            return errors;
+        }
+
     }
 }

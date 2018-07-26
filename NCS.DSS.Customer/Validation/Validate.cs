@@ -10,9 +10,9 @@ namespace NCS.DSS.Customer.Validation
             var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
-            var isValid = Validator.TryValidateObject(resource, context, results, true);
+            Validator.TryValidateObject(resource, context, results, true);
 
-            return isValid ? null : results;
+            return results;
         }
     }
 }

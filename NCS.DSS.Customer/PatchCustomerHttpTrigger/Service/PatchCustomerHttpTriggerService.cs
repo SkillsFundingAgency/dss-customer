@@ -1,9 +1,6 @@
 ﻿using NCS.DSS.Customer.Cosmos.Provider;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service 
