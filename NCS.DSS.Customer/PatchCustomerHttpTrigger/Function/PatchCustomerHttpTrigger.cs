@@ -64,9 +64,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             // validate the request
             var errors = validate.ValidateResource(customerPatchRequest);
-            var customerErrors = customerPatchRequest.ValidateCustomerRules();
-
-            errors.AddRange(customerErrors);
 
             if (errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);

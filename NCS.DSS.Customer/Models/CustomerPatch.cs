@@ -6,7 +6,7 @@ using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {
-    public class CustomerPatch
+    public class CustomerPatch : ICustomer
     {
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]

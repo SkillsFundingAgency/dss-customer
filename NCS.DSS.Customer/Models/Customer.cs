@@ -6,7 +6,7 @@ using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {
-    public class Customer
+    public class Customer : ICustomer
     {
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
@@ -79,6 +79,37 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? LastModifiedTouchpointId { get; set; }
 
+        public void SetDefaultValues()
+        {
+            var customerId = Guid.NewGuid();
+            CustomerId = customerId;
+
+            if (!DateOfRegistration.HasValue)
+                DateOfRegistration = DateTime.Now;
+
+            if (!LastModifiedDate.HasValue)
+                LastModifiedDate = DateTime.Now;
+
+            if (!OptInUserResearch.HasValue)
+                OptInUserResearch = false;
+
+            if (!OptInMarketResearch.HasValue)
+                OptInMarketResearch = false;
+
+            if (Title == null)
+                Title = ReferenceData.Title.NotProvided;
+
+            if (Gender == null)
+                Gender = ReferenceData.Gender.NotProvided;
+
+            if (DateOfTermination.HasValue && ReasonForTermination == null)
+                ReasonForTermination = ReferenceData.ReasonForTermination.Other;
+
+            if (IntroducedBy == null)
+                IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
+
+        }
+
         public void Patch(CustomerPatch customerPatch)
         {
             if (customerPatch == null)
@@ -130,61 +161,6 @@ namespace NCS.DSS.Customer.Models
                 this.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointId;
         }
 
-        public void SetDefaultValues()
-        {
-            var customerId = Guid.NewGuid();
-            CustomerId = customerId;
-
-            if (!DateOfRegistration.HasValue)
-                DateOfRegistration = DateTime.Now;
-
-            if (!LastModifiedDate.HasValue)
-                LastModifiedDate = DateTime.Now;
-
-            if (!OptInUserResearch.HasValue)
-                OptInUserResearch = false;
-
-            if (!OptInMarketResearch.HasValue)
-                OptInMarketResearch = false;
-
-            if (Title == null)
-                Title = ReferenceData.Title.NotProvided;
-
-            if (Gender == null)
-                Gender = ReferenceData.Gender.NotProvided;
-
-            if (DateOfTermination.HasValue && ReasonForTermination == null)
-                ReasonForTermination = ReferenceData.ReasonForTermination.Other;
-
-            if (IntroducedBy == null)
-                IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
-
-        }
-
-        public List<ValidationResult> ValidateCustomerRules()
-        {
-            var errors = new List<ValidationResult>();
-
-            if(DateOfRegistration != null && DateOfRegistration > DateTime.Now)
-                errors.Add(new ValidationResult("Date of Registration must be less the current date", new[] {"DateOfRegistration"}));
-
-            if(DateofBirth != null && DateofBirth.Value <= DateTime.Now.AddYears(-13))
-                errors.Add(new ValidationResult("Customer must be at least 13 years old to use this service.", new[] { "DateofBirth" }));
-
-            if (Title != null && Enum.IsDefined(typeof(Title), Title.Value))
-                errors.Add(new ValidationResult("Please supply a valid Title", new[] { "Title" }));
-
-            if (Gender != null && Enum.IsDefined(typeof(Gender), Gender.Value))
-                errors.Add(new ValidationResult("Please supply a valid Gender", new[] { "Gender" }));
-
-            if (ReasonForTermination != null && Enum.IsDefined(typeof(ReasonForTermination), ReasonForTermination.Value))
-                errors.Add(new ValidationResult("Please supply a valid Reason For Termination", new[] { "ReasonForTermination" }));
-
-            if (IntroducedBy != null && Enum.IsDefined(typeof(IntroducedBy), IntroducedBy.Value))
-                errors.Add(new ValidationResult("Please supply a valid Introduced By value", new[] { "IntroducedBy" }));
-
-            return errors;
-        }
 
     }
 }
