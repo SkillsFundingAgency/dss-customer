@@ -35,7 +35,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                     return false;
 
                 var query = client.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 });
-                var customerExists = query.Where(x => x.CustomerID == customerId).AsEnumerable().Any();
+                var customerExists = query.Where(x => x.CustomerId == customerId).AsEnumerable().Any();
 
                 return customerExists;
             }
@@ -102,7 +102,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             var CustomerByIdQuery = client
                 ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
-                .Where(x => x.CustomerID == customerId)
+                .Where(x => x.CustomerId == customerId)
                 .AsDocumentQuery();
 
             if (CustomerByIdQuery == null)
@@ -131,7 +131,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public async Task<ResourceResponse<Document>> UpdateCustomerAsync(Models.Customer customer)
         {
-            var documentUri = _documentDbHelper.CreateDocumentUri(customer.CustomerID);
+            var documentUri = _documentDbHelper.CreateDocumentUri(customer.CustomerId);
 
             var client = _databaseClient.CreateDocumentClient();
 

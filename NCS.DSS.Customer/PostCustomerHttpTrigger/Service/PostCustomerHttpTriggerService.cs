@@ -16,7 +16,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
                 return null;
 
             var CustomerID = Guid.NewGuid();
-            customer.CustomerID = CustomerID;
+            customer.CustomerId = CustomerID;
 
             var documentDbProvider = new DocumentDBProvider();
 
