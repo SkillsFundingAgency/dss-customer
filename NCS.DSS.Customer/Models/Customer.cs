@@ -85,10 +85,10 @@ namespace NCS.DSS.Customer.Models
             CustomerId = customerId;
 
             if (!DateOfRegistration.HasValue)
-                DateOfRegistration = DateTime.Now;
+                DateOfRegistration = DateTime.UtcNow;
 
             if (!LastModifiedDate.HasValue)
-                LastModifiedDate = DateTime.Now;
+                LastModifiedDate = DateTime.UtcNow;
 
             if (!OptInUserResearch.HasValue)
                 OptInUserResearch = false;
