@@ -8,28 +8,31 @@ namespace NCS.DSS.Customer.Validation
 {
     public class Validate : IValidate
     {
-        public List<ValidationResult> ValidateResource(ICustomer resource)
+        public List<ValidationResult> ValidateResource(ICustomer resource, bool validateModelForPost)
         {
             var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
             Validator.TryValidateObject(resource, context, results, true);
 
-            ValidateCustomerRules(resource, results);
+            ValidateCustomerRules(resource, results, validateModelForPost);
 
             return results;
         }
 
-        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results)
+        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results, bool validateModelForPost)
         {
             if (customerResource == null)
                 return;
 
-            if(string.IsNullOrWhiteSpace(customerResource.FamilyName))
-                results.Add(new ValidationResult("Family Name is a required field", new[] { "FamilyName" }));
+            if (validateModelForPost)
+            {
+                if (string.IsNullOrWhiteSpace(customerResource.FamilyName))
+                    results.Add(new ValidationResult("Family Name is a required field", new[] { "FamilyName" }));
 
-            if (string.IsNullOrWhiteSpace(customerResource.GivenName))
-                results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
+                if (string.IsNullOrWhiteSpace(customerResource.GivenName))
+                    results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
+            }
 
             if (customerResource.DateOfRegistration.HasValue && customerResource.DateOfRegistration.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Date of Registration must be less the current date/time", new[] { "DateOfRegistration" }));

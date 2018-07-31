@@ -63,7 +63,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             customerPatchRequest.LastModifiedTouchpointId = touchpointId;
 
             // validate the request
-            var errors = validate.ValidateResource(customerPatchRequest);
+            var errors = validate.ValidateResource(customerPatchRequest, false);
 
             if (errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
