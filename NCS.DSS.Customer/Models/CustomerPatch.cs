@@ -6,12 +6,8 @@ using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {
-    public class Customer : ICustomer
+    public class CustomerPatch : ICustomer
     {
-        [Display(Description = "Unique identifier of a customer")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
-        public Guid? CustomerId { get; set; }
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]
         [Example(Description = "2018-06-21T14:45:00")]
@@ -21,15 +17,11 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "1")]
         public Title? Title { get; set; }
 
-        [Required]
-        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
         [StringLength(100)]
         public string GivenName { get; set; }
 
-        [Required]
-        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
         [StringLength(100)]
@@ -42,7 +34,7 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Customers gender")]
         [Example(Description = "3")]
         public Gender? Gender { get; set; }
- 
+
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
         [StringLength(10)]
@@ -62,6 +54,7 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Reason for why the customer terminated their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
+        [StringLength(100)]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]
@@ -70,7 +63,6 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
-        [StringLength(100)]
         public string IntroducedByAdditionalInfo { get; set; }
 
         [Display(Description = "Date and time of the last modification to the record")]
@@ -83,86 +75,12 @@ namespace NCS.DSS.Customer.Models
 
         public void SetDefaultValues()
         {
-            var customerId = Guid.NewGuid();
-            CustomerId = customerId;
-
-            if (!DateOfRegistration.HasValue)
-                DateOfRegistration = DateTime.UtcNow;
-
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
 
-            if (!OptInUserResearch.HasValue)
-                OptInUserResearch = false;
-
-            if (!OptInMarketResearch.HasValue)
-                OptInMarketResearch = false;
-
-            if (Title == null)
-                Title = ReferenceData.Title.NotProvided;
-
-            if (Gender == null)
-                Gender = ReferenceData.Gender.NotProvided;
-
             if (DateOfTermination.HasValue && ReasonForTermination == null)
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
-
-            if (IntroducedBy == null)
-                IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
-
         }
-
-        public void Patch(CustomerPatch customerPatch)
-        {
-            if (customerPatch == null)
-                return;
-
-            if (customerPatch.DateOfRegistration.HasValue)
-                this.DateOfRegistration = customerPatch.DateOfRegistration;
-
-            if (customerPatch.Title != 0)
-                this.Title = customerPatch.Title;
-
-            if (!string.IsNullOrEmpty(customerPatch.GivenName))
-                this.GivenName = customerPatch.GivenName;
-
-            if (!string.IsNullOrEmpty(customerPatch.FamilyName))
-                this.FamilyName = customerPatch.FamilyName;
-
-            if (customerPatch.DateofBirth.HasValue)
-                this.DateofBirth = customerPatch.DateofBirth;
-
-            if (customerPatch.Gender != 0)
-                this.Gender = customerPatch.Gender;
-
-            if (!string.IsNullOrEmpty(customerPatch.UniqueLearnerNumber))
-                this.UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
-
-            if (customerPatch.OptInUserResearch.HasValue)
-                this.OptInUserResearch = customerPatch.OptInUserResearch;
-
-            if (customerPatch.OptInMarketResearch.HasValue)
-                this.OptInMarketResearch = customerPatch.OptInMarketResearch;
-
-            if (customerPatch.DateOfTermination.HasValue)
-                this.DateOfTermination = customerPatch.DateOfTermination;
-
-            if (customerPatch.ReasonForTermination != 0)
-                this.ReasonForTermination = customerPatch.ReasonForTermination;
-
-            if (customerPatch.IntroducedBy != 0)
-                this.IntroducedBy = customerPatch.IntroducedBy;
-
-            if (!string.IsNullOrEmpty(IntroducedByAdditionalInfo))
-                this.IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
-
-            if (customerPatch.LastModifiedDate.HasValue)
-                this.LastModifiedDate = customerPatch.LastModifiedDate;
-
-            if (customerPatch.LastModifiedTouchpointId.HasValue)
-                this.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointId;
-        }
-
 
     }
 }
