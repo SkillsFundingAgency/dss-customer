@@ -4,3 +4,5 @@
 
 /.vs/NCS.CDS.Customer/v15
 /.vs
+/NCS.DSS.Customer.Tests
+/packages
