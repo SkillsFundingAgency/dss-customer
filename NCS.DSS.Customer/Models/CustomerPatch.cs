@@ -17,11 +17,13 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "1")]
         public Title? Title { get; set; }
 
+        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
         [StringLength(100)]
         public string GivenName { get; set; }
 
+        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
         [StringLength(100)]
