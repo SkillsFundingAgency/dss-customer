@@ -32,7 +32,7 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Function
 
             return customer == null ?
                 HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :
-                HttpResponseMessageHelper.Ok(customer);
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(customer));
 
         }
     }

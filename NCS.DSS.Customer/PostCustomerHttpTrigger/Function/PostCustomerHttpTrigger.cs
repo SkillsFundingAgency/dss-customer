@@ -66,7 +66,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             return customer == null
                 ? HttpResponseMessageHelper.BadRequest()
-                : HttpResponseMessageHelper.Created(customer);
+                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(customer));
 
         }
     }

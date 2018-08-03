@@ -82,7 +82,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             
             return updatedCustomer == null ?
                 HttpResponseMessageHelper.BadRequest(customerGuid) :
-                HttpResponseMessageHelper.Ok(updatedCustomer);
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(updatedCustomer));
 
         }
     }
