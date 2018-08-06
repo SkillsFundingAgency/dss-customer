@@ -55,7 +55,8 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 return null;
 
             var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri)
-                .Where(x => x.GivenName.Contains(q) || x.FamilyName.Contains(q))
+                .Where(x => x.GivenName.ToLower().Contains(q.ToLower()) ||
+                            x.FamilyName.ToLower().Contains(q.ToLower()))
                 .AsDocumentQuery();
 
             var customers = new List<Models.Customer>();
