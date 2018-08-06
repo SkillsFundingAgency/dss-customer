@@ -71,9 +71,10 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? LastModifiedDate { get; set; }
 
+        [StringLength(10, MinimumLength = 10)]
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid? LastModifiedTouchpointId { get; set; }
+        [Example(Description = "0000000001")]
+        public string LastModifiedTouchpointId { get; set; }
 
         public void SetDefaultValues()
         {

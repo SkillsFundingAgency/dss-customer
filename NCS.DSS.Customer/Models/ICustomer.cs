@@ -19,7 +19,7 @@ namespace NCS.DSS.Customer.Models
         IntroducedBy? IntroducedBy { get; set; }
         string IntroducedByAdditionalInfo { get; set; }
         DateTime? LastModifiedDate { get; set; }
-        Guid? LastModifiedTouchpointId { get; set; }
+        string LastModifiedTouchpointId { get; set; }
 
         void SetDefaultValues();
     }

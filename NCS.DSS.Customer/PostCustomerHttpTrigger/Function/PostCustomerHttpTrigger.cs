@@ -19,7 +19,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
     public static class PostCustomerHttpTrigger
     {
         [FunctionName("POST")]
-        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Added", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Added", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Post request is malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
@@ -33,7 +33,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             [Inject]IPostCustomerHttpTriggerService customerPostService)
         {
             var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
-            if (touchpointId == null)
+            if (string.IsNullOrEmpty(touchpointId))
             {
                 log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return HttpResponseMessageHelper.BadRequest();
