@@ -1,19 +1,19 @@
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
-using System;
+using Newtonsoft.Json;
 
-namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger
+namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
 {
     public static class DeleteCustomerHttpTrigger
     {
+        [Disable]
         [FunctionName("DELETE")]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Deleted", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
