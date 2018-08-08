@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,22 +25,41 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
+        [Display(Name = "SEARCH", Description = "Ability to search for customers using query strings: \n Examples \n ?GivenName=Fred \n ?FamilyName=Bloggs \n ?DateofBirth=2018-01-01 \n ?UniqueLearnerNumber=0123456789 \n" +
+                                                "You can also query a customer on multiple fields: \n Examples: \n ?GivenName=Fred&FamilyName=Bloggs \n ?UniqueLearnerNumber=0123456789&DateofBirth=2018-01-01")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
-            Route = "CustomerSearch/{qQuery}")]HttpRequestMessage req, ILogger log, string qQuery,
+            Route = "CustomerSearch")]HttpRequestMessage req, ILogger log,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
             [Inject]ISearchCustomerHttpTriggerService searchCustomerService)
         {
-
             var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return HttpResponseMessageHelper.BadRequest();
             }
+
             log.LogInformation("C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
-            var customer = await searchCustomerService.SearchCustomerAsync(qQuery);
+            // Parse query parameter
+            var givenName = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "GivenName", StringComparison.OrdinalIgnoreCase) == 0)
+                .Value;
+
+            var familyName = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "FamilyName", StringComparison.OrdinalIgnoreCase) == 0)
+                .Value;
+
+            var dateofBirth = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "DateofBirth", StringComparison.OrdinalIgnoreCase) == 0)
+                .Value;
+
+            var uniqueLearnerNumber = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "UniqueLearnerNumber", StringComparison.OrdinalIgnoreCase) == 0)
+                .Value;
+
+            var customer = await searchCustomerService.SearchCustomerAsync(givenName, familyName, dateofBirth, uniqueLearnerNumber);
 
             return customer == null ?
                 HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :

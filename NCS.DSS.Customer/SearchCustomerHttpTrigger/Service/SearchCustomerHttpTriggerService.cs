@@ -7,19 +7,15 @@ using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Service
 {
-    class SearchCustomerHttpTriggerService : ISearchCustomerHttpTriggerService
+    public class SearchCustomerHttpTriggerService : ISearchCustomerHttpTriggerService
     {
-        public async Task<List<Models.Customer>> SearchCustomerAsync(string qQuery)
+        public async Task<List<Models.Customer>> SearchCustomerAsync(string givenName = null, string familyName = null, string dateofBirth = null,
+            string uniqueLearnerNumber = null)
         {
             var documentDbProvider = new DocumentDBProvider();
-            var customer = await documentDbProvider.SearchAllCustomer(qQuery);
+            var customer = await documentDbProvider.SearchAllCustomer(givenName, familyName, dateofBirth, uniqueLearnerNumber);
 
             return customer;
         }
-
-
-
-
-
     }
 }

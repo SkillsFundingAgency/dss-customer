@@ -45,7 +45,8 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
         }
 
-        public async Task<List<Models.Customer>> SearchAllCustomer(string q)
+        public async Task<List<Models.Customer>> SearchAllCustomer(string givenName = null, string familyName = null, string dateofBirth = null,
+            string uniqueLearnerNumber = null)
         {
             var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
 
@@ -54,10 +55,43 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             if (client == null)
                 return null;
 
-            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri)
-                .Where(x => x.GivenName.ToLower().Contains(q.ToLower()) ||
-                            x.FamilyName.ToLower().Contains(q.ToLower()))
-                .AsDocumentQuery();
+            var queryForCustomers = "SELECT * FROM c WHERE ";
+
+            var addAndToQuery = false;
+
+            if (!string.IsNullOrWhiteSpace(givenName))
+            {
+                queryForCustomers += "CONTAINS (LOWER(c.GivenName), LOWER('" + givenName + "'))";
+                addAndToQuery = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(familyName))
+            {
+                if (addAndToQuery)
+                    queryForCustomers += " AND ";
+
+                queryForCustomers += "CONTAINS (LOWER(c.FamilyName), LOWER('" + familyName + "'))";
+                addAndToQuery = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dateofBirth))
+            {
+                if (addAndToQuery)
+                    queryForCustomers += " AND ";
+
+                queryForCustomers += "CONTAINS (c.DateofBirth, '" + dateofBirth + "')";
+                addAndToQuery = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(uniqueLearnerNumber))
+            {
+                if (addAndToQuery)
+                    queryForCustomers += " AND ";
+
+                queryForCustomers += "CONTAINS (LOWER(c.UniqueLearnerNumber), LOWER('" + uniqueLearnerNumber + "'))";
+            }
+
+            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri, queryForCustomers).AsDocumentQuery();
 
             var customers = new List<Models.Customer>();
 
@@ -69,8 +103,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             return customers.Any() ? customers : null;
         }
-
-
 
         public async Task<List<Models.Customer>> GetAllCustomer()
         {
