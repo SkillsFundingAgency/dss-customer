@@ -34,6 +34,13 @@ namespace NCS.DSS.Customer.Validation
                     results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
             }
 
+            if (Int64.TryParse(customerResource.UniqueLearnerNumber, out Int64 uln))
+            {
+                if(uln < 1000000000 && uln > 9999999999)
+                    results.Add(new ValidationResult("Unique Learner Number must be greater than 1000000000 and less than 9999999999", 
+                        new[] { "UniqueLearnerNumber" }));
+            }
+
             if (customerResource.DateOfRegistration.HasValue && customerResource.DateOfRegistration.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Date of Registration must be less the current date/time", new[] { "DateOfRegistration" }));
 
