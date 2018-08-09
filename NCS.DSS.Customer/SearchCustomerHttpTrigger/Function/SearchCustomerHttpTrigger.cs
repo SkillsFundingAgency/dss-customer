@@ -50,13 +50,13 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
             if (givenName != null && givenName.Length < 3)
             {
                 log.LogWarning("Given Name must have a minimum of 3 characters");
-                HttpResponseMessageHelper.NoContent();
+                return HttpResponseMessageHelper.NoContent();
             }
 
             if (familyName != null && familyName.Length < 3)
             {
                 log.LogWarning("Family Name must have a minimum of 3 characters");
-                HttpResponseMessageHelper.NoContent();
+                return HttpResponseMessageHelper.NoContent();
             }
 
             var dateofBirth = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
