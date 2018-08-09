@@ -79,7 +79,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "CONTAINS (c.DateofBirth, '" + dateofBirth + "')";
+                queryForCustomers += "c.DateofBirth = '" + dateofBirth + "'";
                 addAndToQuery = true;
             }
 
@@ -88,7 +88,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "CONTAINS (LOWER(c.UniqueLearnerNumber), LOWER('" + uniqueLearnerNumber + "'))";
+                queryForCustomers += "c.UniqueLearnerNumber = '" + uniqueLearnerNumber + "'";
             }
 
             var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri, queryForCustomers).AsDocumentQuery();

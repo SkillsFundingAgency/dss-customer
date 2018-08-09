@@ -25,8 +25,9 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ResponseType(typeof(Models.Customer))]
-        [Display(Name = "SEARCH", Description = "Ability to search for customers using query strings: \n Examples \n ?GivenName=Fred \n ?FamilyName=Bloggs \n ?DateofBirth=2018-01-01 \n ?UniqueLearnerNumber=0123456789 \n" +
-                                                "You can also query a customer on multiple fields: \n Examples: \n ?GivenName=Fred&FamilyName=Bloggs \n ?UniqueLearnerNumber=0123456789&DateofBirth=2018-01-01")]
+        [Display(Name = "SEARCH", Description = "Ability to partially search for customers using query strings: </br> Examples </br> ?GivenName=Fred </br> ?FamilyName=Bloggs </br> ?DateofBirth=2018-01-01 </br> ?UniqueLearnerNumber=0123456789 </br>" +
+                                                "You can also query a customer on multiple fields: </br> Examples: </br> ?GivenName=Fred&FamilyName=Bloggs </br> ?UniqueLearnerNumber=0123456789&DateofBirth=2018-01-01 </br>" +
+                                                "When searching by Given Name or Family Name you need to supply a minimum of 3 characters")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
             Route = "CustomerSearch")]HttpRequestMessage req, ILogger log,
             [Inject]IResourceHelper resourceHelper,
@@ -43,26 +44,28 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
             log.LogInformation("C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             // Parse query parameter
-            var givenName = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "GivenName", StringComparison.OrdinalIgnoreCase) == 0)
-                .Value;
+            var givenName = httpRequestMessageHelper.GetQueryNameValuePairs(req, "GivenName");
+            var familyName = httpRequestMessageHelper.GetQueryNameValuePairs(req, "FamilyName");
 
-            var familyName = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "FamilyName", StringComparison.OrdinalIgnoreCase) == 0)
-                .Value;
+            if (givenName != null && givenName.Length < 3)
+            {
+                log.LogWarning("Given Name must have a minimum of 3 characters");
+                HttpResponseMessageHelper.NoContent();
+            }
 
-            var dateofBirth = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "DateofBirth", StringComparison.OrdinalIgnoreCase) == 0)
-                .Value;
+            if (familyName != null && familyName.Length < 3)
+            {
+                log.LogWarning("Family Name must have a minimum of 3 characters");
+                HttpResponseMessageHelper.NoContent();
+            }
 
-            var uniqueLearnerNumber = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "UniqueLearnerNumber", StringComparison.OrdinalIgnoreCase) == 0)
-                .Value;
+            var dateofBirth = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
+            var uniqueLearnerNumber = httpRequestMessageHelper.GetQueryNameValuePairs(req, "UniqueLearnerNumber");
 
             var customer = await searchCustomerService.SearchCustomerAsync(givenName, familyName, dateofBirth, uniqueLearnerNumber);
 
             return customer == null ?
-                HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :
+                HttpResponseMessageHelper.NoContent() :
                 HttpResponseMessageHelper.Ok(JsonHelper.SerializeObjects(customer));
         }
 

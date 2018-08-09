@@ -46,6 +46,11 @@ namespace NCS.DSS.Customer.Helpers
 
         #region NoContent(204)
 
+        public static HttpResponseMessage NoContent()
+        {
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
+        }
+
         public static HttpResponseMessage NoContent(Guid id)
         {
             return new HttpResponseMessage(HttpStatusCode.NoContent)

@@ -7,6 +7,7 @@ namespace NCS.DSS.Customer.Helpers
     public interface IHttpRequestMessageHelper
     {
         Task<T> GetCustomerFromRequest<T>(HttpRequestMessage req);
+        string GetQueryNameValuePairs(HttpRequestMessage req, string queryStringName);
         string GetTouchpointId(HttpRequestMessage req);
     }
 }
