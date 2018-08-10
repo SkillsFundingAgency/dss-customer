@@ -27,7 +27,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
         [ResponseType(typeof(Models.Customer))]
         [Display(Name = "SEARCH", Description = "Ability to partially search for customers using query strings: </br> Examples </br> ?GivenName=Fred </br> ?FamilyName=Bloggs </br> ?DateofBirth=2018-01-01 </br> ?UniqueLearnerNumber=0123456789 </br>" +
                                                 "You can also query a customer on multiple fields: </br> Examples: </br> ?GivenName=Fred&FamilyName=Bloggs </br> ?UniqueLearnerNumber=0123456789&DateofBirth=2018-01-01 </br>" +
-                                                "When searching by Given Name or Family Name you need to supply a minimum of 3 characters")]
+                                                "When searching by Given Name or Family Name you need to supply a minimum of 2 characters")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
             Route = "CustomerSearch")]HttpRequestMessage req, ILogger log,
             [Inject]IResourceHelper resourceHelper,
