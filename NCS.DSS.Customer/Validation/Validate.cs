@@ -39,7 +39,7 @@ namespace NCS.DSS.Customer.Validation
 
             if (long.TryParse(customerResource.UniqueLearnerNumber, out var uln))
             {
-                if(uln < 1000000000 && uln > 9999999999)
+                if(uln < 1000000000 || uln > 9999999999)
                     results.Add(new ValidationResult("Unique Learner Number must be greater than 1000000000 and less than 9999999999", 
                         new[] { "UniqueLearnerNumber" }));
             }
