@@ -121,7 +121,7 @@ namespace NCS.DSS.Customer.Models
             if (customerPatch.DateOfRegistration.HasValue)
                 this.DateOfRegistration = customerPatch.DateOfRegistration;
 
-            if (customerPatch.Title != 0)
+            if (customerPatch.Title.HasValue)
                 this.Title = customerPatch.Title;
 
             if (!string.IsNullOrEmpty(customerPatch.GivenName))
@@ -133,7 +133,7 @@ namespace NCS.DSS.Customer.Models
             if (customerPatch.DateofBirth.HasValue)
                 this.DateofBirth = customerPatch.DateofBirth;
 
-            if (customerPatch.Gender != 0)
+            if (customerPatch.Gender.HasValue)
                 this.Gender = customerPatch.Gender;
 
             if (!string.IsNullOrEmpty(customerPatch.UniqueLearnerNumber))
@@ -148,13 +148,13 @@ namespace NCS.DSS.Customer.Models
             if (customerPatch.DateOfTermination.HasValue)
                 this.DateOfTermination = customerPatch.DateOfTermination;
 
-            if (customerPatch.ReasonForTermination != 0)
+            if (customerPatch.ReasonForTermination.HasValue)
                 this.ReasonForTermination = customerPatch.ReasonForTermination;
 
-            if (customerPatch.IntroducedBy != 0)
+            if (customerPatch.IntroducedBy.HasValue)
                 this.IntroducedBy = customerPatch.IntroducedBy;
 
-            if (!string.IsNullOrEmpty(IntroducedByAdditionalInfo))
+            if (!string.IsNullOrEmpty(customerPatch.IntroducedByAdditionalInfo))
                 this.IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
 
             if (customerPatch.LastModifiedDate.HasValue)

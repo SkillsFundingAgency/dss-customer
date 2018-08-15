@@ -56,7 +56,6 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Reason for why the customer terminated their account.  See DSS Reference Data Resource for values")]
         [Example(Description = "3")]
-        [StringLength(100)]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
         [Display(Description = "See DSS Reference Data Resource for values")]

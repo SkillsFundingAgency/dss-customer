@@ -32,9 +32,12 @@ namespace NCS.DSS.Customer.Validation
 
                 if (string.IsNullOrWhiteSpace(customerResource.GivenName))
                     results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
+
+                if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
+                    results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
             }
 
-            if (Int64.TryParse(customerResource.UniqueLearnerNumber, out Int64 uln))
+            if (long.TryParse(customerResource.UniqueLearnerNumber, out var uln))
             {
                 if(uln < 1000000000 && uln > 9999999999)
                     results.Add(new ValidationResult("Unique Learner Number must be greater than 1000000000 and less than 9999999999", 
@@ -55,9 +58,6 @@ namespace NCS.DSS.Customer.Validation
 
             if (customerResource.DateOfTermination.HasValue && customerResource.DateOfTermination.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Date Of Termination must be less the current date/time", new[] { "DateOfTermination" }));
-
-            if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
-                results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
 
             if (customerResource.LastModifiedDate.HasValue && customerResource.LastModifiedDate.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Last Modified Date must be less the current date/time", new[] { "LastModifiedDate" }));
