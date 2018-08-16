@@ -64,6 +64,9 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 
+            if (customer != null)
+                await customerPostService.SendToServiceBusQueueAsync(customer, req.RequestUri.AbsoluteUri);
+
             return customer == null
                 ? HttpResponseMessageHelper.BadRequest()
                 : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(customer));

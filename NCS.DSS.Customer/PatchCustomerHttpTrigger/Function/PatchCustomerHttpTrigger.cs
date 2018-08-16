@@ -86,35 +86,5 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(updatedCustomer));
 
         }
-
-
-        public static async Task<AuthenticationResult> GetAccessToken(string resourceUri, string clientId, string clientSecret)
-        {
-            var clientCredential = new ClientCredential(clientId, clientSecret);
-
-            var aadInstance = "https://login.microsoftonline.com/";
-            var tenant = string.Empty;
-            var authority = string.Concat(aadInstance, tenant);
-            var authContext = new AuthenticationContext(authority);
-
-            return await authContext.AcquireTokenAsync(resourceUri, clientCredential);
-
-
-
-            //string resourceId = "https://graph.microsoft.com";
-            //string tenantId = String.Empty;
-            //string authString = String.Empty;
-            //string upn = String.Empty;
-            //string clientId = String.Empty;
-            //string clientSecret = ConfigurationManager.AppSettings["clientSecret"];
-
-            //var authenticationContext = new AuthenticationContext(authString, false);
-
-            //// Config for OAuth client credentials 
-            //ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
-            //AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resourceId, clientCred);
-            //string token = authenticationResult.AccessToken;
-
-        }
     }
 }

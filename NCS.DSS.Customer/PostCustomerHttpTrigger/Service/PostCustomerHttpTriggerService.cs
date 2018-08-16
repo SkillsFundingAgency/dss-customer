@@ -23,9 +23,9 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 
         }
 
-        public async Task SendToServiceBusQueueAsync(Models.Customer customer, Guid customerId, string reqUrl)
+        public async Task SendToServiceBusQueueAsync(Models.Customer customer, string reqUrl)
         {
-            await ServiceBusClient.SendPostMessageAsync(customer, customerId, reqUrl);
+            await ServiceBusClient.SendPostMessageAsync(customer, reqUrl);
         }
 
     }
