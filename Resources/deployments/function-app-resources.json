@@ -90,11 +90,11 @@
             },
             {
               "name": "BaseAddress",
-              "value": "parameters('serviceBusBaseAddress')"
+              "value": "[parameters('serviceBusBaseAddress')]"
             },
             {
               "name": "QueueName",
-              "value": "parameters('serviceBusQueueName')"
+              "value": "[parameters('serviceBusQueueName')]"
             }
 
           ]
