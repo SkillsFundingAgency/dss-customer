@@ -1,6 +1,8 @@
-﻿using NCS.DSS.Customer.Cosmos.Provider;
+﻿using System;
+using NCS.DSS.Customer.Cosmos.Provider;
 using System.Net;
 using System.Threading.Tasks;
+using NCS.DSS.Customer.ServiceBus;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
@@ -20,5 +22,11 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
             return response.StatusCode == HttpStatusCode.Created ? (dynamic) response.Resource : null;
 
         }
+
+        public async Task SendToServiceBusQueueAsync(Models.Customer customer, string reqUrl)
+        {
+            await ServiceBusClient.SendPostMessageAsync(customer, reqUrl);
+        }
+
     }
 }
