@@ -80,6 +80,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
             var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatchRequest);
+
+            if (updatedCustomer != null)
+                await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, req.RequestUri.AbsoluteUri);
             
             return updatedCustomer == null ?
                 HttpResponseMessageHelper.BadRequest(customerGuid) :

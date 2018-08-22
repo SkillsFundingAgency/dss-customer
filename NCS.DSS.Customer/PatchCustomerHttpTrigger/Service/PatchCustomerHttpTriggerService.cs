@@ -2,6 +2,8 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using NCS.DSS.Customer.Models;
+using NCS.DSS.Customer.ServiceBus;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service 
 {
@@ -32,6 +34,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             return customer;
         }
 
-
+        public async Task SendToServiceBusQueueAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
+        {
+            await ServiceBusClient.SendPatchMessageAsync(customerPatch, customerId, reqUrl);
+        }
     }
 }
