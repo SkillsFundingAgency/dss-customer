@@ -33,7 +33,7 @@ namespace NCS.DSS.Customer.ServiceBus
                 TouchpointId = customer.LastModifiedTouchpointId
             };
 
-            var msg = new BrokeredMessage(messageModel)
+            var msg = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel))))
             {
                 ContentType = "application/json",
                 MessageId = customer.CustomerId + " " + DateTime.UtcNow
