@@ -7,8 +7,6 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.Cosmos.Provider;
-using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
@@ -44,6 +42,31 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 return false;
             }
         }
+
+        public async Task<bool> DoesCustomerHaveATerminationDate(Guid customerId)
+        {
+            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            var customerByIdQuery = client
+                ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerId == customerId)
+                .AsDocumentQuery();
+
+            if (customerByIdQuery == null)
+                return false;
+
+            var customerQuery = await customerByIdQuery.ExecuteNextAsync<Models.Customer>();
+
+            var customer = customerQuery?.FirstOrDefault();
+
+            if (customer == null)
+                return false;
+
+            return customer.DateOfTermination.HasValue;
+        }
+
 
         public async Task<List<Models.Customer>> SearchAllCustomer(string givenName = null, string familyName = null, string dateofBirth = null,
             string uniqueLearnerNumber = null)
@@ -133,17 +156,17 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             var client = _databaseClient.CreateDocumentClient();
 
-            var CustomerByIdQuery = client
+            var customerByIdQuery = client
                 ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
                 .Where(x => x.CustomerId == customerId)
                 .AsDocumentQuery();
 
-            if (CustomerByIdQuery == null)
+            if (customerByIdQuery == null)
                 return null;
 
-            var Customer = await CustomerByIdQuery.ExecuteNextAsync<Models.Customer>();
+            var customer = await customerByIdQuery.ExecuteNextAsync<Models.Customer>();
 
-            return Customer?.FirstOrDefault();
+            return customer?.FirstOrDefault();
         }
 
                 

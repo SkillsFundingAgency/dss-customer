@@ -4,5 +4,6 @@
 
 /.vs/NCS.CDS.Customer/v15
 /.vs
-/NCS.DSS.Customer.Tests
 /packages
+/NCS.DSS.Customer/Properties/PublishProfiles
+/UpgradeLog.htm
