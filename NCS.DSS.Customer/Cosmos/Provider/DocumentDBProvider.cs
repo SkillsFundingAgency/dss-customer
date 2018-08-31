@@ -84,7 +84,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             if (!string.IsNullOrWhiteSpace(givenName))
             {
-                queryForCustomers += "CONTAINS (LOWER(c.GivenName), LOWER('" + givenName + "'))";
+                queryForCustomers += "STARTSWITH (LOWER(c.GivenName), LOWER('" + givenName + "'))";
                 addAndToQuery = true;
             }
 
@@ -93,7 +93,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "CONTAINS (LOWER(c.FamilyName), LOWER('" + familyName + "'))";
+                queryForCustomers += "STARTSWITH (LOWER(c.FamilyName), LOWER('" + familyName + "'))";
                 addAndToQuery = true;
             }
 
