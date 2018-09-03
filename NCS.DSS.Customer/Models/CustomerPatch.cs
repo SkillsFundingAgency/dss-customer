@@ -13,7 +13,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateOfRegistration { get; set; }
 
-        [Display(Description = "Customers given title   : " +
+        [Display(Description = "Customers given title   :   " +
                                 "1 - Dr,   " +
                                 "2 - Miss,   " +
                                 "3 - Mr,   " +
@@ -39,7 +39,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateofBirth { get; set; }
 
-        [Display(Description = "Customers gender   " +
+        [Display(Description = "Customers gender   :   " +
                                 "1 - Female,  " +
                                 "2 - Male,  " +
                                 "3 - Not applicable,  " +
@@ -64,7 +64,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateOfTermination { get; set; }
 
-        [Display(Description = "Reason for why the customer terminated their account  :  " +
+        [Display(Description = "Reason for why the customer terminated their account   :   " +
                                 "1 - Customer choice,  " +
                                 "2 - Deceased,  " +
                                 "3 - Duplicate,  " +
@@ -72,7 +72,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "3")]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
-        [Display(Description = "Introduced By reference data values   :  " +
+        [Display(Description = "Introduced By   :   " +
                                 "1 - Advanced Learning Loans,  " +
                                 "2 - Apprenticeship Service,  " +
                                 "3 - Careers Fair / Activity,  " +
