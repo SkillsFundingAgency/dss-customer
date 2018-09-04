@@ -9,5 +9,6 @@ namespace NCS.DSS.Customer.Helpers
         Task<T> GetCustomerFromRequest<T>(HttpRequestMessage req);
         string GetQueryNameValuePairs(HttpRequestMessage req, string queryStringName);
         string GetTouchpointId(HttpRequestMessage req);
+        string GetApimURL(HttpRequestMessage req);
     }
 }

@@ -39,6 +39,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
+            var ApimURL = httpRequestMessageHelper.GetApimURL(req);
+            if (string.IsNullOrEmpty(ApimURL))
+            {
+                log.LogInformation("Unable to locate 'apimurl' in request header");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
+
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
             Models.Customer customerRequest;
@@ -63,8 +71,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
-
-            var ApimURL = req.Headers.GetValues("apimurl");
             
             if (customer != null)
                 await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
