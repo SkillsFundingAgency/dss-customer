@@ -64,8 +64,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 
+            var ApimURL = req.Headers.GetValues("apimurl");
+            
             if (customer != null)
-                await customerPostService.SendToServiceBusQueueAsync(customer, req.RequestUri.AbsoluteUri);
+                await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
             return customer == null
                 ? HttpResponseMessageHelper.BadRequest()
