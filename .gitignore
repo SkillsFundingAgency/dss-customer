@@ -7,3 +7,5 @@
 /packages
 /NCS.DSS.Customer/Properties/PublishProfiles
 /UpgradeLog.htm
+/NCS.DSS.Customer.Tests/obj/Debug
+/NCS.DSS.Customer.Tests/bin/Debug

@@ -71,7 +71,9 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
-            
+
+            log.LogInformation("Apimurl:  " + ApimURL);
+
             if (customer != null)
                 await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
