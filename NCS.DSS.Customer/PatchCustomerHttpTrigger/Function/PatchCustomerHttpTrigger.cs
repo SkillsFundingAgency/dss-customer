@@ -42,6 +42,13 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
+            var ApimURL = httpRequestMessageHelper.GetApimURL(req);
+            if (string.IsNullOrEmpty(ApimURL))
+            {
+                log.LogInformation("Unable to locate 'apimurl' in request header");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
             log.LogInformation("C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
@@ -86,8 +93,10 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatchRequest);
 
+            log.LogInformation("Apimurl:  " + ApimURL);
+
             if (updatedCustomer != null)
-                await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, req.RequestUri.AbsoluteUri);
+                await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
             
             return updatedCustomer == null ?
                 HttpResponseMessageHelper.BadRequest(customerGuid) :
