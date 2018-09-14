@@ -198,5 +198,49 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             return response;
         }
+
+
+        public async Task<List<Models.Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId)
+        {
+            var collectionUri = _documentDbHelper.CreateSubscriptionDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            var query = client
+                ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
+                .Where(x => x.CustomerId == customerId &&
+                            x.Subscribe)
+                .AsDocumentQuery();
+
+            if (query == null)
+                return null;
+
+            var subscriptions = new List<Models.Subscriptions>();
+
+            while (query.HasMoreResults)
+            {
+                var results = await query.ExecuteNextAsync<Models.Subscriptions>();
+                subscriptions.AddRange(results);
+            }
+
+            return subscriptions.Any() ? subscriptions : null;
+        }
+
+        public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
+        {
+            var collectionUri = _documentDbHelper.CreateSubscriptionDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            if (client == null)
+                return null;
+
+            var response = await client.CreateDocumentAsync(collectionUri, subscriptions);
+
+            return response;
+
+        }
+
+
     }
 }

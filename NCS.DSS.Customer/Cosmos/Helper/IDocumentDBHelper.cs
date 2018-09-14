@@ -6,6 +6,6 @@ namespace NCS.DSS.Customer.Cosmos.Helper
     {
         Uri CreateDocumentCollectionUri();
         Uri CreateDocumentUri(Guid? customerId);
-
+        Uri CreateSubscriptionDocumentCollectionUri();
     }
 }

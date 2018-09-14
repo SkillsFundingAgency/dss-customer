@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using NCS.DSS.Customer.Models;
+using NCS.DSS.Customers.Cosmos.Helper;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.ServiceBus
@@ -16,6 +18,14 @@ namespace NCS.DSS.Customer.ServiceBus
         public static readonly string AccessKey = ConfigurationManager.AppSettings["AccessKey"];
         public static readonly string BaseAddress = ConfigurationManager.AppSettings["BaseAddress"];
         public static readonly string QueueName = ConfigurationManager.AppSettings["QueueName"];
+
+        private static readonly SubscriptionHelper _subscriptionHelper = new SubscriptionHelper();
+
+        public static async Task AutoSubscribeCustomer(Models.Customer customer)
+        {
+            //Auto subscribe last modified touchpoint to the newly posted customer
+            await _subscriptionHelper.CreateSubscriptionAsync(customer);
+        }
 
         public static async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
         {
@@ -39,7 +49,7 @@ namespace NCS.DSS.Customer.ServiceBus
                 MessageId = customer.CustomerId + " " + DateTime.UtcNow
             };
 
-            //msg.ForcePersistence = true; Required when we save message to cosmos
+            await AutoSubscribeCustomer(customer);
             await sender.SendAsync(msg);
         }
 
