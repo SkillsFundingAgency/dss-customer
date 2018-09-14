@@ -95,8 +95,15 @@
             {
               "name": "QueueName",
               "value": "[parameters('serviceBusQueueName')]"
+            },
+            {
+              "name": "SubscriptionCollectionId",
+              "value": "subscriptions"
+            },
+            {
+              "name": "SubscriptionDatabaseId",
+              "value": "subscriptions"
             }
-
           ]
         }
       }
