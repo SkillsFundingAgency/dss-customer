@@ -40,7 +40,9 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
 
-            if (!resourceHelper.DoesCustomerExist(customerGuid))
+            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
+
+            if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
             var customer = await getCustomerByIdService.GetCustomerAsync(customerGuid);

@@ -12,68 +12,58 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
-        private readonly DocumentDBHelper _documentDbHelper;
-        private readonly DocumentDBClient _databaseClient;
-
-        public DocumentDBProvider()
+        public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
-            _documentDbHelper = new DocumentDBHelper();
-            _databaseClient = new DocumentDBClient();
-        }
+            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
 
-        public bool DoesCustomerResourceExist(Guid customerId)
-        {
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            if (client == null)
+                return false;
+
             try
             {
-                var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
-
-                var client = _databaseClient.CreateDocumentClient();
-
-                if (client == null)
-                    return false;
-
-                var query = client.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 });
-                var customerExists = query.Where(x => x.CustomerId == customerId).AsEnumerable().Any();
-
-                return customerExists;
+                var response = await client.ReadDocumentAsync(documentUri);
+                if (response.Resource != null)
+                    return true;
             }
-            catch
+            catch (DocumentClientException)
             {
                 return false;
             }
+
+            return false;
         }
 
         public async Task<bool> DoesCustomerHaveATerminationDate(Guid customerId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
-            var customerByIdQuery = client
-                ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
-                .Where(x => x.CustomerId == customerId)
-                .AsDocumentQuery();
-
-            if (customerByIdQuery == null)
+            if (client == null)
                 return false;
 
-            var customerQuery = await customerByIdQuery.ExecuteNextAsync<Models.Customer>();
+            try
+            {
+                var response = await client.ReadDocumentAsync(documentUri);
 
-            var customer = customerQuery?.FirstOrDefault();
+                var dateOfTermination = response.Resource?.GetPropertyValue<DateTime?>("DateOfTermination");
 
-            if (customer == null)
+                return dateOfTermination.HasValue;
+            }
+            catch (DocumentClientException)
+            {
                 return false;
-
-            return customer.DateOfTermination.HasValue;
+            }
         }
-
-
+        
         public async Task<List<Models.Customer>> SearchAllCustomer(string givenName = null, string familyName = null, string dateofBirth = null,
             string uniqueLearnerNumber = null)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -129,9 +119,9 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public async Task<List<Models.Customer>> GetAllCustomer()
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -148,33 +138,35 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             return customers.Any() ? customers: null;
         }
-
-
+        
         public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
-            var customerByIdQuery = client
-                ?.CreateDocumentQuery<Models.Customer>(collectionUri, new FeedOptions { MaxItemCount = 1 })
-                .Where(x => x.CustomerId == customerId)
-                .AsDocumentQuery();
-
-            if (customerByIdQuery == null)
+            if (client == null)
                 return null;
 
-            var customer = await customerByIdQuery.ExecuteNextAsync<Models.Customer>();
+            try
+            {
+                var response = await client.ReadDocumentAsync(documentUri);
+                if (response.Resource != null)
+                    return (dynamic) response.Resource;
+            }
+            catch (DocumentClientException)
+            {
+                return null;
+            }
 
-            return customer?.FirstOrDefault();
+            return null;
         }
-
                 
         public async Task<ResourceResponse<Document>> CreateCustomerAsync(Models.Customer customer)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -187,9 +179,9 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public async Task<ResourceResponse<Document>> UpdateCustomerAsync(Models.Customer customer)
         {
-            var documentUri = _documentDbHelper.CreateDocumentUri(customer.CustomerId);
+            var documentUri = DocumentDBHelper.CreateDocumentUri(customer.CustomerId);
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -198,13 +190,12 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             return response;
         }
-
-
+        
         public async Task<List<Models.Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId)
         {
-            var collectionUri = _documentDbHelper.CreateSubscriptionDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateSubscriptionDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             var query = client
                 ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
@@ -228,9 +219,9 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {
-            var collectionUri = _documentDbHelper.CreateSubscriptionDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateSubscriptionDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -240,7 +231,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             return response;
 
         }
-
-
+        
     }
 }
