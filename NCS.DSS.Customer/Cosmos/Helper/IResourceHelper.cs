@@ -5,7 +5,7 @@ namespace NCS.DSS.Customer.Cosmos.Helper
 {
     public interface IResourceHelper
     {
-        bool DoesCustomerExist(Guid customerId);
+        Task<bool> DoesCustomerExist(Guid customerId);
         Task<bool> IsCustomerReadOnly(Guid customerId);
     }
 }

@@ -4,12 +4,11 @@ using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Customer.Cosmos.Client
 {
-    public class DocumentDBClient : IDocumentDBClient
+    public static class DocumentDBClient
     {
-        private DocumentClient _documentClient;
-        private DocumentClient _customerDocumentClient;
+        private static DocumentClient _documentClient;
 
-        public DocumentClient CreateDocumentClient()
+        public static DocumentClient CreateDocumentClient()
         {
             if (_documentClient != null)
                 return _documentClient;
@@ -20,18 +19,6 @@ namespace NCS.DSS.Customer.Cosmos.Client
 
             return _documentClient;
         }
-
-        public DocumentClient CreateCustomerDocumentClient()
-        {
-            if (_customerDocumentClient != null)
-                return _customerDocumentClient;
-
-            _customerDocumentClient = new DocumentClient(new Uri(
-                    ConfigurationManager.AppSettings["CustomerEndpoint"]),
-                ConfigurationManager.AppSettings["CustomerKey"]);
-
-            return _customerDocumentClient;
-        }
-
+        
     }
 }
