@@ -74,7 +74,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             if (!string.IsNullOrWhiteSpace(givenName))
             {
-                queryForCustomers += "STARTSWITH (LOWER(c.GivenName), LOWER('" + givenName + "'))";
+                queryForCustomers += "STARTSWITH (LOWER(c.GivenName), LOWER(@givenName))";
                 addAndToQuery = true;
             }
 
@@ -83,7 +83,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "STARTSWITH (LOWER(c.FamilyName), LOWER('" + familyName + "'))";
+                queryForCustomers += "STARTSWITH (LOWER(c.FamilyName), LOWER(@familyName))";
                 addAndToQuery = true;
             }
 
@@ -92,7 +92,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "c.DateofBirth = '" + dateofBirth + "'";
+                queryForCustomers += "c.DateofBirth = @dateofBirth";
                 addAndToQuery = true;
             }
 
@@ -101,10 +101,21 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 if (addAndToQuery)
                     queryForCustomers += " AND ";
 
-                queryForCustomers += "c.UniqueLearnerNumber = '" + uniqueLearnerNumber + "'";
+                queryForCustomers += "c.UniqueLearnerNumber = @uniqueLearnerNumber";
             }
 
-            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri, queryForCustomers).AsDocumentQuery();
+            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri, new SqlQuerySpec()
+            {
+                QueryText = queryForCustomers,
+
+                Parameters = new SqlParameterCollection()
+                {
+                    new SqlParameter("@givenName", givenName),
+                    new SqlParameter("@familyName", familyName),
+                    new SqlParameter("@dateofBirth", dateofBirth),
+                    new SqlParameter("@uniqueLearnerNumber", uniqueLearnerNumber)
+                }
+            }).AsDocumentQuery();
 
             var customers = new List<Models.Customer>();
 
