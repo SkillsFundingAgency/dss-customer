@@ -2,10 +2,12 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/NCS.CDS.Customer/v15
+/.vs/NCS.DSS.Customer/v15
 /.vs
 /packages
 /NCS.DSS.Customer/Properties/PublishProfiles
 /UpgradeLog.htm
-/NCS.DSS.Customer.Tests/obj/Debug
-/NCS.DSS.Customer.Tests/bin/Debug
+/NCS.DSS.Customer.Tests/obj/
+/NCS.DSS.Customer.Tests/bin/
+/NCS.DSS.Customer/obj/
+/NCS.DSS.Customer/bin/
