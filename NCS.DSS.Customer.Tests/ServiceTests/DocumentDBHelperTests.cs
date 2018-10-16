@@ -25,5 +25,14 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             Assert.IsInstanceOf<Uri>(uri);
             Assert.IsNotNull(uri);
         }
+
+        [Test]
+        public void DocumentDBHelperTests_ReturnsURI_WhenCreateSubscriptionDocumentCollectionUriIsCalled()
+        {
+            var uri = DocumentDBHelper.CreateSubscriptionDocumentCollectionUri();
+
+            Assert.IsInstanceOf<Uri>(uri);
+            Assert.IsNotNull(uri);
+        }
     }
 }
