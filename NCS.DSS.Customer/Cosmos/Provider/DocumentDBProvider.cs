@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
 using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
+using Document = Microsoft.Azure.Documents.Document;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
@@ -57,75 +60,41 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 return false;
             }
         }
-        
-        public async Task<List<Models.Customer>> SearchAllCustomer(string givenName = null, string familyName = null, string dateofBirth = null,
-            string uniqueLearnerNumber = null)
+
+        public async Task<List<Models.Customer>> SearchCustomer(ISearchIndexClient indexClient, string searchText,
+            string filter = null, IList<string> order = null, IList<string> facets = null)
         {
-            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var queryForCustomers = "SELECT * FROM c WHERE ";
-
-            var addAndToQuery = false;
-
-            if (!string.IsNullOrWhiteSpace(givenName))
+            var sp = new SearchParameters
             {
-                queryForCustomers += "STARTSWITH (LOWER(c.GivenName), LOWER(@givenName))";
-                addAndToQuery = true;
+                QueryType = QueryType.Full,
+                SearchMode = SearchMode.All,
+                IncludeTotalResultCount = true,
+                Top = 1000
+            };
+
+            //Add Filter
+            if (!string.IsNullOrEmpty(filter))
+            {
+                sp.Filter = filter;
             }
 
-            if (!string.IsNullOrWhiteSpace(familyName))
+            //Order
+            if (order != null && order.Count > 0)
             {
-                if (addAndToQuery)
-                    queryForCustomers += " AND ";
-
-                queryForCustomers += "STARTSWITH (LOWER(c.FamilyName), LOWER(@familyName))";
-                addAndToQuery = true;
+                sp.OrderBy = order;
             }
 
-            if (!string.IsNullOrWhiteSpace(dateofBirth))
+            //facets
+            if (facets != null && facets.Count > 0)
             {
-                if (addAndToQuery)
-                    queryForCustomers += " AND ";
-
-                queryForCustomers += "c.DateofBirth = @dateofBirth";
-                addAndToQuery = true;
+                sp.Facets = facets;
             }
 
-            if (!string.IsNullOrWhiteSpace(uniqueLearnerNumber))
-            {
-                if (addAndToQuery)
-                    queryForCustomers += " AND ";
+            //Search
+            var response = await indexClient.Documents.SearchAsync<Models.Customer>(searchText, sp);
 
-                queryForCustomers += "c.UniqueLearnerNumber = @uniqueLearnerNumber";
-            }
+            return response.Results.Select(result => result.Document).ToList();
 
-            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri, new SqlQuerySpec()
-            {
-                QueryText = queryForCustomers,
-
-                Parameters = new SqlParameterCollection()
-                {
-                    new SqlParameter("@givenName", givenName),
-                    new SqlParameter("@familyName", familyName),
-                    new SqlParameter("@dateofBirth", dateofBirth),
-                    new SqlParameter("@uniqueLearnerNumber", uniqueLearnerNumber)
-                }
-            }).AsDocumentQuery();
-
-            var customers = new List<Models.Customer>();
-
-            while (queryCust.HasMoreResults)
-            {
-                var response = await queryCust.ExecuteNextAsync<Models.Customer>();
-                customers.AddRange(response);
-            }
-
-            return customers.Any() ? customers : null;
         }
 
         public async Task<List<Models.Customer>> GetAllCustomer()
