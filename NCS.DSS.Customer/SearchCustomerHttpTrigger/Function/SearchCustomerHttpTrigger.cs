@@ -61,7 +61,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             if (!string.IsNullOrEmpty(givenName))
             {
-                query += "GivenName:" + givenName + "* ";
+                query += "GivenName:(" + givenName + "* OR " + givenName + ") ";
             }
 
             if (familyName != null && familyName.Length < 3)
@@ -72,14 +72,14 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             if (!string.IsNullOrEmpty(familyName))
             {
-                query += "FamilyName:" + familyName + "* ";
+                query += "FamilyName:(" + familyName + "* OR " + familyName + ") ";
             }
 
             var uniqueLearnerNumber = httpRequestMessageHelper.GetQueryNameValuePairs(req, "UniqueLearnerNumber");
 
             if (!string.IsNullOrEmpty(uniqueLearnerNumber))
             {
-                query += "UniqueLearnerNumber:" + uniqueLearnerNumber + "* ";
+                query += "UniqueLearnerNumber:" + uniqueLearnerNumber;
             }
 
             var dob = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
