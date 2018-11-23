@@ -23,6 +23,12 @@
     "functionAppName": {
       "type": "string"
     },
+    "searchServiceName": {
+      "type": "string"
+    },
+    "searchServiceQueryApiKey": {
+      "type": "string"
+    },
     "serviceBusAccessKey": {
       "type": "string"
     },
@@ -73,6 +79,10 @@
               "value": "[parameters('cosmosDbCollectionId')]"
             },
             {
+              "name": "CustomerSearchIndexName",
+              "value": "customer-search-index"
+            },
+            {
               "name": "DatabaseId",
               "value": "[parameters('cosmosDbDatabaseId')]"
             },
@@ -99,6 +109,14 @@
             {
               "name": "QueueName",
               "value": "[parameters('serviceBusQueueName')]"
+            },
+            {
+              "name": "SearchServiceName",
+              "value": "[parameters('searchServiceName')]"
+            },
+            {
+              "name": "SearchServiceQueryApiKey",
+              "value": "[parameters('searchServiceQueryApiKey')]"
             },
             {
               "name": "SubscriptionCollectionId",

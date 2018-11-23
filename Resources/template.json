@@ -20,6 +20,12 @@
     "functionAppNames": {
       "type": "array"
     },
+    "searchServiceName": {
+      "type": "string"
+    },
+    "searchServiceQueryApiKey": {
+      "type": "string"
+    },
     "serviceBusAccessKey": {
       "type": "string"
     },
@@ -78,6 +84,12 @@
                 },
                 "cosmosDbKey": {
                   "value": "[parameters('cosmosDbKey')]"
+                },
+                "searchServiceName": {
+                  "value": "[parameters('searchServiceName')]"
+                },
+                "searchServiceQueryApiKey": {
+                  "value": "[parameters('searchServiceQueryApiKey')]"
                 },
                 "serviceBusAccessKey": {
                   "value": "[parameters('serviceBusAccessKey')]"
