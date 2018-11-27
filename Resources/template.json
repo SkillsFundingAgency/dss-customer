@@ -89,7 +89,7 @@
                   "value": "[parameters('cosmosDbKey')]"
                 },
                 "customerConnectionString": {
-                  "type": "[parameters('customerConnectionString')]"
+                  "value": "[parameters('customerConnectionString')]"
                 },
                 "searchServiceName": {
                   "value": "[parameters('searchServiceName')]"

@@ -84,7 +84,7 @@
             {
               "name": "CustomerConnectionString",
               "value": "[parameters('customerConnectionString')]"
-            }
+            },
             {
               "name": "CustomerSearchIndexName",
               "value": "customer-search-index"
