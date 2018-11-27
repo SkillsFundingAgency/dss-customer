@@ -6,7 +6,7 @@ namespace NCS.DSS.Customer.Helpers
     public static class SearchHelper
     {
         private static readonly string SearchServiceName = ConfigurationManager.AppSettings["SearchServiceName"];
-        private static readonly string SearchServiceKey = ConfigurationManager.AppSettings["SearchServiceQueryApiKey"];
+        private static readonly string SearchServiceKey = ConfigurationManager.AppSettings["SearchServiceAdminApiKey"];
         private static readonly string SearchServiceIndexName = ConfigurationManager.AppSettings["CustomerSearchIndexName"];
 
         private static SearchServiceClient _serviceClient;
