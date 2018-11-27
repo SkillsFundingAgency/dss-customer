@@ -20,6 +20,9 @@
     "cosmosDbKey": {
       "type": "string"
     },
+    "customerConnectionString": {
+      "type": "string"
+    },
     "functionAppName": {
       "type": "string"
     },
@@ -78,6 +81,10 @@
               "name": "CollectionId",
               "value": "[parameters('cosmosDbCollectionId')]"
             },
+            {
+              "name": "CustomerConnectionString",
+              "value": "[parameters('customerConnectionString')]"
+            }
             {
               "name": "CustomerSearchIndexName",
               "value": "customer-search-index"

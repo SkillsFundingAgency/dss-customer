@@ -14,6 +14,9 @@
     "cosmosDbKey": {
       "type": "string"
     },
+    "customerConnectionString": {
+      "type": "string"
+    },
     "environmentName": {
       "type": "string"
     },
@@ -84,6 +87,9 @@
                 },
                 "cosmosDbKey": {
                   "value": "[parameters('cosmosDbKey')]"
+                },
+                "customerConnectionString": {
+                  "type": "[parameters('customerConnectionString')]"
                 },
                 "searchServiceName": {
                   "value": "[parameters('searchServiceName')]"
