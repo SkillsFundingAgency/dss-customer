@@ -26,7 +26,7 @@
     "searchServiceName": {
       "type": "string"
     },
-    "searchServiceQueryApiKey": {
+    "searchServiceAdminApiKey": {
       "type": "string"
     },
     "serviceBusAccessKey": {
@@ -94,8 +94,8 @@
                 "searchServiceName": {
                   "value": "[parameters('searchServiceName')]"
                 },
-                "searchServiceQueryApiKey": {
-                  "value": "[parameters('searchServiceQueryApiKey')]"
+                "searchServiceAdminApiKey": {
+                  "value": "[parameters('searchServiceAdminApiKey')]"
                 },
                 "serviceBusAccessKey": {
                   "value": "[parameters('serviceBusAccessKey')]"

@@ -29,7 +29,7 @@
     "searchServiceName": {
       "type": "string"
     },
-    "searchServiceQueryApiKey": {
+    "searchServiceAdminApiKey": {
       "type": "string"
     },
     "serviceBusAccessKey": {
@@ -122,8 +122,8 @@
               "value": "[parameters('searchServiceName')]"
             },
             {
-              "name": "SearchServiceQueryApiKey",
-              "value": "[parameters('searchServiceQueryApiKey')]"
+              "name": "SearchServiceAdminApiKey",
+              "value": "[parameters('searchServiceAdminApiKey')]"
             },
             {
               "name": "SubscriptionCollectionId",
