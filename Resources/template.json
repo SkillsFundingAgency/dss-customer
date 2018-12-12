@@ -8,12 +8,6 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
-    "cosmosDbEndpoint": {
-      "type": "string"
-    },
-    "cosmosDbKey": {
-      "type": "string"
-    },
     "customerConnectionString": {
       "type": "string"
     },
@@ -81,12 +75,6 @@
                 },
                 "cosmosDbDatabaseId": {
                   "value": "[parameters('cosmosDbDatabaseId')]"
-                },
-                "cosmosDbEndpoint": {
-                  "value": "[parameters('cosmosDbEndpoint')]"
-                },
-                "cosmosDbKey": {
-                  "value": "[parameters('cosmosDbKey')]"
                 },
                 "customerConnectionString": {
                   "value": "[parameters('customerConnectionString')]"
