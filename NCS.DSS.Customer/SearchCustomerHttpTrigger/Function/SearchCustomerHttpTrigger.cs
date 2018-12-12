@@ -92,6 +92,9 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
                     return HttpResponseMessageHelper.NoContent();
             }
 
+            if(string.IsNullOrWhiteSpace(query) && string.IsNullOrWhiteSpace(filter))
+                return HttpResponseMessageHelper.NoContent();
+
             log.LogInformation("Attempting to search customers");
 
             var customer = await searchCustomerService.SearchCustomerAsync(indexClient, query, filter);
