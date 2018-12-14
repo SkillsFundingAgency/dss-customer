@@ -14,13 +14,16 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
-    "cosmosDbEndpoint": {
-      "type": "string"
-    },
-    "cosmosDbKey": {
+    "customerConnectionString": {
       "type": "string"
     },
     "functionAppName": {
+      "type": "string"
+    },
+    "searchServiceName": {
+      "type": "string"
+    },
+    "searchServiceAdminApiKey": {
       "type": "string"
     },
     "serviceBusAccessKey": {
@@ -73,16 +76,16 @@
               "value": "[parameters('cosmosDbCollectionId')]"
             },
             {
+              "name": "CustomerConnectionString",
+              "value": "[parameters('customerConnectionString')]"
+            },
+            {
+              "name": "CustomerSearchIndexName",
+              "value": "customer-search-index"
+            },
+            {
               "name": "DatabaseId",
               "value": "[parameters('cosmosDbDatabaseId')]"
-            },
-            {
-              "name": "Endpoint",
-              "value": "[parameters('cosmosDbEndpoint')]"
-            },
-            {
-              "name": "Key",
-              "value": "[parameters('cosmosDbKey')]"
             },
             {
               "name": "KeyName",
@@ -99,6 +102,14 @@
             {
               "name": "QueueName",
               "value": "[parameters('serviceBusQueueName')]"
+            },
+            {
+              "name": "SearchServiceName",
+              "value": "[parameters('searchServiceName')]"
+            },
+            {
+              "name": "SearchServiceAdminApiKey",
+              "value": "[parameters('searchServiceAdminApiKey')]"
             },
             {
               "name": "SubscriptionCollectionId",

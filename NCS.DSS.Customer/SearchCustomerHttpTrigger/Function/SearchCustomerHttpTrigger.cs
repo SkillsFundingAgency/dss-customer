@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -43,6 +43,12 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             log.LogInformation("C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
+            SearchHelper.GetSearchServiceClient();
+            var indexClient = SearchHelper.GetIndexClient();
+
+            var query = string.Empty;
+            var filter = string.Empty;
+
             // Parse query parameter
             var givenName = httpRequestMessageHelper.GetQueryNameValuePairs(req, "GivenName");
             var familyName = httpRequestMessageHelper.GetQueryNameValuePairs(req, "FamilyName");
@@ -53,16 +59,47 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.NoContent();
             }
 
+            if (!string.IsNullOrEmpty(givenName))
+            {
+                query += string.Format("GivenName:({0}* OR {0}) ",givenName);
+            }
+
             if (familyName != null && familyName.Length < 3)
             {
                 log.LogWarning("Family Name must have a minimum of 3 characters");
                 return HttpResponseMessageHelper.NoContent();
             }
 
-            var dateofBirth = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
+            if (!string.IsNullOrEmpty(familyName))
+            {
+                query += string.Format("FamilyName:({0}* OR {0}) ", familyName);
+            }
+
             var uniqueLearnerNumber = httpRequestMessageHelper.GetQueryNameValuePairs(req, "UniqueLearnerNumber");
 
-            var customer = await searchCustomerService.SearchCustomerAsync(givenName, familyName, dateofBirth, uniqueLearnerNumber);
+            if (!string.IsNullOrEmpty(uniqueLearnerNumber))
+            {
+                query += string.Format("UniqueLearnerNumber:{0}", uniqueLearnerNumber);
+            }
+
+            var dob = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
+
+            if (!string.IsNullOrEmpty(dob))
+            {
+                if (DateTime.TryParse(dob, CultureInfo.CurrentCulture, DateTimeStyles.None, out var dateOfBirth))
+                    filter = string.Format("DateofBirth eq {0:yyyy-MM-dd}", dateOfBirth);
+                else
+                    return HttpResponseMessageHelper.NoContent();
+            }
+
+            if(string.IsNullOrWhiteSpace(query) && string.IsNullOrWhiteSpace(filter))
+                return HttpResponseMessageHelper.NoContent();
+
+            log.LogInformation("Attempting to search customers");
+
+            var customer = await searchCustomerService.SearchCustomerAsync(indexClient, query, filter);
+
+            log.LogInformation("Search completed");
 
             return customer == null ?
                 HttpResponseMessageHelper.NoContent() :
@@ -70,5 +107,4 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
         }
 
     }
-
 }

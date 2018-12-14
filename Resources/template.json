@@ -8,10 +8,7 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
-    "cosmosDbEndpoint": {
-      "type": "string"
-    },
-    "cosmosDbKey": {
+    "customerConnectionString": {
       "type": "string"
     },
     "environmentName": {
@@ -19,6 +16,12 @@
     },
     "functionAppNames": {
       "type": "array"
+    },
+    "searchServiceName": {
+      "type": "string"
+    },
+    "searchServiceAdminApiKey": {
+      "type": "string"
     },
     "serviceBusAccessKey": {
       "type": "string"
@@ -73,11 +76,14 @@
                 "cosmosDbDatabaseId": {
                   "value": "[parameters('cosmosDbDatabaseId')]"
                 },
-                "cosmosDbEndpoint": {
-                  "value": "[parameters('cosmosDbEndpoint')]"
+                "customerConnectionString": {
+                  "value": "[parameters('customerConnectionString')]"
                 },
-                "cosmosDbKey": {
-                  "value": "[parameters('cosmosDbKey')]"
+                "searchServiceName": {
+                  "value": "[parameters('searchServiceName')]"
+                },
+                "searchServiceAdminApiKey": {
+                  "value": "[parameters('searchServiceAdminApiKey')]"
                 },
                 "serviceBusAccessKey": {
                   "value": "[parameters('serviceBusAccessKey')]"

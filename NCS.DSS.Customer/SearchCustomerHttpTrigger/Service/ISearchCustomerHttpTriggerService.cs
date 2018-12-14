@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Azure.Search;
 
 namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Service
 {
     public interface ISearchCustomerHttpTriggerService
     {
-        Task<List<Models.Customer>> SearchCustomerAsync(string givenName = null, string familyName = null, string dateofBirth = null, string uniqueLearnerNumber = null);
+        Task<List<Models.Customer>> SearchCustomerAsync(ISearchIndexClient indexClient, string searchText,
+            string filter = null, IList<string> order = null, IList<string> facets = null);
     }
 }
