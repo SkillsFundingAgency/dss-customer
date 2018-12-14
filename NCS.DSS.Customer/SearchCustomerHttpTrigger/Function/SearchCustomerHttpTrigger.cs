@@ -61,7 +61,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             if (!string.IsNullOrEmpty(givenName))
             {
-                query += "GivenName:(" + givenName + "* OR " + givenName + ") ";
+                query += string.Format("GivenName:({0}* OR {0}) ",givenName);
             }
 
             if (familyName != null && familyName.Length < 3)
@@ -72,14 +72,14 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             if (!string.IsNullOrEmpty(familyName))
             {
-                query += "FamilyName:(" + familyName + "* OR " + familyName + ") ";
+                query += string.Format("FamilyName:({0}* OR {0}) ", familyName);
             }
 
             var uniqueLearnerNumber = httpRequestMessageHelper.GetQueryNameValuePairs(req, "UniqueLearnerNumber");
 
             if (!string.IsNullOrEmpty(uniqueLearnerNumber))
             {
-                query += "UniqueLearnerNumber:" + uniqueLearnerNumber;
+                query += string.Format("UniqueLearnerNumber:{0}", uniqueLearnerNumber);
             }
 
             var dob = httpRequestMessageHelper.GetQueryNameValuePairs(req, "DateofBirth");
@@ -87,7 +87,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
             if (!string.IsNullOrEmpty(dob))
             {
                 if (DateTime.TryParse(dob, CultureInfo.CurrentCulture, DateTimeStyles.None, out var dateOfBirth))
-                    filter = "DateofBirth eq " + dateOfBirth.ToString("yyyy-MM-dd");
+                    filter = string.Format("DateofBirth eq {0:yyyy-MM-dd}", dateOfBirth);
                 else
                     return HttpResponseMessageHelper.NoContent();
             }

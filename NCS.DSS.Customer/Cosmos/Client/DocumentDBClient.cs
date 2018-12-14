@@ -25,26 +25,41 @@ namespace NCS.DSS.Customer.Cosmos.Client
             try
             {
                 connectionString = ConfigurationManager.AppSettings["CustomerConnectionString"];
-
             }
             catch (Exception e)
             {
                 throw;
             }
 
-            if(string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
                 throw new ArgumentNullException();
 
-            var endPoint = connectionString.Split(new[] { "AccountEndpoint=" }, StringSplitOptions.None)[1]
-                .Split(';')[0]
-                .Trim();
+            string endPoint;
+            try
+            {
+                endPoint = connectionString.Split(new[] {"AccountEndpoint="}, StringSplitOptions.None)[1]
+                    .Split(';')[0]
+                    .Trim();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
 
             if (string.IsNullOrWhiteSpace(endPoint))
                 throw new ArgumentNullException();
 
-            var key = connectionString.Split(new[] { "AccountKey=" }, StringSplitOptions.None)[1]
-                .Split(';')[0]
-                .Trim();
+            string key;
+            try
+            {
+                key = connectionString.Split(new[] {"AccountKey="}, StringSplitOptions.None)[1]
+                    .Split(';')[0]
+                    .Trim();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
 
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException();
