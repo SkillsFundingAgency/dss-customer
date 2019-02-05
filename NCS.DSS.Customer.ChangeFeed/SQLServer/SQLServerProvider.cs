@@ -17,21 +17,13 @@ namespace NCS.DSS.Customer.ChangeFeed.SQLServer
             _dbConnection = dbConnection;
         }
 
-        public bool UpsertResource(Document document, ILogger log)
+        public async Task<bool> UpsertResource(Document document, ILogger log)
         {
             try
             {
                 _loggerHelper.LogMethodEnter(log);
 
-                _dbConnection.Open();
-
-                var dbCommand = BuildCommand();                       
-                
-                dbCommand.Parameters.Add(BuildParameter(dbCommand, document));
-
-                dbCommand.ExecuteNonQuery();
-
-                _dbConnection.Close();                
+                await Task.Run(() => Execute(document));
 
                 _loggerHelper.LogMethodExit(log);
                 return true;
@@ -41,6 +33,19 @@ namespace NCS.DSS.Customer.ChangeFeed.SQLServer
                 _loggerHelper.LogException(log, Guid.NewGuid(), ex);
                 return false;
             }
+        }
+
+        private void Execute(Document document)
+        {
+            _dbConnection.Open();
+
+            var dbCommand = BuildCommand();
+
+            dbCommand.Parameters.Add(BuildParameter(dbCommand, document));
+
+            dbCommand.ExecuteNonQuery();
+
+            _dbConnection.Close();
         }
 
         private IDbDataParameter BuildParameter(IDbCommand command, Document document)
