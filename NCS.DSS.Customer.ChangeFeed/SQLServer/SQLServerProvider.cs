@@ -62,7 +62,7 @@ namespace NCS.DSS.Customer.ChangeFeed.SQLServer
         {
             IDbCommand result = _dbConnection.CreateCommand();
             result.CommandType = CommandType.StoredProcedure;
-            result.CommandText = "UpsertCustomer";
+            result.CommandText = "Change_Feed_Upsert_Customer";
 
             return result;
         }
