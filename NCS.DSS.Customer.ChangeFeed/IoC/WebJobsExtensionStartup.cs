@@ -10,11 +10,11 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 
-[assembly: WebJobsStartup(typeof(DIConfig))]
+[assembly: WebJobsStartup(typeof(WebJobsExtensionStartup))]
 
 namespace NCS.DSS.Customer.ChangeFeed.IoC
 {
-    public class DIConfig : IWebJobsStartup
+    public class WebJobsExtensionStartup : IWebJobsStartup
     {
         public void Configure(IWebJobsBuilder builder)
         {
