@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.DSS.Customer", "NCS.DSS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCS.DSS.Customer.Tests", "NCS.DSS.Customer.Tests\NCS.DSS.Customer.Tests.csproj", "{D9BEE22A-B8DB-4B46-8069-400DDF26CD9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCS.DSS.Customer.ChangeFeed", "NCS.DSS.Customer.ChangeFeed\NCS.DSS.Customer.ChangeFeed.csproj", "{1B61EF3A-815D-497F-B897-9CCF8EA610E7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{D9BEE22A-B8DB-4B46-8069-400DDF26CD9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9BEE22A-B8DB-4B46-8069-400DDF26CD9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9BEE22A-B8DB-4B46-8069-400DDF26CD9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1B61EF3A-815D-497F-B897-9CCF8EA610E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1B61EF3A-815D-497F-B897-9CCF8EA610E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1B61EF3A-815D-497F-B897-9CCF8EA610E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1B61EF3A-815D-497F-B897-9CCF8EA610E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

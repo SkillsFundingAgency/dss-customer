@@ -1,23 +1,19 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.Azure.ServiceBus;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customers.Cosmos.Helper;
 using Newtonsoft.Json;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.ServiceBus
 {
+
+
     public static class ServiceBusClient
     {
-        public static readonly string KeyName = ConfigurationManager.AppSettings["KeyName"];
-        public static readonly string AccessKey = ConfigurationManager.AppSettings["AccessKey"];
-        public static readonly string BaseAddress = ConfigurationManager.AppSettings["BaseAddress"];
-        public static readonly string QueueName = ConfigurationManager.AppSettings["QueueName"];
+        public static readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
+        public static readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
 
         private static readonly SubscriptionHelper _subscriptionHelper = new SubscriptionHelper();
 
@@ -29,38 +25,34 @@ namespace NCS.DSS.Customer.ServiceBus
 
         public static async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
         {
-            var tokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(KeyName, AccessKey);
-            var messagingFactory = MessagingFactory.Create(BaseAddress, tokenProvider);
-            var sender = messagingFactory.CreateMessageSender(QueueName);
+            var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
             var messageModel = new MessageModel()
             {
-                TitleMessage = "New customer record {" + customer.CustomerId + "} added at " + DateTime.UtcNow,
+                TitleMessage = "New Customer record {" + customer.CustomerId + "} added at " + DateTime.UtcNow,
                 CustomerGuid = customer.CustomerId,
                 LastModifiedDate = customer.LastModifiedDate,
                 URL = reqUrl + "/" + customer.CustomerId,
-                IsNewCustomer = true,
+                IsNewCustomer = false,
                 TouchpointId = customer.LastModifiedTouchpointId
             };
 
-            var msg = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel))))
+            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
             {
                 ContentType = "application/json",
                 MessageId = customer.CustomerId + " " + DateTime.UtcNow
             };
 
-            await AutoSubscribeCustomer(customer);
-            await sender.SendAsync(msg);
+            await queueClient.SendAsync(msg);
         }
 
         public static async Task SendPatchMessageAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
         {
-            var tokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(KeyName, AccessKey);
-            var messagingFactory = MessagingFactory.Create(BaseAddress, tokenProvider);
-            var sender = messagingFactory.CreateMessageSender(QueueName);
+            var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+
             var messageModel = new MessageModel
             {
-                TitleMessage = "Customer record modification for {" + customerId + "} at " + DateTime.UtcNow,
+                TitleMessage = "Outcome record modification for {" + customerId + "} at " + DateTime.UtcNow,
                 CustomerGuid = customerId,
                 LastModifiedDate = customerPatch.LastModifiedDate,
                 URL = reqUrl,
@@ -68,27 +60,26 @@ namespace NCS.DSS.Customer.ServiceBus
                 TouchpointId = customerPatch.LastModifiedTouchpointId
             };
 
-            var msg = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel))))
+            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
             {
                 ContentType = "application/json",
                 MessageId = customerId + " " + DateTime.UtcNow
             };
 
-            //msg.ForcePersistence = true; Required when we save message to cosmos
-            await sender.SendAsync(msg);
+            await queueClient.SendAsync(msg);
+
+        }
+
+        public class MessageModel
+        {
+            public string TitleMessage { get; set; }
+            public Guid? CustomerGuid { get; set; }
+            public DateTime? LastModifiedDate { get; set; }
+            public string URL { get; set; }
+            public bool IsNewCustomer { get; set; }
+            public string TouchpointId { get; set; }
         }
 
     }
-
-    public class MessageModel
-    {
-        public string TitleMessage { get; set; }
-        public Guid? CustomerGuid { get; set; }
-        public DateTime? LastModifiedDate { get; set; }
-        public string URL { get; set; }
-        public bool IsNewCustomer { get; set; }
-        public string TouchpointId { get; set; }
-    }
-
 }
 

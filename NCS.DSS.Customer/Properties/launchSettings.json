@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "NCS.DSS.Customer": {
+      "commandName": "Project"
+    }
+  }
+}

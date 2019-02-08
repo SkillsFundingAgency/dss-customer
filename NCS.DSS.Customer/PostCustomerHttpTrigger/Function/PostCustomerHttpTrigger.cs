@@ -1,18 +1,20 @@
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
+using DFC.Functions.DI.Standard.Attributes;
+using DFC.HTTP.Standard;
+using DFC.JSON.Standard;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.Helpers;
-using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -25,25 +27,27 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
-        [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequestMessage req, ILogger log,
+        [ProducesResponseType(typeof(Models.Customer), 200)]
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequest req, ILogger log,
             [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
+            [Inject]IHttpRequestHelper httpRequestHelper,
+            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
             [Inject]IValidate validate,
-            [Inject]IPostCustomerHttpTriggerService customerPostService)
+            [Inject]IPostCustomerHttpTriggerService customerPostService,
+            [Inject]IJsonHelper jsonHelper)
         {
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
+            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
-                return HttpResponseMessageHelper.BadRequest();
+                return httpResponseMessageHelper.BadRequest();
             }
 
-            var ApimURL = httpRequestMessageHelper.GetApimURL(req);
+            var ApimURL = httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
                 log.LogInformation("Unable to locate 'apimurl' in request header");
-                return HttpResponseMessageHelper.BadRequest();
+                return httpResponseMessageHelper.BadRequest();
             }
 
 
@@ -53,22 +57,22 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             try
             {
-                customerRequest = await httpRequestMessageHelper.GetCustomerFromRequest<Models.Customer>(req);
+                customerRequest = await httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
             }
             catch (JsonException ex)
             {
-                return HttpResponseMessageHelper.UnprocessableEntity(ex);
+                return httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (customerRequest == null)
-                return HttpResponseMessageHelper.UnprocessableEntity(req);
+                return httpResponseMessageHelper.UnprocessableEntity(req);
 
             customerRequest.LastModifiedTouchpointId = touchpointId;
 
             var errors = validate.ValidateResource(customerRequest,true);
 
             if (errors.Any())
-                return HttpResponseMessageHelper.UnprocessableEntity(errors);
+                return httpResponseMessageHelper.UnprocessableEntity(errors);
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 
@@ -78,8 +82,8 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
             return customer == null
-                ? HttpResponseMessageHelper.BadRequest()
-                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(customer));
+                ? httpResponseMessageHelper.BadRequest()
+                : httpResponseMessageHelper.Created(jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "customerId"));
 
         }
     }

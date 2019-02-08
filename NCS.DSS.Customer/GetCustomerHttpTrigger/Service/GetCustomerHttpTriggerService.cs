@@ -1,25 +1,19 @@
 ﻿using NCS.DSS.Customer.Cosmos.Provider;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Service
 {
-    class GetCustomerHttpTriggerService : IGetCustomerHttpTriggerService
+    public class GetCustomerHttpTriggerService : IGetCustomerHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+        public GetCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
         public async Task<List<Models.Customer>> GetAllCustomerAsync()
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var customer = documentDbProvider.GetAllCustomer();
-
-            return await customer;
+            return await _documentDbProvider.GetAllCustomer();         
         }
-
-
-
-
-
     }
 }

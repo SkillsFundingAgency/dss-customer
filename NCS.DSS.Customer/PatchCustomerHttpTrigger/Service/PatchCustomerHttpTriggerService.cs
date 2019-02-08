@@ -9,6 +9,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
     public class PatchCustomerHttpTriggerService : IPatchCustomerHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+
+        public PatchCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
         public async Task<Models.Customer> UpdateCustomerAsync(Models.Customer customer, Models.CustomerPatch customerPatch)
         {
             if (customer == null)
@@ -17,9 +23,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             customerPatch.SetDefaultValues();
 
             customer.Patch(customerPatch);
-
-            var documentDbProvider = new DocumentDBProvider();
-            var response = await documentDbProvider.UpdateCustomerAsync(customer);
+            
+            var response = await _documentDbProvider.UpdateCustomerAsync(customer);
 
             var responseStatusCode = response.StatusCode;
 
@@ -28,10 +33,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 
         public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var customer = await documentDbProvider.GetCustomerByIdAsync(customerId);
-
-            return customer;
+            return await _documentDbProvider.GetCustomerByIdAsync(customerId);
         }
 
         public async Task SendToServiceBusQueueAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)

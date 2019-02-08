@@ -1,13 +1,14 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using Microsoft.Azure.Search;
 
 namespace NCS.DSS.Customer.Helpers
 {
     public static class SearchHelper
-    {
-        private static readonly string SearchServiceName = ConfigurationManager.AppSettings["SearchServiceName"];
-        private static readonly string SearchServiceKey = ConfigurationManager.AppSettings["SearchServiceAdminApiKey"];
-        private static readonly string SearchServiceIndexName = ConfigurationManager.AppSettings["CustomerSearchIndexName"];
+    {        
+        private static readonly string SearchServiceName = Environment.GetEnvironmentVariable("SearchServiceName");
+        private static readonly string SearchServiceKey = Environment.GetEnvironmentVariable("SearchServiceAdminApiKey");
+        private static readonly string SearchServiceIndexName = Environment.GetEnvironmentVariable("CustomerSearchIndexName");
 
         private static SearchServiceClient _serviceClient;
         private static ISearchIndexClient _indexClient;

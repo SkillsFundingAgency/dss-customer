@@ -1,21 +1,20 @@
-﻿using System;
+﻿using NCS.DSS.Customer.Cosmos.Provider;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using NCS.DSS.Customer.Cosmos.Provider;
-using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
     public class GetCustomerByIdHttpTriggerService : IGetCustomerByIdHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+        public GetCustomerByIdHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
         public async Task<Models.Customer> GetCustomerAsync(Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var customer = await documentDbProvider.GetCustomerByIdAsync(customerId);
-
-            return customer;
+            return await _documentDbProvider.GetCustomerByIdAsync(customerId);            
         }
 
         public List<Models.Customer> CreateTempCustomers()

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Configuration;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents.Client;
+using System;
 
 namespace NCS.DSS.Customer.Cosmos.Client
 {
@@ -24,7 +23,7 @@ namespace NCS.DSS.Customer.Cosmos.Client
 
             try
             {
-                connectionString = ConfigurationManager.AppSettings["CustomerConnectionString"];
+                connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
             }
             catch (Exception e)
             {
@@ -37,7 +36,7 @@ namespace NCS.DSS.Customer.Cosmos.Client
             string endPoint;
             try
             {
-                endPoint = connectionString.Split(new[] {"AccountEndpoint="}, StringSplitOptions.None)[1]
+                endPoint = connectionString.Split(new[] { "AccountEndpoint=" }, StringSplitOptions.None)[1]
                     .Split(';')[0]
                     .Trim();
             }
@@ -52,7 +51,7 @@ namespace NCS.DSS.Customer.Cosmos.Client
             string key;
             try
             {
-                key = connectionString.Split(new[] {"AccountKey="}, StringSplitOptions.None)[1]
+                key = connectionString.Split(new[] { "AccountKey=" }, StringSplitOptions.None)[1]
                     .Split(';')[0]
                     .Trim();
             }
@@ -66,6 +65,5 @@ namespace NCS.DSS.Customer.Cosmos.Client
 
             return new DocumentClient(new Uri(endPoint), key);
         }
-
     }
 }

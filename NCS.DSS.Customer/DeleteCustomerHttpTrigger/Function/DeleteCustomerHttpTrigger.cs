@@ -1,14 +1,17 @@
+using DFC.Common.Standard.Logging;
+using DFC.Functions.DI.Standard.Attributes;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
+using NCS.DSS.Customer.Annotations;
+using NCS.DSS.Customer.Cosmos.Helper;
+using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http.Description;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using NCS.DSS.Customer.Annotations;
-using NCS.DSS.Customer.Cosmos.Helper;
-using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
 {
@@ -21,10 +24,13 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Delete request is malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
-        [ResponseType(typeof(Models.Customer))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        [ProducesResponseType(typeof(Models.Customer), 200)]
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequestMessage req, ILogger log, string customerId,
+            [Inject]ILoggerHelper loggerHelper,
+            [Inject]IResourceHelper resourceHelper)
         {
-            log.Info("C# HTTP trigger function Delete Customer processed a request.");
+
+            loggerHelper.LogMethodEnter(log);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
@@ -34,12 +40,13 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
                         System.Text.Encoding.UTF8, "application/json")
                 };
             }
-
-            var resourceHelper = new ResourceHelper();
+            
             var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
+                loggerHelper.LogMethodExit(log);
+
                 return new HttpResponseMessage(HttpStatusCode.NoContent)
                 {
                     Content = new StringContent("Unable to find a customer with Id of : " +
@@ -48,10 +55,12 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
                 };
             }
 
+            loggerHelper.LogMethodExit(log);
+
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent("Deleted record with Id of : " + customerId)
-            };
+            };            
         }
     }
 }

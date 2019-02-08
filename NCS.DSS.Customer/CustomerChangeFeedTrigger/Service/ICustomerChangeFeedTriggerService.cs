@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCS.DSS.Customer.ChangeFeed.CustomerChangeFeedTrigger.Service
+namespace NCS.DSS.Customer.CustomerChangeFeedTrigger.Service
 {
     public interface ICustomerChangeFeedTriggerService
     {

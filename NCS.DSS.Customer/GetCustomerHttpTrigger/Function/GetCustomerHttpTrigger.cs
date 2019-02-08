@@ -1,16 +1,17 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
+using DFC.Functions.DI.Standard.Attributes;
+using DFC.HTTP.Standard;
+using DFC.JSON.Standard;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
-using NCS.DSS.Customer.Helpers;
-using NCS.DSS.Customer.Ioc;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Function
 {
@@ -22,18 +23,19 @@ namespace NCS.DSS.Customer.GetCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Get request is malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
-        [ResponseType(typeof(Models.Customer))]
+        [ProducesResponseType(typeof(Models.Customer), 200)]
         [Disable]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers")]HttpRequestMessage req, ILogger log,
                 [Inject]IResourceHelper resourceHelper,
-                [Inject]IGetCustomerHttpTriggerService getAllCustomerService)
+                [Inject]IGetCustomerHttpTriggerService getAllCustomerService,
+                [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
+                [Inject]IJsonHelper jsonHelper)
         {
             var customer = await getAllCustomerService.GetAllCustomerAsync();
 
             return customer == null ?
-                HttpResponseMessageHelper.NoContent(Guid.NewGuid()) :
-                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(customer));
-
+                httpResponseMessageHelper.NoContent(Guid.NewGuid()) :
+                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectsAndRenameIdProperty(customer, "id", "CustomerId"));
         }
     }
 }

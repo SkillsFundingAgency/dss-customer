@@ -1,12 +1,13 @@
+using DFC.Common.Standard.Logging;
+using DFC.Functions.DI.Standard.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Annotations;
+using System.Net;
+using System.Net.Http;
 
 namespace NCS.DSS.Customer.PutCustomerHttpTrigger
 {
@@ -18,11 +19,12 @@ namespace NCS.DSS.Customer.PutCustomerHttpTrigger
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "Unauthorised", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
-        [ResponseType(typeof(Models.Customer))]
+        [ProducesResponseType(typeof(Models.Customer), 200)]
         [Disable]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "Customers/{customerId}")]HttpRequestMessage req, TraceWriter log, string customerId)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "Customers/{customerId}")]HttpRequestMessage req, ILogger log, string customerId,
+            [Inject]ILoggerHelper loggerHelper)
         {
-            log.Info("C# HTTP trigger function Replace Customer processed a request.");
+            loggerHelper.LogMethodEnter(log);            
 
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
