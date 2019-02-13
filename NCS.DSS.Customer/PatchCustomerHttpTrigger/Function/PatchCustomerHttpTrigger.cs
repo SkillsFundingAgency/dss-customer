@@ -1,3 +1,4 @@
+using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -8,7 +9,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
@@ -37,26 +37,48 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             [Inject]IHttpRequestHelper httpRequestHelper,
             [Inject]IValidate validate,
             [Inject]IPatchCustomerHttpTriggerService customerPatchService,
-            [Inject]IJsonHelper jsonHelper)
+            [Inject]IJsonHelper jsonHelper,
+            [Inject]ILoggerHelper loggerHelper)
         {
+
+            loggerHelper.LogMethodEnter(log);
+
+            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            if (string.IsNullOrEmpty(correlationId))
+                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
+
+            if (!Guid.TryParse(correlationId, out var correlationGuid))
+            {
+                log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
+                correlationGuid = Guid.NewGuid();
+            }
+
             var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
 
             var ApimURL = httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                log.LogInformation("Unable to locate 'apimurl' in request header");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
 
-            log.LogInformation("C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
+            loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to parse customerId to Guid");
                 return httpResponseMessageHelper.BadRequest(customerGuid);
+            }
+
+            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subContractorId))
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+
 
             Models.CustomerPatch customerPatchRequest;
 
@@ -66,13 +88,17 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
+                loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
                 return httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (customerPatchRequest == null)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Customer patch request is null");
                 return httpResponseMessageHelper.UnprocessableEntity(req);
+            }
 
-            customerPatchRequest.LastModifiedTouchpointId = touchpointId;
+            customerPatchRequest.SetIds(touchpointId, subContractorId);            
 
             // validate the request
             var errors = validate.ValidateResource(customerPatchRequest, false);
@@ -83,25 +109,35 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer do not exist {0}", customerGuid));
                 return httpResponseMessageHelper.NoContent(customerGuid);
+            }
 
             var isCustomerReadOnly = await resourceHelper.IsCustomerReadOnly(customerGuid);
 
             if (isCustomerReadOnly)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is readonly {0}", customerGuid));
                 return httpResponseMessageHelper.Forbidden(customerGuid);
+            }
 
             var customer = await customerPatchService.GetCustomerByIdAsync(customerGuid);
 
             if (customer == null)
                 return httpResponseMessageHelper.NoContent(customerGuid);
 
-            var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatchRequest);
+            var patchedCustomer = customerPatchService.PatchResource(customer, customerPatchRequest);
 
-            log.LogInformation("Apimurl:  " + ApimURL);
+            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer);
+
+            loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
 
             if (updatedCustomer != null)
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
-            
+
+            loggerHelper.LogMethodExit(log);
+
             return updatedCustomer == null ?
                 httpResponseMessageHelper.BadRequest(customerGuid) :
                 httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "customerId"));

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Customer.Annotations;
+﻿using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.ReferenceData;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -106,6 +105,11 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
         public string IntroducedByAdditionalInfo { get; set; }
 
+        [StringLength(50)]
+        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
+        [Example(Description = "01234567899876543210")]
+        public string SubcontractorId { get; set; }
+
         [Display(Description = "Date and time of the last modification to the record")]
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? LastModifiedDate { get; set; }
@@ -124,5 +128,10 @@ namespace NCS.DSS.Customer.Models
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
         }
 
+        public void SetIds(string touchpointId, string subcontractorId)
+        {
+            LastModifiedTouchpointId = touchpointId;
+            SubcontractorId = subcontractorId;
+        }
     }
 }

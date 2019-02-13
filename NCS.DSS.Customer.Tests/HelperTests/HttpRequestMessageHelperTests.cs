@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using NCS.DSS.Customer.Helpers;
+﻿using DFC.HTTP.Standard;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace NCS.DSS.Customer.Tests.HelperTests
@@ -9,24 +9,29 @@ namespace NCS.DSS.Customer.Tests.HelperTests
     [TestFixture]
     public class HttpRequestMessageHelperTests
     {
-        private HttpRequestMessage _request;
+        private HttpRequest _request;
+        private IHttpRequestHelper _httpRequestHelper;
 
         [SetUp]
         public void Setup()
         {
-            _request = new HttpRequestMessage()
-            {
-                Content = new StringContent(String.Empty, Encoding.UTF8, "application/json"),
-                RequestUri = new Uri($"http://localhost:7071/")
-            };
+            _request = new DefaultHttpRequest(new DefaultHttpContext());
+            _httpRequestHelper = Substitute.For<IHttpRequestHelper>();
+            _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
+
+            //_request = new HttpRequestMessage()
+            //{
+            //    Content = new StringContent(String.Empty, Encoding.UTF8, "application/json"),
+            //    RequestUri = new Uri($"http://localhost:7071/")
+            //};
         }
 
         [Test]
         public void HttpRequestMessageHelper_ReturnsEmptyString_WhenTouchpointHeaderIsNotAvailable()
         {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
+            _httpRequestHelper.GetDssTouchpointId(_request).Returns(null as string);
 
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(_request);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(_request);
 
             Assert.IsNull(touchpointId);
         }
@@ -34,22 +39,19 @@ namespace NCS.DSS.Customer.Tests.HelperTests
         [Test]
         public void HttpRequestMessageHelper_ReturnsEmptyString_WhenTouchpointHeaderAvailableButEmpty()
         {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
-            _request.Headers.Add("TouchpointId", "");
+            _httpRequestHelper.GetDssTouchpointId(_request).Returns("");
 
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(_request);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(_request);
 
             Assert.IsEmpty(touchpointId);
         }
 
         [Test]
         public void HttpRequestMessageHelper_ReturnsTouchpointId_WhenHeaderIsAvailable()
-        {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
+        {            
+            _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000000");
 
-            _request.Headers.Add("TouchpointId", "0000000000");
-
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(_request);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(_request);            
 
             Assert.IsNotEmpty(touchpointId);
             Assert.NotNull(touchpointId);
@@ -58,32 +60,29 @@ namespace NCS.DSS.Customer.Tests.HelperTests
         [Test]
         public void HttpRequestMessageHelper_ReturnsEmptyString_WhenApimUrlHeaderIsNotAvailable()
         {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
+            _httpRequestHelper.GetDssApimUrl(_request).Returns(null as string);
 
-            var apimUrl = httpRequestMessageHelper.GetApimURL(_request);
+            var apimUrl = _httpRequestHelper.GetDssApimUrl(_request);
 
             Assert.IsNull(apimUrl);
         }
 
         [Test]
         public void HttpRequestMessageHelper_ReturnsEmptyString_WhenApimUrlHeaderAvailableButEmpty()
-        {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
-            _request.Headers.Add("apimurl", "");
+        {            
+            _httpRequestHelper.GetDssApimUrl(_request).Returns("");
 
-            var apimUrl = httpRequestMessageHelper.GetApimURL(_request);
+            var apimUrl = _httpRequestHelper.GetDssApimUrl(_request);
 
             Assert.IsEmpty(apimUrl);
         }
 
         [Test]
         public void HttpRequestMessageHelper_ReturnsApimUrl_WhenApimUrlHeaderIsAvailable()
-        {
-            var httpRequestMessageHelper = new HttpRequestMessageHelper();
+        {            
+            _httpRequestHelper.GetDssApimUrl(_request).Returns("http://localhost:7071/");
 
-            _request.Headers.Add("apimurl", "http://localhost:7071/");
-
-            var apimUrl = httpRequestMessageHelper.GetApimURL(_request);
+            var apimUrl = _httpRequestHelper.GetDssApimUrl(_request);
 
             Assert.IsNotEmpty(apimUrl);
             Assert.NotNull(apimUrl);

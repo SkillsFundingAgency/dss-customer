@@ -3,7 +3,6 @@ using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using NCS.DSS.Customer.Ioc;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;

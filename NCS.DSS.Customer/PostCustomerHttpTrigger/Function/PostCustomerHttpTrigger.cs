@@ -1,3 +1,4 @@
+using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -11,6 +12,7 @@ using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -34,22 +36,40 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
             [Inject]IValidate validate,
             [Inject]IPostCustomerHttpTriggerService customerPostService,
-            [Inject]IJsonHelper jsonHelper)
+            [Inject]IJsonHelper jsonHelper,
+            [Inject]ILoggerHelper loggerHelper)
         {
+            loggerHelper.LogMethodEnter(log);
+
+            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            if (string.IsNullOrEmpty(correlationId))
+                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
+
+            if (!Guid.TryParse(correlationId, out var correlationGuid))
+            {
+                log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
+                correlationGuid = Guid.NewGuid();
+            }
+
             var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
 
             var ApimURL = httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                log.LogInformation("Unable to locate 'apimurl' in request header");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
+
+            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subContractorId))
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
 
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
@@ -67,7 +87,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             if (customerRequest == null)
                 return httpResponseMessageHelper.UnprocessableEntity(req);
 
-            customerRequest.LastModifiedTouchpointId = touchpointId;
+            customerRequest.SetIds(touchpointId, subContractorId);            
 
             var errors = validate.ValidateResource(customerRequest,true);
 
@@ -76,10 +96,8 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 
-            log.LogInformation("Apimurl:  " + ApimURL);
-
-            if (customer != null)
-                await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+            //if (customer != null)
+            //    await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
             return customer == null
                 ? httpResponseMessageHelper.BadRequest()

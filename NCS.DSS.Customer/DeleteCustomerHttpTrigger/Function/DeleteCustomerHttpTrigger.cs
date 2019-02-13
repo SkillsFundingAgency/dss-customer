@@ -1,5 +1,7 @@
 using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
+using DFC.HTTP.Standard;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -25,12 +27,27 @@ namespace NCS.DSS.Customer.DeleteCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API Key unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequestMessage req, ILogger log, string customerId,
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId,
             [Inject]ILoggerHelper loggerHelper,
-            [Inject]IResourceHelper resourceHelper)
+            [Inject]IResourceHelper resourceHelper,
+            [Inject]IHttpRequestHelper httpRequestHelper)
         {
-
             loggerHelper.LogMethodEnter(log);
+
+            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            if (string.IsNullOrEmpty(correlationId))
+                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
+
+            if (!Guid.TryParse(correlationId, out var correlationGuid))
+            {
+                log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
+                correlationGuid = Guid.NewGuid();
+            }
+
+            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subContractorId))
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {

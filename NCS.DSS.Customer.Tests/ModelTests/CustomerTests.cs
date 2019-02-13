@@ -1,4 +1,5 @@
 ﻿using System;
+using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.ReferenceData;
 using NUnit.Framework;
 
@@ -117,10 +118,12 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer{ DateOfRegistration = DateTime.UtcNow };
             var customerPatch = new Models.CustomerPatch { DateOfRegistration = DateTime.MaxValue };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);            
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.DateOfRegistration);
+            Assert.AreEqual(DateTime.MaxValue, patchedCustomer.DateOfRegistration);
         }
 
         [Test]
@@ -129,7 +132,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { Title = Title.NotProvided };
             var customerPatch = new Models.CustomerPatch { Title = Title.Dr };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(Title.Dr, customer.Title);
@@ -142,7 +147,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { GivenName = "GivenName" };
             var customerPatch = new Models.CustomerPatch { GivenName = givenName };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(givenName, customer.GivenName);
@@ -155,7 +162,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { FamilyName = "FamilyName" };
             var customerPatch = new Models.CustomerPatch { FamilyName = familyName };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(familyName, customer.FamilyName);
@@ -167,7 +176,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { DateofBirth = DateTime.UtcNow };
             var customerPatch = new Models.CustomerPatch { DateofBirth = DateTime.MaxValue };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(DateTime.MaxValue, customer.DateofBirth);
@@ -179,7 +190,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { Gender = Gender.NotProvided };
             var customerPatch = new Models.CustomerPatch { Gender = Gender.NotApplicable };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(Gender.NotApplicable, customer.Gender);
@@ -191,7 +204,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { UniqueLearnerNumber = "0000000000" };
             var customerPatch = new Models.CustomerPatch { UniqueLearnerNumber = "0000000111" };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual("0000000111", customer.UniqueLearnerNumber);
@@ -203,7 +218,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { OptInUserResearch = false };
             var customerPatch = new Models.CustomerPatch { OptInUserResearch = true };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(true, customer.OptInUserResearch);
@@ -215,7 +232,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { OptInMarketResearch = false };
             var customerPatch = new Models.CustomerPatch { OptInMarketResearch = true };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(true, customer.OptInMarketResearch);
@@ -227,7 +246,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { DateOfTermination = DateTime.UtcNow };
             var customerPatch = new Models.CustomerPatch { DateOfTermination = DateTime.MaxValue };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(DateTime.MaxValue, customer.DateOfTermination);
@@ -239,7 +260,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { ReasonForTermination = ReasonForTermination.Other };
             var customerPatch = new Models.CustomerPatch { ReasonForTermination = ReasonForTermination.Duplicate };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(ReasonForTermination.Duplicate, customer.ReasonForTermination);
@@ -251,7 +274,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { IntroducedBy = IntroducedBy.Other };
             var customerPatch = new Models.CustomerPatch { IntroducedBy = IntroducedBy.NotProvided };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(IntroducedBy.NotProvided, customer.IntroducedBy);
@@ -263,7 +288,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { IntroducedByAdditionalInfo = "Info" };
             var customerPatch = new Models.CustomerPatch { IntroducedByAdditionalInfo = "More Info" };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual("More Info", customer.IntroducedByAdditionalInfo);
@@ -275,7 +302,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { LastModifiedDate = DateTime.UtcNow };
             var customerPatch = new Models.CustomerPatch { LastModifiedDate = DateTime.MaxValue };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual(DateTime.MaxValue, customer.LastModifiedDate);
@@ -288,7 +317,9 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             var customer = new Models.Customer { LastModifiedTouchpointId = "0000000000" };
             var customerPatch = new Models.CustomerPatch { LastModifiedTouchpointId = "0000000111" };
 
-            customer.Patch(customerPatch);
+            CustomerPatchService customerPatchService = new CustomerPatchService();
+
+            var patchedCustomer = customerPatchService.Patch(customer, customerPatch);
 
             // Assert
             Assert.AreEqual("0000000111", customer.LastModifiedTouchpointId);

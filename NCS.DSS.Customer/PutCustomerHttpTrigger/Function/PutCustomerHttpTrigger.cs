@@ -23,7 +23,7 @@ namespace NCS.DSS.Customer.PutCustomerHttpTrigger
         [Disable]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "Customers/{customerId}")]HttpRequestMessage req, ILogger log, string customerId,
             [Inject]ILoggerHelper loggerHelper)
-        {
+        {             
             loggerHelper.LogMethodEnter(log);            
 
             return new HttpResponseMessage(HttpStatusCode.OK)

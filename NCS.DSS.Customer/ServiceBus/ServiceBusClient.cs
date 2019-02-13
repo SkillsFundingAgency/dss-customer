@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customers.Cosmos.Helper;
 using Newtonsoft.Json;
@@ -15,7 +16,7 @@ namespace NCS.DSS.Customer.ServiceBus
         public static readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
         public static readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
 
-        private static readonly SubscriptionHelper _subscriptionHelper = new SubscriptionHelper();
+        private static readonly SubscriptionHelper _subscriptionHelper = new SubscriptionHelper(new DocumentDBProvider());
 
         public static async Task AutoSubscribeCustomer(Models.Customer customer)
         {

@@ -1,3 +1,4 @@
+using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -37,16 +38,32 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
             [Inject]IHttpRequestHelper httpRequestHelper,
             [Inject]ISearchCustomerHttpTriggerService searchCustomerService,
             [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IJsonHelper jsonHelper)
+            [Inject]IJsonHelper jsonHelper,
+            [Inject]ILoggerHelper loggerHelper)
         {
+            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            if (string.IsNullOrEmpty(correlationId))
+                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
+
+            if (!Guid.TryParse(correlationId, out var correlationGuid))
+            {
+                log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
+                correlationGuid = Guid.NewGuid();
+            }
+
             var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
 
-            log.LogInformation("C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
+            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subContractorId))
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+
+
+            loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             SearchHelper.GetSearchServiceClient();
             var indexClient = SearchHelper.GetIndexClient();

@@ -44,7 +44,7 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
             builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
             builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
-            builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();            
+            builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();               
         }
 
         private void RegisterServices(IWebJobsBuilder builder)
@@ -55,6 +55,8 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddScoped<IGetCustomerHttpTriggerService, GetCustomerHttpTriggerService>();
             builder.Services.AddScoped<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();
             builder.Services.AddScoped<ICustomerChangeFeedTriggerService, CustomerChangeFeedTriggerService>();
+            builder.Services.AddScoped<ICustomerPatchService, CustomerPatchService>();
+
         }
 
         private void RegisterDataProviders(IWebJobsBuilder builder)
