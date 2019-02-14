@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
@@ -17,6 +16,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 {
@@ -57,11 +57,6 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
                 loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
                 return httpResponseMessageHelper.BadRequest();
             }
-
-            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
-            if (string.IsNullOrEmpty(subContractorId))
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
-
 
             loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
@@ -125,7 +120,7 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 
             return customer == null ?
                 httpResponseMessageHelper.NoContent() :
-                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectsAndRenameIdProperty(customer, "id", "customerId"));
+                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectsAndRenameIdProperty(customer, "id", "CustomerId"));
         }
 
     }

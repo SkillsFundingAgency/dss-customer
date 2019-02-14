@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -17,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -67,23 +67,24 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return httpResponseMessageHelper.BadRequest();
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
+            loggerHelper.LogInformationMessage(log, correlationGuid,
+                "C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to parse customerId to Guid");
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
                 return httpResponseMessageHelper.BadRequest(customerGuid);
             }
 
             var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
                 loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
-
-
+            
             Models.CustomerPatch customerPatchRequest;
 
             try
             {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
                 customerPatchRequest = await httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
             catch (JsonException ex)
@@ -94,26 +95,32 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (customerPatchRequest == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Customer patch request is null");
+                loggerHelper.LogInformationMessage(log, correlationGuid, "customer patch request is null");
                 return httpResponseMessageHelper.UnprocessableEntity(req);
             }
 
-            customerPatchRequest.SetIds(touchpointId, subContractorId);            
+            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
+            customerPatchRequest.SetIds(touchpointId, subContractorId);
 
-            // validate the request
+            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
             var errors = validate.ValidateResource(customerPatchRequest, false);
 
-            if (errors.Any())
+            if (errors != null && errors.Any())
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
                 return httpResponseMessageHelper.UnprocessableEntity(errors);
+            }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
             var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer do not exist {0}", customerGuid));
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
                 return httpResponseMessageHelper.NoContent(customerGuid);
             }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
             var isCustomerReadOnly = await resourceHelper.IsCustomerReadOnly(customerGuid);
 
             if (isCustomerReadOnly)
@@ -122,25 +129,32 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return httpResponseMessageHelper.Forbidden(customerGuid);
             }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Customer {0}", customerGuid));
             var customer = await customerPatchService.GetCustomerByIdAsync(customerGuid);
 
             if (customer == null)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to get Customer resource {0}", customerGuid));
                 return httpResponseMessageHelper.NoContent(customerGuid);
+            }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get patch customer resource {0}", customerGuid));
             var patchedCustomer = customerPatchService.PatchResource(customer, customerPatchRequest);
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
             var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer);
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
-
             if (updatedCustomer != null)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", customerGuid));
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
+            }
 
             loggerHelper.LogMethodExit(log);
 
             return updatedCustomer == null ?
                 httpResponseMessageHelper.BadRequest(customerGuid) :
-                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "customerId"));
+                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
 
         }
     }

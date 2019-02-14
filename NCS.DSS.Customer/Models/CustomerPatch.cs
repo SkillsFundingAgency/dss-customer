@@ -1,7 +1,7 @@
-﻿using NCS.DSS.Customer.Annotations;
-using NCS.DSS.Customer.ReferenceData;
+﻿using NCS.DSS.Customer.ReferenceData;
 using System;
 using System.ComponentModel.DataAnnotations;
+using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.Models
 {

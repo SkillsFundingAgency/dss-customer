@@ -1,9 +1,4 @@
-﻿using DFC.Common.Standard.Logging;
-using DFC.HTTP.Standard;
-using DFC.JSON.Standard;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.Azure.Search;
+﻿using DFC.HTTP.Standard;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Models;
@@ -16,6 +11,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Common.Standard.Logging;
+using DFC.JSON.Standard;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Azure.Search;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
 {
@@ -40,13 +40,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _customer = Substitute.For<Models.Customer>();
 
             _request = new DefaultHttpRequest(new DefaultHttpContext());
-
-            //_request = new HttpRequestMessage()
-            //{
-            //    Content = new StringContent(string.Empty),
-            //    RequestUri =
-            //        new Uri($"http://localhost:7071/api/Customers/7E467BDB-213F-407A-B86A-1954053D3C24/")
-            //};
 
             _log = Substitute.For<ILogger>();
             _resourceHelper = Substitute.For<IResourceHelper>();

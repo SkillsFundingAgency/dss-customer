@@ -17,6 +17,20 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             _documentDbProvider = documentDbProvider;
             _customerPatchService = customerPatchService;
         }
+
+        public Models.Customer PatchResource(string customerJson, CustomerPatch customerPatch)
+        {
+            if (string.IsNullOrEmpty(customerJson))
+                return null;
+
+            if (customerPatch == null)
+                return null;
+
+            customerPatch.SetDefaultValues();
+
+            return _customerPatchService.Patch(customerJson, customerPatch);
+        }
+
         public async Task<Models.Customer> UpdateCosmosAsync(Models.Customer customer)
         {
             if (customer == null)
@@ -24,14 +38,14 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             
             var response = await _documentDbProvider.UpdateCustomerAsync(customer);
 
-            var responseStatusCode = response.StatusCode;
+            var responseStatusCode = response?.StatusCode;
 
-            return responseStatusCode == HttpStatusCode.OK ? customer : null;
+            return responseStatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
         }
 
-        public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
+        public async Task<string> GetCustomerByIdAsync(Guid customerId)
         {
-            return await _documentDbProvider.GetCustomerByIdAsync(customerId);
+            return await _documentDbProvider.GetCustomerByIdForUpdateAsync(customerId);
         }
 
         public async Task SendToServiceBusQueueAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
@@ -39,14 +53,5 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             await ServiceBusClient.SendPatchMessageAsync(customerPatch, customerId, reqUrl);
         }
 
-        public Models.Customer PatchResource(Models.Customer customer, CustomerPatch customerPatch)
-        {            
-            if (customerPatch == null)
-                return null;
-
-            customerPatch.SetDefaultValues();
-
-            return _customerPatchService.Patch(customer, customerPatch);           
-        }
     }
 }

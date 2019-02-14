@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Customer.Cosmos.Helper

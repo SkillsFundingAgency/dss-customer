@@ -7,15 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Swagger.Standard.Annotations;
 
-namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
+namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function  
 {
     public static class GetCustomerByIdHttpTrigger
     {
@@ -53,20 +53,16 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 return httpResponseMessageHelper.BadRequest();
             }           
 
-            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
-            if (string.IsNullOrEmpty(subContractorId))            
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");                            
-
-            loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
+            loggerHelper.LogInformationMessage(log, correlationGuid,
+                "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
                 return httpResponseMessageHelper.BadRequest(customerGuid);
+            }
 
-            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
-
-            if (!doesCustomerExist)
-                return httpResponseMessageHelper.NoContent(customerGuid);
-
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get  customer {0}", customerGuid));
             var customer = await customerByIdService.GetCustomerAsync(customerGuid);
 
             loggerHelper.LogMethodExit(log);

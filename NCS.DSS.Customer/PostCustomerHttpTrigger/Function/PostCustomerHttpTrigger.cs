@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Annotations;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -17,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -77,31 +77,37 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             try
             {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
                 customerRequest = await httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
             }
             catch (JsonException ex)
             {
+                loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
                 return httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (customerRequest == null)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Customer request is null");
                 return httpResponseMessageHelper.UnprocessableEntity(req);
+            }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
             customerRequest.SetIds(touchpointId, subContractorId);            
 
             var errors = validate.ValidateResource(customerRequest,true);
 
-            if (errors.Any())
+            if (errors != null && errors.Any())
                 return httpResponseMessageHelper.UnprocessableEntity(errors);
             
             var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
 
-            //if (customer != null)
-            //    await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+            if (customer != null)
+                await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
             return customer == null
                 ? httpResponseMessageHelper.BadRequest()
-                : httpResponseMessageHelper.Created(jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "customerId"));
+                : httpResponseMessageHelper.Created(jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
 
         }
     }

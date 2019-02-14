@@ -1,63 +1,76 @@
-﻿using NCS.DSS.Customer.Models;
+﻿using DFC.JSON.Standard;
+using NCS.DSS.Customer.Models;
+using Newtonsoft.Json.Linq;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
     public class CustomerPatchService : ICustomerPatchService
-    {       
-        public Models.Customer Patch(Models.Customer customer, CustomerPatch customerPatch)
+    {
+
+        private readonly IJsonHelper _jsonHelper;
+
+        public CustomerPatchService(IJsonHelper jsonHelper)
         {
-            if (customerPatch == null)
+            _jsonHelper = jsonHelper;
+        }
+
+        public Models.Customer Patch(string customerJson, CustomerPatch customerPatch)
+        {
+            if (string.IsNullOrEmpty(customerJson))
                 return null;
 
+            var obj = JObject.Parse(customerJson);
+            
             if (!string.IsNullOrEmpty(customerPatch.SubcontractorId))
-                customer.SubcontractorId = customerPatch.SubcontractorId;
+                _jsonHelper.UpdatePropertyValue(obj["SubcontractorId"], customerPatch.SubcontractorId);
 
             if (customerPatch.DateOfRegistration.HasValue)
-                customer.DateOfRegistration = customerPatch.DateOfRegistration;
+                _jsonHelper.UpdatePropertyValue(obj["DateOfRegistration"], customerPatch.DateOfRegistration);
 
             if (customerPatch.Title.HasValue)
-                customer.Title = customerPatch.Title;
+                _jsonHelper.UpdatePropertyValue(obj["Title"], customerPatch.Title);
 
             if (!string.IsNullOrEmpty(customerPatch.GivenName))
-                customer.GivenName = customerPatch.GivenName;
+                _jsonHelper.UpdatePropertyValue(obj["GivenName"], customerPatch.GivenName);
 
             if (!string.IsNullOrEmpty(customerPatch.FamilyName))
-                customer.FamilyName = customerPatch.FamilyName;
+                _jsonHelper.UpdatePropertyValue(obj["FamilyName"], customerPatch.FamilyName);
 
             if (customerPatch.DateofBirth.HasValue)
-                customer.DateofBirth = customerPatch.DateofBirth;
+                _jsonHelper.UpdatePropertyValue(obj["DateofBirth"], customerPatch.DateofBirth);
 
             if (customerPatch.Gender.HasValue)
-                customer.Gender = customerPatch.Gender;
+                _jsonHelper.UpdatePropertyValue(obj["Gender"], customerPatch.Gender);
 
             if (!string.IsNullOrEmpty(customerPatch.UniqueLearnerNumber))
-                customer.UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
+                _jsonHelper.UpdatePropertyValue(obj["UniqueLearnerNumber"], customerPatch.UniqueLearnerNumber);
 
             if (customerPatch.OptInUserResearch.HasValue)
-                customer.OptInUserResearch = customerPatch.OptInUserResearch;
+                _jsonHelper.UpdatePropertyValue(obj["OptInUserResearch"], customerPatch.OptInUserResearch);
 
             if (customerPatch.OptInMarketResearch.HasValue)
-                customer.OptInMarketResearch = customerPatch.OptInMarketResearch;
+                _jsonHelper.UpdatePropertyValue(obj["OptInMarketResearch"], customerPatch.OptInMarketResearch);
 
             if (customerPatch.DateOfTermination.HasValue)
-                customer.DateOfTermination = customerPatch.DateOfTermination;
+                _jsonHelper.UpdatePropertyValue(obj["DateOfTermination"], customerPatch.DateOfTermination);
 
             if (customerPatch.ReasonForTermination.HasValue)
-                customer.ReasonForTermination = customerPatch.ReasonForTermination;
+                _jsonHelper.UpdatePropertyValue(obj["ReasonForTermination"], customerPatch.ReasonForTermination);
 
             if (customerPatch.IntroducedBy.HasValue)
-                customer.IntroducedBy = customerPatch.IntroducedBy;
+                _jsonHelper.UpdatePropertyValue(obj["IntroducedBy"], customerPatch.IntroducedBy);
 
             if (!string.IsNullOrEmpty(customerPatch.IntroducedByAdditionalInfo))
-                customer.IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
+                _jsonHelper.UpdatePropertyValue(obj["IntroducedByAdditionalInfo"], customerPatch.IntroducedByAdditionalInfo);
 
             if (customerPatch.LastModifiedDate.HasValue)
-                customer.LastModifiedDate = customerPatch.LastModifiedDate;
+                _jsonHelper.UpdatePropertyValue(obj["LastModifiedDate"], customerPatch.LastModifiedDate);
 
             if (!string.IsNullOrEmpty(customerPatch.LastModifiedTouchpointId))
-                customer.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointId;
+                _jsonHelper.UpdatePropertyValue(obj["LastModifiedTouchpointId"], customerPatch.LastModifiedTouchpointId);
 
-            return customer;
+            return obj.ToObject<Models.Customer>();
+
         }
     }
 }

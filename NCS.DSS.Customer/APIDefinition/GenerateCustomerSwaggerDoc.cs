@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace NCS.DSS.Customer.APIDefinition
 {
-    public static class ApiDefinition
+    public static class GenerateCustomerSwaggerDoc
     {
         public const string APITitle = "Customers";
         public const string APIDefinitionName = "API-Definition";

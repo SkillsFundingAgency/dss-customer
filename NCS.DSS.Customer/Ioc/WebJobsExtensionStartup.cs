@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
-using NCS.DSS.Customer.GetCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
@@ -47,7 +46,6 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddScoped<IGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService>();
             builder.Services.AddScoped<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
             builder.Services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
-            builder.Services.AddScoped<IGetCustomerHttpTriggerService, GetCustomerHttpTriggerService>();
             builder.Services.AddScoped<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();            
             builder.Services.AddScoped<ICustomerPatchService, CustomerPatchService>();
 

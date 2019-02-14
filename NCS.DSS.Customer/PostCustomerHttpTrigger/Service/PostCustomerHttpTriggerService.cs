@@ -1,5 +1,4 @@
-﻿using System;
-using NCS.DSS.Customer.Cosmos.Provider;
+﻿using NCS.DSS.Customer.Cosmos.Provider;
 using System.Net;
 using System.Threading.Tasks;
 using NCS.DSS.Customer.ServiceBus;

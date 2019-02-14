@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 
-namespace NCS.DSS.Customers.Cosmos.Helper
+namespace NCS.DSS.Customer.Cosmos.Helper
 {
     public class SubscriptionHelper : ISubscriptionHelper
     {
@@ -15,6 +14,7 @@ namespace NCS.DSS.Customers.Cosmos.Helper
         {
             _documentDbProvider = documentDbProvider;
         }
+
         public async Task<Subscriptions> CreateSubscriptionAsync(Customer.Models.Customer customer)
         {
             if (customer == null)

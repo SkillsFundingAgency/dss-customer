@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace NCS.DSS.Customer.Tests.ValidationTests

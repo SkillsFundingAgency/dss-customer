@@ -149,7 +149,30 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             return null;
         }
-                
+
+        public async Task<string> GetCustomerByIdForUpdateAsync(Guid customerId)
+        {
+            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
+
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            if (client == null)
+                return null;
+
+            try
+            {
+                var response = await client.ReadDocumentAsync(documentUri);
+                if (response.Resource != null)
+                    return response.Resource.ToString();
+            }
+            catch (DocumentClientException)
+            {
+                return null;
+            }
+
+            return null;
+        }
+
         public async Task<ResourceResponse<Document>> CreateCustomerAsync(Models.Customer customer)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
