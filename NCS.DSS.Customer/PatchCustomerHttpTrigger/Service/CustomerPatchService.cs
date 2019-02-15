@@ -22,7 +22,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             var obj = JObject.Parse(customerJson);
             
             if (!string.IsNullOrEmpty(customerPatch.SubcontractorId))
-                _jsonHelper.UpdatePropertyValue(obj["SubcontractorId"], customerPatch.SubcontractorId);
+            {
+                if (obj["SubcontractorId"] == null)
+                    _jsonHelper.CreatePropertyOnJObject(obj, "SubcontractorId", customerPatch.SubcontractorId);
+                else
+                    _jsonHelper.UpdatePropertyValue(obj["SubcontractorId"], customerPatch.SubcontractorId);
+            }
 
             if (customerPatch.DateOfRegistration.HasValue)
                 _jsonHelper.UpdatePropertyValue(obj["DateOfRegistration"], customerPatch.DateOfRegistration);
