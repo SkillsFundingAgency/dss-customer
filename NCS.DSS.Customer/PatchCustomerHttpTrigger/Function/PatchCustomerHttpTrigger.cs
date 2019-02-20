@@ -49,6 +49,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
+            log.LogInformation("Apimurl:  " + ApimURL);
+
             log.LogInformation("C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
@@ -91,9 +93,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (customer == null)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var updatedCustomer = await customerPatchService.UpdateCustomerAsync(customer, customerPatchRequest);
+            var patchedCustomer = customerPatchService.PatchResource(customer, customerPatchRequest);
 
-            log.LogInformation("Apimurl:  " + ApimURL);
+            if (patchedCustomer == null)
+                return HttpResponseMessageHelper.NoContent(customerGuid);
+
+            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer);
 
             if (updatedCustomer != null)
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
