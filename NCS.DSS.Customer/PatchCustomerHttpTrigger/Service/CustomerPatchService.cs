@@ -7,7 +7,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
     public class CustomerPatchService : ICustomerPatchService
     {
 
-        public Models.Customer Patch(string customerJson, CustomerPatch customerPatch)
+        public string Patch(string customerJson, CustomerPatch customerPatch)
         {
             if (string.IsNullOrEmpty(customerJson))
                 return null;
@@ -59,7 +59,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             if (!string.IsNullOrEmpty(customerPatch.LastModifiedTouchpointId))
                 JsonHelper.UpdatePropertyValue(obj["LastModifiedTouchpointId"], customerPatch.LastModifiedTouchpointId);
 
-            return obj.ToObject<Models.Customer>();
+            return obj.ToString();
 
         }
     }

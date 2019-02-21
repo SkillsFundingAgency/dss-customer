@@ -95,10 +95,10 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             var patchedCustomer = customerPatchService.PatchResource(customer, customerPatchRequest);
 
-            if (patchedCustomer == null)
+            if (string.IsNullOrEmpty(patchedCustomer))
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer);
+            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
             if (updatedCustomer != null)
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);

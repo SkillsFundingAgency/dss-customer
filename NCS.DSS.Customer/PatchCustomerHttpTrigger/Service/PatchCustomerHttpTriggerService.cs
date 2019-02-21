@@ -18,7 +18,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             _customerPatchService = customerPatchService;
         }
 
-        public Models.Customer PatchResource(string customerJson, CustomerPatch customerPatch)
+        public string PatchResource(string customerJson, CustomerPatch customerPatch)
         {
             if (string.IsNullOrEmpty(customerJson))
                 return null;
@@ -31,12 +31,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
             return _customerPatchService.Patch(customerJson, customerPatch);
         }
 
-        public async Task<Models.Customer> UpdateCosmosAsync(Models.Customer customer)
+        public async Task<Models.Customer> UpdateCosmosAsync(string customerJson, Guid customerId)
         {
-            if (customer == null)
+            if (customerJson == null)
                 return null;
 
-            var response = await _documentDbProvider.UpdateCustomerAsync(customer);
+            var response = await _documentDbProvider.UpdateCustomerAsync(customerJson, customerId);
 
             var responseStatusCode = response?.StatusCode;
 
