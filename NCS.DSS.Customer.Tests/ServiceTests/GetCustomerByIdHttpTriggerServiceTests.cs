@@ -28,7 +28,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         [Test]
         public async Task GetCustomerByIdHttpTriggerServiceTests_GetCustomerAsync_ReturnsNullWhenResourceCannotBeFound()
         {
-            _documentDbProvider.GetCustomerByIdAsync(Arg.Any<Guid>()).ReturnsForAnyArgs(Task.FromResult<Models.Customer>(null).Result);
+            _documentDbProvider.GetCustomerByIdAsync(_customerId).Returns(Task.FromResult<Models.Customer>(null).Result);
 
             // Act
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);

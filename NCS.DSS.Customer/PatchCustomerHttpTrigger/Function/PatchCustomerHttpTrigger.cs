@@ -138,11 +138,11 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return httpResponseMessageHelper.NoContent(customerGuid);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get patch customer resource {0}", customerGuid));
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to patch customer resource {0}", customerGuid));
             var patchedCustomer = customerPatchService.PatchResource(customer, customerPatchRequest);
 
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
-            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer);
+            var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
             if (updatedCustomer != null)
             {

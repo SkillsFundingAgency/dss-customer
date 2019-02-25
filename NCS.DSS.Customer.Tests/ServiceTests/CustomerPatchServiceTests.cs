@@ -44,8 +44,10 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, patchedCustomer.DateOfRegistration);
+            Assert.AreEqual(DateTime.MaxValue, customer.DateOfRegistration);
         }
 
         [Test]
@@ -55,8 +57,10 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(Title.Dr, patchedCustomer.Title);
+            Assert.AreEqual(Title.Dr, customer.Title);
         }
 
         [Test]
@@ -67,8 +71,10 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(givenName, patchedCustomer.GivenName);
+            Assert.AreEqual(givenName, customer.GivenName);
         }
 
         [Test]
@@ -76,11 +82,13 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         {
             var familyName = "Smith";
             var customerPatch = new CustomerPatch { FamilyName = familyName };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(familyName, patchedCustomer.FamilyName);
+            Assert.AreEqual(familyName, customer.FamilyName);
         }
 
         [Test]
@@ -90,107 +98,127 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, patchedCustomer.DateofBirth);
+            Assert.AreEqual(DateTime.MaxValue, customer.DateofBirth);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckGenderIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { Gender = Gender.NotApplicable };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(Gender.NotApplicable, patchedCustomer.Gender);
+            Assert.AreEqual(Gender.NotApplicable, customer.Gender);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckUniqueLearnerNumberIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { UniqueLearnerNumber = "0000000111" };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual("0000000111", patchedCustomer.UniqueLearnerNumber);
+            Assert.AreEqual("0000000111", customer.UniqueLearnerNumber);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckOptInUserResearchIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { OptInUserResearch = true };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(true, patchedCustomer.OptInUserResearch);
+            Assert.AreEqual(true, customer.OptInUserResearch);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckOptInMarketResearchIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { OptInMarketResearch = true };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(true, patchedCustomer.OptInMarketResearch);
+            Assert.AreEqual(true, customer.OptInMarketResearch);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckDateOfTerminationIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { DateOfTermination = DateTime.MaxValue };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, patchedCustomer.DateOfTermination);
+            Assert.AreEqual(DateTime.MaxValue, customer.DateOfTermination);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckReasonForTerminationIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { ReasonForTermination = ReasonForTermination.Duplicate };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(ReasonForTermination.Duplicate, patchedCustomer.ReasonForTermination);
+            Assert.AreEqual(ReasonForTermination.Duplicate, customer.ReasonForTermination);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckIntroducedByIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { IntroducedBy = IntroducedBy.NotProvided };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(IntroducedBy.NotProvided, patchedCustomer.IntroducedBy);
+            Assert.AreEqual(IntroducedBy.NotProvided, customer.IntroducedBy);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckIntroducedByAdditionalInfoIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { IntroducedByAdditionalInfo = "More Info" };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual("More Info", patchedCustomer.IntroducedByAdditionalInfo);
+            Assert.AreEqual("More Info", customer.IntroducedByAdditionalInfo);
         }
 
         [Test]
         public void CustomerPatchServiceTests_CheckLastModifiedDatesUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { LastModifiedDate = DateTime.MaxValue };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, patchedCustomer.LastModifiedDate);
+            Assert.AreEqual(DateTime.MaxValue, customer.LastModifiedDate);
         }
 
 
@@ -198,11 +226,13 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         public void CustomerPatchServiceTests_CheckLastModifiedTouchpointIdIsUpdated_WhenPatchIsCalled()
         {
             var customerPatch = new CustomerPatch { LastModifiedTouchpointId = "0000000111" };
-            
+
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual("0000000111", patchedCustomer.LastModifiedTouchpointId);
+            Assert.AreEqual("0000000111", customer.LastModifiedTouchpointId);
         }
 
         [Test]
@@ -212,8 +242,10 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             var patchedCustomer = _customerPatchService.Patch(_json, customerPatch);
 
+            var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
+
             // Assert
-            Assert.AreEqual("0000000111", patchedCustomer.SubcontractorId);
+            Assert.AreEqual("0000000111", customer.SubcontractorId);
         }
     }
 }

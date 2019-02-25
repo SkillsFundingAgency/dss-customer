@@ -37,6 +37,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private IPatchCustomerHttpTriggerService _patchCustomerHttpTriggerService;
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
+        private string _customerString;
 
         [SetUp]
         public void Setup()
@@ -56,6 +57,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _log = Substitute.For<ILogger>();
             _resourceHelper = Substitute.For<IResourceHelper>();
             _patchCustomerHttpTriggerService = Substitute.For<IPatchCustomerHttpTriggerService>();
+            _customerString = JsonConvert.SerializeObject(_customer);
 
             _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
             _httpRequestHelper.GetDssApimUrl(_request).Returns("http://localhost:7071/");
@@ -161,9 +163,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Test]
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeBadRequest_WhenUnableToUpdateCustomerRecord()
         {
-            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult("customer").Result);
+            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult(_customerString).Result);
 
-            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult<Models.Customer>(null).Result);
+            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Customer>(null).Result);
 
             _httpResponseMessageHelper
                 .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
@@ -178,9 +180,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Test]
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsNotValid()
         {
-            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult("customer").Result);
+            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult(_customerString).Result);
 
-            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult<Models.Customer>(null).Result);
+            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Customer>(null).Result);
 
             _httpResponseMessageHelper
                 .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
@@ -195,9 +197,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Test]
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsValid()
         {
-            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult("customer").Result);
+            _patchCustomerHttpTriggerService.GetCustomerByIdAsync(Arg.Any<Guid>()).Returns(Task.FromResult(_customerString).Result);
 
-            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult(_customer).Result);
+            _patchCustomerHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult(_customer).Result);
 
             _httpResponseMessageHelper
                 .Ok(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.OK));

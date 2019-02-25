@@ -282,9 +282,6 @@
     <Compile Include="FunctionTests\SearchCustomerHttpTriggerTests.cs" />
     <Compile Include="ModelTests\CustomerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceTests\GetCustomerByIdHttpTriggerServiceTests.cs" />
-    <Compile Include="ServiceTests\PatchCustomerHttpTriggerServiceTests.cs" />
-    <Compile Include="ServiceTests\PostCustomerHttpTriggerTests.cs" />
     <Compile Include="TestData\TestData.cs" />
     <Compile Include="ValidationTests\ValidateTests.cs" />
   </ItemGroup>

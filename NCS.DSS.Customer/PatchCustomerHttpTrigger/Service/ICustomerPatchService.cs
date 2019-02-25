@@ -4,6 +4,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
     public interface ICustomerPatchService
     {
-        Models.Customer Patch(string customerJson, CustomerPatch customerPatch);
+        string Patch(string customerJson, CustomerPatch customerPatch);
     }
 }

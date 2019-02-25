@@ -64,7 +64,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.CreateCustomerAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult(resourceResponse).Result);
+            _documentDbProvider.CreateCustomerAsync(_customer).Returns(Task.FromResult(resourceResponse).Result);
 
             // Act
             var result = await _customerHttpTriggerService.CreateNewCustomerAsync(_customer);
