@@ -1,5 +1,4 @@
-﻿using System;
-using NCS.DSS.Customer.Cosmos.Provider;
+﻿using NCS.DSS.Customer.Cosmos.Provider;
 using System.Net;
 using System.Threading.Tasks;
 using NCS.DSS.Customer.ServiceBus;
@@ -8,16 +7,19 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
     public class PostCustomerHttpTriggerService : IPostCustomerHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+        public PostCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
         public async Task<Models.Customer> CreateNewCustomerAsync(Models.Customer customer)
         {
             if (customer == null)
                 return null;
 
-            customer.SetDefaultValues();
+            customer.SetDefaultValues();            
 
-            var documentDbProvider = new DocumentDBProvider();
-
-            var response = await documentDbProvider.CreateCustomerAsync(customer);
+            var response = await _documentDbProvider.CreateCustomerAsync(customer);
 
             return response.StatusCode == HttpStatusCode.Created ? (dynamic) response.Resource : null;
 

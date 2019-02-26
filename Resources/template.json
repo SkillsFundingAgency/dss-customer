@@ -23,13 +23,7 @@
     "searchServiceAdminApiKey": {
       "type": "string"
     },
-    "serviceBusAccessKey": {
-      "type": "string"
-    },
-    "serviceBusAccessKeyName": {
-      "type": "string"
-    },
-    "serviceBusBaseAddress": {
+    "serviceBusConnectionString": {
       "type": "string"
     },
     "serviceBusQueueName": {
@@ -39,6 +33,12 @@
       "type": "string"
     },
     "sharedAppServicePlanResourceGroup": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountKey": {
       "type": "string"
     },
     "templateBaseUrl": {
@@ -85,17 +85,17 @@
                 "searchServiceAdminApiKey": {
                   "value": "[parameters('searchServiceAdminApiKey')]"
                 },
-                "serviceBusAccessKey": {
-                  "value": "[parameters('serviceBusAccessKey')]"
-                },
-                "serviceBusAccessKeyName": {
-                  "value": "[parameters('serviceBusAccessKeyName')]"
-                },
-                "serviceBusBaseAddress": {
-                  "value": "[parameters('serviceBusBaseAddress')]"
+                "serviceBusConnectionString": {
+                  "value": "[parameters('serviceBusConnectionString')]"
                 },
                 "serviceBusQueueName": {
                   "value": "[parameters('serviceBusQueueName')]"
+                },
+                "storageAccountKey": {
+                  "value": "[parameters('storageAccountKey')]"
+                },
+                "storageAccountName": {
+                  "value": "[parameters('storageAccountName')]"
                 }
               }
             },

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NCS.DSS.Customer.ReferenceData;
+using System;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Customer.Annotations;
-using NCS.DSS.Customer.ReferenceData;
+using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -28,14 +27,14 @@ namespace NCS.DSS.Customer.Models
         public Title? Title { get; set; }
 
         [Required]
-        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
+        [RegularExpression(@"^[a-zA-Z ]+((['\,\.\- ][a-zA-Z ])?[a-zA-Z ]*)*$")]
         [Display(Description = "Customers first or given name")]
         [Example(Description = "Boris")]
         [StringLength(100)]
         public string GivenName { get; set; }
 
         [Required]
-        [RegularExpression(@"^[a-zA-Z]+((['\,\.\-][a-zA-Z])?[a-zA-Z]*)*$")]
+        [RegularExpression(@"^[a-zA-Z ]+((['\,\.\- ][a-zA-Z ])?[a-zA-Z ]*)*$")]
         [Display(Description = "Customers family or surname")]
         [Example(Description = "Johnson")]
         [StringLength(100)]
@@ -113,6 +112,11 @@ namespace NCS.DSS.Customer.Models
         [StringLength(100)]
         public string IntroducedByAdditionalInfo { get; set; }
 
+        [StringLength(50)]
+        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
+        [Example(Description = "01234567899876543210")]
+        public string SubcontractorId { get; set; }
+
         [Display(Description = "Date and time of the last modification to the record")]
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? LastModifiedDate { get; set; }
@@ -153,57 +157,10 @@ namespace NCS.DSS.Customer.Models
 
         }
 
-        public void Patch(CustomerPatch customerPatch)
+        public void SetIds(string touchpointId, string subcontractorid)
         {
-            if (customerPatch == null)
-                return;
-
-            if (customerPatch.DateOfRegistration.HasValue)
-                this.DateOfRegistration = customerPatch.DateOfRegistration;
-
-            if (customerPatch.Title.HasValue)
-                this.Title = customerPatch.Title;
-
-            if (!string.IsNullOrEmpty(customerPatch.GivenName))
-                this.GivenName = customerPatch.GivenName;
-
-            if (!string.IsNullOrEmpty(customerPatch.FamilyName))
-                this.FamilyName = customerPatch.FamilyName;
-
-            if (customerPatch.DateofBirth.HasValue)
-                this.DateofBirth = customerPatch.DateofBirth;
-
-            if (customerPatch.Gender.HasValue)
-                this.Gender = customerPatch.Gender;
-
-            if (!string.IsNullOrEmpty(customerPatch.UniqueLearnerNumber))
-                this.UniqueLearnerNumber = customerPatch.UniqueLearnerNumber;
-
-            if (customerPatch.OptInUserResearch.HasValue)
-                this.OptInUserResearch = customerPatch.OptInUserResearch;
-
-            if (customerPatch.OptInMarketResearch.HasValue)
-                this.OptInMarketResearch = customerPatch.OptInMarketResearch;
-
-            if (customerPatch.DateOfTermination.HasValue)
-                this.DateOfTermination = customerPatch.DateOfTermination;
-
-            if (customerPatch.ReasonForTermination.HasValue)
-                this.ReasonForTermination = customerPatch.ReasonForTermination;
-
-            if (customerPatch.IntroducedBy.HasValue)
-                this.IntroducedBy = customerPatch.IntroducedBy;
-
-            if (!string.IsNullOrEmpty(customerPatch.IntroducedByAdditionalInfo))
-                this.IntroducedByAdditionalInfo = customerPatch.IntroducedByAdditionalInfo;
-
-            if (customerPatch.LastModifiedDate.HasValue)
-                this.LastModifiedDate = customerPatch.LastModifiedDate;
-
-            if (!string.IsNullOrEmpty(customerPatch.LastModifiedTouchpointId))
-                this.LastModifiedTouchpointId = customerPatch.LastModifiedTouchpointId;
+            LastModifiedTouchpointId = touchpointId;
+            SubcontractorId = subcontractorid;
         }
-
-
-    }
+    }    
 }

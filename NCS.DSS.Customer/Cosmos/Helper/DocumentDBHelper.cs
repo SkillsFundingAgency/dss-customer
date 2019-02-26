@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Customer.Cosmos.Helper
@@ -7,12 +6,12 @@ namespace NCS.DSS.Customer.Cosmos.Helper
     public static class DocumentDBHelper
     {
         private static Uri _documentCollectionUri;
-        private static readonly string DatabaseId = ConfigurationManager.AppSettings["DatabaseId"];
-        private static readonly string CollectionId = ConfigurationManager.AppSettings["CollectionId"];
+        private static readonly string DatabaseId = Environment.GetEnvironmentVariable("DatabaseId");
+        private static readonly string CollectionId = Environment.GetEnvironmentVariable("CollectionId");
 
         private static Uri _subscriptionDocumentCollectionUri;
-        private static readonly string SubscriptionDatabaseId = ConfigurationManager.AppSettings["SubscriptionDatabaseId"];
-        private static readonly string SubscriptionCollectionId = ConfigurationManager.AppSettings["SubscriptionCollectionId"];
+        private static readonly string SubscriptionDatabaseId = Environment.GetEnvironmentVariable("SubscriptionDatabaseId");
+        private static readonly string SubscriptionCollectionId = Environment.GetEnvironmentVariable("SubscriptionCollectionId");
 
         public static Uri CreateDocumentCollectionUri()
         {
