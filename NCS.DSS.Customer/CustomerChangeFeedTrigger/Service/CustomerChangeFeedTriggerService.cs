@@ -1,41 +1,44 @@
-﻿using DFC.AzureSql.Standard;
-using DFC.Common.Standard.Logging;
-using Microsoft.Azure.Documents;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.ServiceBus;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.CustomerChangeFeedTrigger.Service
 {
     public class CustomerChangeFeedTriggerService : ICustomerChangeFeedTriggerService
     {
-        private readonly ILoggerHelper _loggerHelper;
-        private readonly ISQLServerProvider _sqlServerProvider;
-        private static readonly string CommandText = Environment.GetEnvironmentVariable("SQLCommandText");
-        private static readonly string ParameterName = Environment.GetEnvironmentVariable("SQLParameterName");
-        public CustomerChangeFeedTriggerService(ILoggerHelper loggerHelper, ISQLServerProvider sqlServerProvider)
+        private readonly string _queueName = Environment.GetEnvironmentVariable("ChangeFeedQueueName");
+        private readonly string _serviceBusConnectionString = Environment.GetEnvironmentVariable("ChangeFeedServiceBusConnectionString");
+
+        public async Task SendMessageToChangeFeedQueueAsync(Document document)
         {
-            _loggerHelper = loggerHelper;
-            _sqlServerProvider = sqlServerProvider;
+
+            if (document == null)
+                return;
+
+            var queueClient = new QueueClient(_serviceBusConnectionString, _queueName);
+
+            var changeFeedMessageModel = new ChangeFeedMessageModel()
+            {
+                Document = document,
+                IsCustomer = true
+            };
+
+            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(changeFeedMessageModel)))
+            {
+                ContentType = "application/json",
+                MessageId = document.Id
+            };
+
+            await queueClient.SendAsync(msg);
         }
-        public async Task PersistChangeAsync(IReadOnlyList<Document> documents, ILogger log)
+
+        public class ChangeFeedMessageModel
         {
-            _loggerHelper.LogMethodEnter(log);
-
-            try
-            {
-                foreach (Document document in documents)
-                {
-                    await _sqlServerProvider.UpsertResource(document, log, CommandText, ParameterName);
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggerHelper.LogException(log, Guid.NewGuid(), "Error when trying to upsert into SQL", ex);
-            }
-
-            _loggerHelper.LogMethodExit(log);
+            public Document Document { get; set; }
+            public bool IsCustomer { get; set; }
         }
     }
 }

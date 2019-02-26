@@ -4,6 +4,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.CustomerChangeFeedTrigger.Service;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,19 +12,19 @@ namespace NCS.DSS.Customer.CustomerChangeFeedTrigger.Function
 {
     public static class CustomerChangeFeedTrigger
     {
-        private const string _databaseName = "%DatabaseName%";
-        private const string _collectionName = "%CollectionId%";
-        private const string _connectionString = "CustomerConnectionString";
-        private const string _leaseCollectionName = "%LeaseCollectionName%";
-        private const string _leaseCollectionPrefix = "%LeaseCollectionPrefix%";
+        private const string DatabaseName = "%DatabaseName%";
+        private const string CollectionName = "%CollectionId%";
+        private const string ConnectionString = "CustomerConnectionString";
+        private const string LeaseCollectionName = "%LeaseCollectionName%";
+        private const string LeaseCollectionPrefix = "%LeaseCollectionPrefix%";
 
         [FunctionName("CustomerChangeFeedTrigger")]
         public static async Task Run([CosmosDBTrigger(
-            databaseName: _databaseName,
-            collectionName: _collectionName,
-            ConnectionStringSetting = _connectionString,
-            LeaseCollectionName = _leaseCollectionName,
-            LeaseCollectionPrefix = _leaseCollectionPrefix,
+            DatabaseName,
+            CollectionName,
+            ConnectionStringSetting = ConnectionString,
+            LeaseCollectionName = LeaseCollectionName,
+            LeaseCollectionPrefix = LeaseCollectionPrefix,
             CreateLeaseCollectionIfNotExists = true
             )]IReadOnlyList<Document> documents, ILogger log,
             [Inject]ILoggerHelper loggerHelper,
@@ -31,7 +32,18 @@ namespace NCS.DSS.Customer.CustomerChangeFeedTrigger.Function
         {
             loggerHelper.LogMethodEnter(log);
 
-            await customerChangeFeedTriggerService.PersistChangeAsync(documents, log);
+            try
+            {
+                foreach (var document in documents)
+                {
+                    loggerHelper.LogInformationMessage(log, Guid.NewGuid(), string.Format("Attempting to send document id: {0} to service bus queue", document.Id));
+                    await customerChangeFeedTriggerService.SendMessageToChangeFeedQueueAsync(document);
+                }
+            }
+            catch (Exception ex)
+            {
+                loggerHelper.LogException(log, Guid.NewGuid(), "Error when trying to add document to service bus queue", ex);
+            }
 
             loggerHelper.LogMethodExit(log);
         }
