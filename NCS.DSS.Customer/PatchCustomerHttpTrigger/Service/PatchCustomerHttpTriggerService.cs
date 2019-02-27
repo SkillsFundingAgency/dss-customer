@@ -9,29 +9,43 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
     public class PatchCustomerHttpTriggerService : IPatchCustomerHttpTriggerService
     {
-        public async Task<Models.Customer> UpdateCustomerAsync(Models.Customer customer, Models.CustomerPatch customerPatch)
+        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly ICustomerPatchService _customerPatchService;
+
+        public PatchCustomerHttpTriggerService(ICustomerPatchService customerPatchService, IDocumentDBProvider documentDbProvider)
         {
-            if (customer == null)
+            _documentDbProvider = documentDbProvider;
+            _customerPatchService = customerPatchService;
+        }
+
+        public string PatchResource(string customerJson, CustomerPatch customerPatch)
+        {
+            if (string.IsNullOrEmpty(customerJson))
+                return null;
+
+            if (customerPatch == null)
                 return null;
 
             customerPatch.SetDefaultValues();
 
-            customer.Patch(customerPatch);
-
-            var documentDbProvider = new DocumentDBProvider();
-            var response = await documentDbProvider.UpdateCustomerAsync(customer);
-
-            var responseStatusCode = response.StatusCode;
-
-            return responseStatusCode == HttpStatusCode.OK ? customer : null;
+            return _customerPatchService.Patch(customerJson, customerPatch);
         }
 
-        public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
+        public async Task<Models.Customer> UpdateCosmosAsync(string customerJson, Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var customer = await documentDbProvider.GetCustomerByIdAsync(customerId);
+            if (customerJson == null)
+                return null;
 
-            return customer;
+            var response = await _documentDbProvider.UpdateCustomerAsync(customerJson, customerId);
+
+            var responseStatusCode = response?.StatusCode;
+
+            return responseStatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
+        }
+
+        public async Task<string> GetCustomerByIdAsync(Guid customerId)
+        {
+            return await _documentDbProvider.GetCustomerByIdForUpdateAsync(customerId);
         }
 
         public async Task SendToServiceBusQueueAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
