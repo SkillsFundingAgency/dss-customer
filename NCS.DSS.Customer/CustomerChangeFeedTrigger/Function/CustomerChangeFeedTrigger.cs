@@ -12,7 +12,7 @@ namespace NCS.DSS.Customer.CustomerChangeFeedTrigger.Function
 {
     public static class CustomerChangeFeedTrigger
     {
-        private const string DatabaseName = "%DatabaseName%";
+        private const string DatabaseName = "%DatabaseId%";
         private const string CollectionName = "%CollectionId%";
         private const string ConnectionString = "CustomerConnectionString";
         private const string LeaseCollectionName = "%LeaseCollectionName%";
