@@ -93,15 +93,8 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             DocumentSearchResult<Models.Customer> response;
 
-            try
-            {
-                //Search
-                response = await indexClient.Documents.SearchAsync<Models.Customer>(searchText, sp);
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+            //Search
+            response = await indexClient.Documents.SearchAsync<Models.Customer>(searchText, sp);
 
             return response?.Results.Count == 0 ? null : response?.Results.Select(result => result.Document).ToList();
         }

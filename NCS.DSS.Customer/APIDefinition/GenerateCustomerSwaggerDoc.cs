@@ -11,17 +11,18 @@ namespace NCS.DSS.Customer.APIDefinition
 {
     public static class GenerateCustomerSwaggerDoc
     {
-        public const string APITitle = "Customers";
-        public const string APIDefinitionName = "API-Definition";
-        public const string APIDefRoute = APITitle + "/" + APIDefinitionName;
-        public const string APIDescription = "Basic details of a National Careers Service " + APITitle + " Resource";
+        public const string ApiTitle = "Customers";
+        public const string ApiDefinitionName = "API-Definition";
+        public const string ApiDefRoute = ApiTitle + "/" + ApiDefinitionName;
+        public const string ApiDescription = "To support the Data Collections integration with DSS SubcontractorId has been added as an attribute.";
+        public const string ApiVersion = "2.0.0";
 
-        [FunctionName(APIDefinitionName)]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = APIDefRoute)]HttpRequest req,
+        [FunctionName(ApiDefinitionName)]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefRoute)]HttpRequest req,
             [Inject]ISwaggerDocumentGenerator swaggerDocumentGenerator)
         {
-            var swagger = swaggerDocumentGenerator.GenerateSwaggerDocument(req, APITitle, APIDescription,
-                APIDefinitionName, Assembly.GetExecutingAssembly());
+            var swagger = swaggerDocumentGenerator.GenerateSwaggerDocument(req, ApiTitle, ApiDescription,
+                ApiDefinitionName, ApiVersion, Assembly.GetExecutingAssembly());
 
             if (string.IsNullOrEmpty(swagger))
                 return new HttpResponseMessage(HttpStatusCode.NoContent);

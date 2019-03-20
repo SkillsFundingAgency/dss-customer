@@ -19,51 +19,27 @@ namespace NCS.DSS.Customer.Cosmos.Client
 
         private static DocumentClient InitialiseDocumentClient()
         {
-            string connectionString;
-
-            try
-            {
-                connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+            var connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
 
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new ArgumentNullException();
 
-            string endPoint;
-            try
-            {
-                endPoint = connectionString.Split(new[] { "AccountEndpoint=" }, StringSplitOptions.None)[1]
-                    .Split(';')[0]
-                    .Trim();
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+            var endPoint = connectionString.Split(new[] { "AccountEndpoint=" }, StringSplitOptions.None)[1]
+                .Split(';')[0]
+                .Trim();
 
             if (string.IsNullOrWhiteSpace(endPoint))
                 throw new ArgumentNullException();
 
-            string key;
-            try
-            {
-                key = connectionString.Split(new[] { "AccountKey=" }, StringSplitOptions.None)[1]
-                    .Split(';')[0]
-                    .Trim();
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+            var key = connectionString.Split(new[] { "AccountKey=" }, StringSplitOptions.None)[1]
+                .Split(';')[0]
+                .Trim();
 
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException();
 
             return new DocumentClient(new Uri(endPoint), key);
         }
+
     }
 }
