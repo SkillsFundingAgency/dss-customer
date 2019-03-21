@@ -4,11 +4,6 @@
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>    
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="CustomerChangeFeedTrigger\**" />
-    <EmbeddedResource Remove="CustomerChangeFeedTrigger\**" />
-    <None Remove="CustomerChangeFeedTrigger\**" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="DFC.Common.Standard" Version="0.1.0" />
     <PackageReference Include="DFC.Functions.DI.Standard" Version="0.1.0" />
     <PackageReference Include="DFC.HTTP.Standard" Version="0.1.5" />

@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.CustomerChangeFeedTrigger.Service;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
@@ -48,6 +49,7 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
             builder.Services.AddScoped<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();            
             builder.Services.AddScoped<ICustomerPatchService, CustomerPatchService>();
+            builder.Services.AddScoped<ICustomerChangeFeedTriggerService, CustomerChangeFeedTriggerService>();
 
         }
 
