@@ -4,16 +4,23 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using NCS.DSS.Customer.Cosmos.Helper;
 
 namespace NCS.DSS.Customer.ServiceBus
 {
     
-    public static class ServiceBusClient
+    public class ServiceBusClient : IServiceBusClient
     {
-        public static readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
-        public static readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+        private readonly ISubscriptionHelper _subscriptionHelper;
+        public readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
+        public readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+        
+        public ServiceBusClient(ISubscriptionHelper subscriptionHelper)
+        {
+            _subscriptionHelper = subscriptionHelper;
+        }
 
-        public static async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
+        public async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
         {
             var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
@@ -33,10 +40,11 @@ namespace NCS.DSS.Customer.ServiceBus
                 MessageId = customer.CustomerId + " " + DateTime.UtcNow
             };
 
+            await AutoSubscribeCustomer(customer);
             await queueClient.SendAsync(msg);
         }
 
-        public static async Task SendPatchMessageAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
+        public async Task SendPatchMessageAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
         {
             var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
@@ -68,6 +76,12 @@ namespace NCS.DSS.Customer.ServiceBus
             public string URL { get; set; }
             public bool IsNewCustomer { get; set; }
             public string TouchpointId { get; set; }
+        }
+
+        private async Task AutoSubscribeCustomer(Models.Customer customer)
+        {
+            //Auto subscribe last modified touchpoint to the newly posted customer
+            await _subscriptionHelper.CreateSubscriptionAsync(customer);
         }
 
     }

@@ -11,10 +11,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
     {
         private readonly IDocumentDBProvider _documentDbProvider;
         private readonly ICustomerPatchService _customerPatchService;
+        private readonly IServiceBusClient _serviceBusClient;
 
-        public PatchCustomerHttpTriggerService(ICustomerPatchService customerPatchService, IDocumentDBProvider documentDbProvider)
+        public PatchCustomerHttpTriggerService(ICustomerPatchService customerPatchService, IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _documentDbProvider = documentDbProvider;
+            _serviceBusClient = serviceBusClient;
             _customerPatchService = customerPatchService;
         }
 
@@ -50,7 +52,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 
         public async Task SendToServiceBusQueueAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
         {
-            await ServiceBusClient.SendPatchMessageAsync(customerPatch, customerId, reqUrl);
+            await _serviceBusClient.SendPatchMessageAsync(customerPatch, customerId, reqUrl);
         }
 
     }

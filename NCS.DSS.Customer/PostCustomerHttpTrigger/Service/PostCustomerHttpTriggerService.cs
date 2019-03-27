@@ -8,9 +8,12 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
     public class PostCustomerHttpTriggerService : IPostCustomerHttpTriggerService
     {
         private readonly IDocumentDBProvider _documentDbProvider;
-        public PostCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        private readonly IServiceBusClient _serviceBusClient;
+
+        public PostCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _documentDbProvider = documentDbProvider;
+            _serviceBusClient = serviceBusClient;
         }
         public async Task<Models.Customer> CreateNewCustomerAsync(Models.Customer customer)
         {
@@ -27,7 +30,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 
         public async Task SendToServiceBusQueueAsync(Models.Customer customer, string reqUrl)
         {
-            await ServiceBusClient.SendPostMessageAsync(customer, reqUrl);
+            await _serviceBusClient.SendPostMessageAsync(customer, reqUrl);
         }
 
     }
