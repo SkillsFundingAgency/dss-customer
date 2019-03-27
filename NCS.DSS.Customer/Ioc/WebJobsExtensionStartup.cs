@@ -14,6 +14,7 @@ using NCS.DSS.Customer.Ioc;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.ServiceBus;
 using NCS.DSS.Customer.Validation;
 
 [assembly: WebJobsStartup(typeof(WebJobsExtensionStartup), "Web Jobs Extension Startup")]
@@ -40,6 +41,7 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
             builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
             builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();               
+            builder.Services.AddScoped<ISubscriptionHelper, SubscriptionHelper>();               
         }
 
         private void RegisterServices(IWebJobsBuilder builder)
@@ -50,6 +52,7 @@ namespace NCS.DSS.Customer.Ioc
             builder.Services.AddScoped<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();            
             builder.Services.AddScoped<ICustomerPatchService, CustomerPatchService>();
             builder.Services.AddScoped<ICustomerChangeFeedTriggerService, CustomerChangeFeedTriggerService>();
+            builder.Services.AddScoped<IServiceBusClient, ServiceBusClient>();
 
         }
 

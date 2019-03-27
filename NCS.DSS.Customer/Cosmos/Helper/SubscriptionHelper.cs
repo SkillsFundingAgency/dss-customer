@@ -15,7 +15,7 @@ namespace NCS.DSS.Customer.Cosmos.Helper
             _documentDbProvider = documentDbProvider;
         }
 
-        public async Task<Subscriptions> CreateSubscriptionAsync(Customer.Models.Customer customer)
+        public async Task<Subscriptions> CreateSubscriptionAsync(Models.Customer customer)
         {
             if (customer == null)
                 return null;
