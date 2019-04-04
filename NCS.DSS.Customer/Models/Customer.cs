@@ -16,13 +16,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateOfRegistration { get; set; }
 
-        [Display(Description = "Customers given title   :   " +
-                                "1 - Dr,   " +
-                                "2 - Miss,   " +
-                                "3 - Mr,   " +
-                                "4 - Mrs,   " +
-                                "5 - Ms,   " +
-                                "99 - Not provided")]
+        [Display(Description = "Customers given title.")]
         [Example(Description = "1")]
         public Title? Title { get; set; }
 
@@ -44,11 +38,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateofBirth { get; set; }
 
-        [Display(Description = "Customers gender  :   " +
-                                "1 - Female,  " +
-                                "2 - Male,  " +
-                                "3 - Not applicable,  " +
-                                "99 - Not provided,  ")]
+        [Display(Description = "Customers gender.")]
         [Example(Description = "3")]
         public Gender? Gender { get; set; }
  
@@ -69,41 +59,11 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateOfTermination { get; set; }
 
-        [Display(Description = "Reason for why the customer terminated their account   :   " +
-                                "1 - Customer choice,  " +
-                                "2 - Deceased,  " +
-                                "3 - Duplicate,  " +
-                                "99 - Other")]
+        [Display(Description = "Reason for why the customer terminated their account.")]
         [Example(Description = "3")]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
-        [Display(Description = "Introduced By   :   " +
-                                "1 - Advanced Learning Loans,  " +
-                                "2 - Apprenticeship Service,  " +
-                                "3 - Careers Fair / Activity,  " +
-                                "4 - Charity,  " +
-                                "5 - Citizens Advice,  " +
-                                "6 - College / 6th Form,  " +
-                                "7 - Community Centre / Library,  " +
-                                "8 - Employer,  " +
-                                "9 - Facebook,  " +
-                                "10 - Job Centre Plus,  " +
-                                "11 - LEP,  " +
-                                "12 - National careers service website,  " +
-                                "13 - Newspaper / magazine,  " +
-                                "14 - Billboard or Public Transport Advert,  " +
-                                "15 - Professional Body or Organisation,  " +
-                                "16 - Radio,  " +
-                                "17 - School,  " +
-                                "18 - Training Provider,  " +
-                                "19 - TV,  " +
-                                "20 - Twitter,  " +
-                                "21 - University / School / College / Training Provider,  " +
-                                "22 - University,  " +
-                                "23 - Word of Mouth,  " +
-                                "24 - World Skills UK Live,  " +
-                                "98 - Other,  " +
-                                "99 - Not provided  ")]
+        [Display(Description = "Introduced By.")]
         [Example(Description = "12345")]
         public IntroducedBy? IntroducedBy { get; set; }
 
