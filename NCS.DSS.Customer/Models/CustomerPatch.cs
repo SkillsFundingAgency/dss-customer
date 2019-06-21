@@ -7,7 +7,6 @@ namespace NCS.DSS.Customer.Models
 {
     public class CustomerPatch : ICustomer
     {
-
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? DateOfRegistration { get; set; }
