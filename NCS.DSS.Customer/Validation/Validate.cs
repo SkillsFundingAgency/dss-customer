@@ -32,10 +32,10 @@ namespace NCS.DSS.Customer.Validation
 
                 if (string.IsNullOrWhiteSpace(customerResource.GivenName))
                     results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
-
-                if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
-                    results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
             }
+
+            if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
+                results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
 
             if (long.TryParse(customerResource.UniqueLearnerNumber, out var uln))
             {
