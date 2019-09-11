@@ -9,11 +9,15 @@ namespace NCS.DSS.Customer.Models
 
         public DateTime? DateOfRegistration { get; set; }
 
+        public Title? Title { get; set; }
+
         public string GivenName { get; set; }
 
         public string FamilyName { get; set; }
 
         public DateTime? DateofBirth { get; set; }
+
+        public Gender? Gender { get; set; }
 
         public string UniqueLearnerNumber { get; set; }
 
