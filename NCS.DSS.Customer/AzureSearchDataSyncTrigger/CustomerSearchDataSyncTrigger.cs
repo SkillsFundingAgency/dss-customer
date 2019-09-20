@@ -42,13 +42,15 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
             if (documents.Count > 0)
             {
-                var customers = documents.Select(doc => new Models.Customer()
+                var customers = documents.Select(doc => new Models.CustomerSearch()
                     {
                         CustomerId = doc.GetPropertyValue<Guid?>("id"),
                         DateOfRegistration = doc.GetPropertyValue<DateTime?>("DateOfRegistration"),
+                        Title = doc.GetPropertyValue<Title>("Title"),
                         GivenName = doc.GetPropertyValue<string>("GivenName"),
                         FamilyName = doc.GetPropertyValue<string>("FamilyName"),
                         DateofBirth = doc.GetPropertyValue<DateTime?>("DateofBirth"),
+                        Gender = doc.GetPropertyValue<Gender?>("Gender"),
                         UniqueLearnerNumber = doc.GetPropertyValue<string>("UniqueLearnerNumber"),
                         OptInUserResearch = doc.GetPropertyValue<bool?>("OptInUserResearch"),
                         OptInMarketResearch = doc.GetPropertyValue<bool?>("OptInMarketResearch"),
