@@ -8,6 +8,7 @@ namespace NCS.DSS.Customer.Helpers
         private static readonly string SearchServiceName = Environment.GetEnvironmentVariable("SearchServiceName");
         private static readonly string SearchServiceKey = Environment.GetEnvironmentVariable("SearchServiceAdminApiKey");
         private static readonly string SearchServiceIndexName = Environment.GetEnvironmentVariable("CustomerSearchIndexName");
+        private static readonly string SearchServiceIndexNameForSearchV2 = Environment.GetEnvironmentVariable("CustomerSearchIndexNameV2");        
 
         private static SearchServiceClient _serviceClient;
         private static ISearchIndexClient _indexClient;
@@ -32,5 +33,12 @@ namespace NCS.DSS.Customer.Helpers
             return _indexClient;
         }
 
+        public static ISearchIndexClient GetIndexClientForSearchV2()
+        {
+            if (_indexClient != null)
+                return _indexClient;
+            _indexClient = _serviceClient?.Indexes?.GetClient(SearchServiceIndexNameForSearchV2);
+            return _indexClient;
+        }
     }
 }
