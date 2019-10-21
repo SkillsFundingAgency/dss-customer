@@ -31,6 +31,8 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             loggerHelper.LogMethodEnter(log);
 
             loggerHelper.LogInformationMessage(log, _correlationId, "get search service client");
+            SearchHelper.GetSearchServiceClient();
+
             loggerHelper.LogInformationMessage(log, _correlationId, "get index client");
 
             var indexClient = SearchHelper.GetIndexClientForSearchV2();

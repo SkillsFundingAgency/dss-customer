@@ -12,6 +12,8 @@ namespace NCS.DSS.Customer.Helpers
 
         private static SearchServiceClient _serviceClient;
         private static ISearchIndexClient _indexClient;
+        private static ISearchIndexClient _indexClientV2;
+
 
         public static SearchServiceClient GetSearchServiceClient()
         {
@@ -35,10 +37,11 @@ namespace NCS.DSS.Customer.Helpers
 
         public static ISearchIndexClient GetIndexClientForSearchV2()
         {
-            if (_indexClient != null)
-                return _indexClient;
-            _indexClient = _serviceClient?.Indexes?.GetClient(SearchServiceIndexNameForSearchV2);
-            return _indexClient;
+            if (_indexClientV2 != null)
+                return _indexClientV2;
+
+            _indexClientV2 = _serviceClient?.Indexes?.GetClient(SearchServiceIndexNameForSearchV2);
+            return _indexClientV2;
         }
     }
 }
