@@ -86,6 +86,10 @@
             },
             {
               "name": "CustomerSearchIndexName",
+              "value": "customer-search-index"
+            },
+            {
+              "name": "CustomerSearchIndexNameV2",
               "value": "customer-search-index-v2"
             },
             {
