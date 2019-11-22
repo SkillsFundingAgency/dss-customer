@@ -81,7 +81,7 @@
             },
             {
               "name": "CustomerSearchIndexName",
-              "value": "customer-search-index"
+              "value": "customer-search-index-v2"
             },
             {
               "name": "DatabaseId",
