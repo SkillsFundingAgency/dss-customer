@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using DFC.Swagger.Standard.Annotations;
+using System.Collections.Generic;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -77,6 +78,10 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
+
+        [Display(Description = "Priority Customer reference data.")]
+        [Example(Description = "[2,3]")]
+        public List<PriorityCustomer> PriorityGroups { get; set; }
 
         public void SetDefaultValues()
         {
