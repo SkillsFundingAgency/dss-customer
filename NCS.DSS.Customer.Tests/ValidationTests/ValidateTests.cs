@@ -28,7 +28,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.IsNotNull(result);
-            //Chamged to 5 as PriorityGroups are now required
+            //Changed to 5 as PriorityGroups are now required
             Assert.AreEqual(5, result.Count);
         }
 
