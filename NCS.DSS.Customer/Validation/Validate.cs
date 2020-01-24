@@ -67,6 +67,22 @@ namespace NCS.DSS.Customer.Validation
 
             if (customerResource.IntroducedBy.HasValue && !Enum.IsDefined(typeof(IntroducedBy), customerResource.IntroducedBy.Value))
                 results.Add(new ValidationResult("Please supply a valid Introduced By value", new[] { "IntroducedBy" }));
+
+            if (customerResource.PriorityGroups != null && customerResource.PriorityGroups.Count == 0)
+            {
+                results.Add(new ValidationResult("Please supply a valid Priority Group", new[] { "PriorityCustomer" }));
+            }
+
+            if (customerResource.PriorityGroups != null && customerResource.PriorityGroups.Count > 0)
+            {
+                foreach (var claimedPriorityGroup in customerResource.PriorityGroups)
+                {
+                    if (!Enum.IsDefined(typeof(PriorityCustomer), claimedPriorityGroup))
+                        results.Add(new ValidationResult("Please supply a valid Priority Group", new[] { "PriorityCustomer" }));
+
+
+                }
+            }
         }
 
     }

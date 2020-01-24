@@ -23,6 +23,9 @@ namespace NCS.DSS.Customer.ReferenceData
         [Description("Adults aged 50 years or over who are unemployed or at demonstrable risk of unemployment")]
         AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment = 6,
 
+        [Description("Adults affected by Government defined economic shock")]
+        AdultsAffectedByGovernmentDefinedEconomicShock = 7,
+
         [Description("Not a priority customer")]
         NotAPriorityCustomer = 99
     }
