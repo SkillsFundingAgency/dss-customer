@@ -75,12 +75,30 @@ namespace NCS.DSS.Customer.Validation
 
             if (customerResource.PriorityGroups != null && customerResource.PriorityGroups.Count > 0)
             {
+                //Can only have 99
+                if (customerResource.PriorityGroups.Contains(PriorityCustomer.NotAPriorityCustomer)
+                    && customerResource.PriorityGroups.Count > 1) {
+                    results.Add(new ValidationResult("If not a priority customer is selected no other priority group is allowed", new[] { "PriorityCustomer" }));
+                }
+
+                //Can't have 1 and 6 at the same time
+                if (customerResource.PriorityGroups.Contains(PriorityCustomer.EighteenToTwentyfourNotInEducationEmploymentOrTraining)
+                    && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment)){
+                    results.Add(new ValidationResult("Can not be 18 to 24 and over 50 at the same time", new[] { "PriorityCustomer" }));
+                }
+
+                //Can't have 3 and 6 at the same time
+                if (customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months)
+    && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment))
+                {
+                    results.Add(new ValidationResult("Can not be unemployed for over 12 months and be at the risk of unemployment", new[] { "PriorityCustomer" }));
+                }
+
+                //Check if any invalid priority groups have been posted
                 foreach (var claimedPriorityGroup in customerResource.PriorityGroups)
                 {
                     if (!Enum.IsDefined(typeof(PriorityCustomer), claimedPriorityGroup))
                         results.Add(new ValidationResult("Please supply a valid Priority Group", new[] { "PriorityCustomer" }));
-
-
                 }
             }
         }
