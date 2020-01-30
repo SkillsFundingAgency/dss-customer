@@ -1,5 +1,6 @@
 ﻿using NCS.DSS.Customer.ReferenceData;
 using System;
+using System.Collections.Generic;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -36,6 +37,8 @@ namespace NCS.DSS.Customer.Models
         public DateTime? LastModifiedDate { get; set; }
 
         public string LastModifiedTouchpointId { get; set; }
+
+        public List<PriorityCustomer> PriorityGroups { get; set; }
 
     }
 
