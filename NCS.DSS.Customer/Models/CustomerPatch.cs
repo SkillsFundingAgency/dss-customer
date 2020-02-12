@@ -3,6 +3,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using DFC.Swagger.Standard.Annotations;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -81,6 +83,7 @@ namespace NCS.DSS.Customer.Models
 
         [Display(Description = "Priority Customer reference data.")]
         [Example(Description = "[2,3]")]
+        [JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
         public void SetDefaultValues()
