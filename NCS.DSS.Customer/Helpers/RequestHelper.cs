@@ -9,6 +9,7 @@ using System.Text;
 
 namespace NCS.DSS.Customer.Helpers
 {
+    //JSON converter for prioritygroups
     public class PriorityGroupConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
