@@ -454,7 +454,8 @@ namespace DSS.Swagger.Standard
                                 enumValues.Add(Convert.ToInt32(item) + " - " + description);
                             }
                         }
-
+                        //For remove the definition value
+                        definitions = null;
                         if (enumValues.Any())
                             opParam.items.@enum = enumValues.ToArray();
                     }
