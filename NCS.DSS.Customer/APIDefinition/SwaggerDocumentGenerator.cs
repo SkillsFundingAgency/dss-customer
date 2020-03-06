@@ -456,7 +456,7 @@ namespace DSS.Swagger.Standard
                         }
 
                         if (enumValues.Any())
-                            opParam.items = enumValues.ToArray();
+                            opParam.items.@enum = enumValues.ToArray();
                     }
                 }
             }
