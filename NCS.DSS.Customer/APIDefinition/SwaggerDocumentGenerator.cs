@@ -418,6 +418,7 @@ namespace DSS.Swagger.Standard
             {
                 
                 opParam.type = "array";
+                if (!string.IsNullOrWhiteSpace(exampleDescription)) setObject.example = exampleDescription;
                 opParam.items = new ExpandoObject();
                 setObject = opParam.items;
 
@@ -427,12 +428,10 @@ namespace DSS.Swagger.Standard
                 }
                 else if (inputType.IsGenericType && inputType.GenericTypeArguments.Length == 1)
                 {
-                    parameterType = inputType.GetGenericArguments()[0];
+                    parameterType = inputType.GetGenericArguments()[0];;
+ 
                     if (parameterType.IsEnum)
                     {
-                        //opParam.type = "string";
-                        if (!string.IsNullOrWhiteSpace(exampleDescription)) setObject.example = exampleDescription;
-
                         var enumValues = new List<string>();
                         foreach (var item in Enum.GetValues(parameterType))
                         {
@@ -457,7 +456,7 @@ namespace DSS.Swagger.Standard
                         }
 
                         if (enumValues.Any())
-                            opParam.@enum = enumValues.ToArray();
+                            opParam.items = enumValues.ToArray();
                     }
                 }
             }
