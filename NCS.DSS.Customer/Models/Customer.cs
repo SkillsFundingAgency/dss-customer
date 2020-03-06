@@ -52,11 +52,11 @@ namespace NCS.DSS.Customer.Models
         public string UniqueLearnerNumber { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in User Research or not")]
-        [Example(Description = "true/false")]
+        [Example(Description = "true")]
         public bool? OptInUserResearch { get; set; }
 
         [Display(Description = "An indicator to show whether an individual wishes to participate in Market Research or not")]
-        [Example(Description = "true/false")]
+        [Example(Description = "false")]
         public bool? OptInMarketResearch { get; set; }
 
         [Display(Description = "Date the customer terminated their account")]
