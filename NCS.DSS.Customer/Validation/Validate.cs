@@ -81,6 +81,13 @@ namespace NCS.DSS.Customer.Validation
                     results.Add(new ValidationResult("If not a priority customer is selected no other priority group is allowed", new[] { "PriorityCustomer" }));
                 }
 
+                //Can only have 98
+                if (customerResource.PriorityGroups.Contains(PriorityCustomer.NotKnown)
+                    && customerResource.PriorityGroups.Count > 1)
+                {
+                    results.Add(new ValidationResult("If not a Not Known is selected no other priority group is allowed", new[] { "PriorityCustomer" }));
+                }
+
                 //Can't have 1 and 6 at the same time
                 if (customerResource.PriorityGroups.Contains(PriorityCustomer.EighteenToTwentyfourNotInEducationEmploymentOrTraining)
                     && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment)){
