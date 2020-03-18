@@ -17,6 +17,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DFC.Swagger.Standard.Annotations;
+using Newtonsoft.Json.Linq;
+using NCS.DSS.Customer.Helpers;
+using System.IO;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -79,6 +82,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             {
                 loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
                 customerRequest = await httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
+                /*if (tempRequest != null)
+                {
+                    customerRequest = RequestHelper.GetCustomerFromRequest(tempRequest).ToObject<Models.Customer>();
+                }*/
             }
             catch (JsonException ex)
             {

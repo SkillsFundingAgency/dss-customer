@@ -1,6 +1,7 @@
 ﻿using DFC.JSON.Standard;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
@@ -73,6 +74,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 
             if (!string.IsNullOrEmpty(customerPatch.LastModifiedTouchpointId))
                 _jsonHelper.UpdatePropertyValue(obj["LastModifiedTouchpointId"], customerPatch.LastModifiedTouchpointId);
+
+            if (customerPatch.PriorityGroups != null && customerPatch.PriorityGroups.Count() > 0)
+                _jsonHelper.UpdatePropertyValue(obj["PriorityGroups"], customerPatch.PriorityGroups);
 
             return obj.ToString();
 

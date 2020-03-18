@@ -52,6 +52,8 @@ namespace NCS.DSS.Customer.ReferenceData
         WordofMouth = 23,
         [Description("World Skills UK Live")]
         WorldSkillsUKLive = 24,
+        [Description("NationalRetrainingScheme")]
+        NationalRetrainingScheme = 25,
         [Description("Other")]
         Other = 98,
         [Description("Not provided")]

@@ -14,8 +14,9 @@ namespace NCS.DSS.Customer.APIDefinition
         public const string ApiTitle = "Customers";
         public const string ApiDefinitionName = "API-Definition";
         public const string ApiDefRoute = ApiTitle + "/" + ApiDefinitionName;
-        public const string ApiDescription = "To support the Data Collections integration with DSS SubcontractorId has been added as an attribute.";
-        public const string ApiVersion = "2.0.0";
+        public const string ApiDescription = "To support the Data Collections integration with DSS  PriorityGroups has been added as an attribute "
+            + "and it supports multiple values in the form of a JSON array. With multiple groups we also now have new validation rules.";
+        public const string ApiVersion = "3.0.0";
 
         [FunctionName(ApiDefinitionName)]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefRoute)]HttpRequest req,
