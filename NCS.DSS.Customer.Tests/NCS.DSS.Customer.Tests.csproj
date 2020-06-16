@@ -63,7 +63,7 @@
       <HintPath>..\packages\DFC.JSON.Standard.0.1.3\lib\netstandard2.0\DFC.JSON.Standard.dll</HintPath>
     </Reference>
     <Reference Include="DFC.Swagger.Standard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DFC.Swagger.Standard.0.1.16\lib\netstandard2.0\DFC.Swagger.Standard.dll</HintPath>
+      <HintPath>..\packages\DFC.Swagger.Standard.0.1.20\lib\netstandard2.0\DFC.Swagger.Standard.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Authentication.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
