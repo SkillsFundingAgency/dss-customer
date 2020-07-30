@@ -13,8 +13,8 @@ resources:
     endpoint: 'GitHub (CDH)'
 
 pool:
-    name: name: NCS - CI and CD
-    demands:
+  name: name: NCS - CI and CD
+  demands:
     - msbuild
     - visualstudio
 
