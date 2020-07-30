@@ -52,9 +52,11 @@
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "properties": {
+        "httpsOnly": true,
         "serverFarmId": "[parameters('appServicePlanId')]",
         "siteConfig": {
           "alwaysOn": true,
+          "minTlsVersion": "1.2",
           "appSettings": [
             {
               "name": "EnvironmentName",
