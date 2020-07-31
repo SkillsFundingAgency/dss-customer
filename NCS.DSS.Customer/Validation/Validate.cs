@@ -94,13 +94,6 @@ namespace NCS.DSS.Customer.Validation
                     results.Add(new ValidationResult("Can not be 18 to 24 and over 50 at the same time", new[] { "PriorityCustomer" }));
                 }
 
-                //Can't have 3 and 6 at the same time
-                if (customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months)
-    && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment))
-                {
-                    results.Add(new ValidationResult("Can not be unemployed for over 12 months and be at the risk of unemployment", new[] { "PriorityCustomer" }));
-                }
-
                 //Check if any invalid priority groups have been posted
                 foreach (var claimedPriorityGroup in customerResource.PriorityGroups)
                 {

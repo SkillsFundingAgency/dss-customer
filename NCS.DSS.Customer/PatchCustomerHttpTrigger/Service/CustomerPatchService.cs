@@ -76,7 +76,14 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
                 _jsonHelper.UpdatePropertyValue(obj["LastModifiedTouchpointId"], customerPatch.LastModifiedTouchpointId);
 
             if (customerPatch.PriorityGroups != null && customerPatch.PriorityGroups.Count() > 0)
+            {
+                if(obj["PriorityGroups"] == null)
+                {
+                    obj.Add("PriorityGroups", null);
+                }
+
                 _jsonHelper.UpdatePropertyValue(obj["PriorityGroups"], customerPatch.PriorityGroups);
+            }
 
             return obj.ToString();
 
