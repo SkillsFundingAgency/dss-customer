@@ -117,6 +117,14 @@
             {
               "name": "SubscriptionDatabaseId",
               "value": "subscriptions"
+            },
+            {
+              "name": "DigitalIdentityDatabaseId",
+              "value": "digitalidentities"
+            },
+            {
+              "name": "DigitalIdentityCollectionId",
+              "value": "digitalidentities"
             }
           ]
         }
