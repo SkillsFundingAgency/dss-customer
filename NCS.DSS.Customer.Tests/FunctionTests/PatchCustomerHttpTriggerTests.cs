@@ -1,6 +1,11 @@
-﻿using DFC.HTTP.Standard;
+﻿using DFC.Common.Standard.Logging;
+using DFC.HTTP.Standard;
+using DFC.JSON.Standard;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -14,10 +19,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
-using DFC.JSON.Standard;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
 {
@@ -38,6 +39,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
         private string _customerString;
+        private IDocumentDBProvider _provider;
 
         [SetUp]
         public void Setup()
@@ -58,7 +60,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _resourceHelper = Substitute.For<IResourceHelper>();
             _patchCustomerHttpTriggerService = Substitute.For<IPatchCustomerHttpTriggerService>();
             _customerString = JsonConvert.SerializeObject(_customer);
-
+            _provider = Substitute.For<IDocumentDBProvider>();
             _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
             _httpRequestHelper.GetDssApimUrl(_request).Returns("http://localhost:7071/");
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
@@ -223,7 +225,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _validate,
                 _patchCustomerHttpTriggerService,
                 _jsonHelper,
-                _loggerHelper).ConfigureAwait(false);
+                _loggerHelper,
+                _provider).ConfigureAwait(false);
         }
 
     }

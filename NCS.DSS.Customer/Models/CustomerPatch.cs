@@ -1,10 +1,10 @@
-﻿using NCS.DSS.Customer.ReferenceData;
-using System;
-using System.ComponentModel.DataAnnotations;
-using DFC.Swagger.Standard.Annotations;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.ReferenceData;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -86,6 +86,13 @@ namespace NCS.DSS.Customer.Models
         [JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
+        [JsonIgnore]
+        public bool? IsDigitalAccount { get; private set; }
+        [JsonIgnore]
+        public bool? UpdateDigitalIdentity { get; private set; }
+        [JsonIgnore]
+        public Guid? IdentityStoreId { get; private set; }
+
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
@@ -93,6 +100,13 @@ namespace NCS.DSS.Customer.Models
 
             if (DateOfTermination.HasValue && ReasonForTermination == null)
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
+        }
+
+        public void SetUpdateDigitalAccount(Guid identityStoreId)
+        {
+            IsDigitalAccount = true;
+            UpdateDigitalIdentity = true;
+            IdentityStoreId = Guid.NewGuid();
         }
 
         public void SetIds(string touchpointId, string subcontractorId)

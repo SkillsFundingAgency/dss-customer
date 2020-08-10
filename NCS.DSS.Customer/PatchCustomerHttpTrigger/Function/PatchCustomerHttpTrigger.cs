@@ -2,12 +2,14 @@ using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
+using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
@@ -16,9 +18,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Swagger.Standard.Annotations;
-using Newtonsoft.Json.Linq;
-using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -40,7 +39,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             [Inject]IValidate validate,
             [Inject]IPatchCustomerHttpTriggerService customerPatchService,
             [Inject]IJsonHelper jsonHelper,
-            [Inject]ILoggerHelper loggerHelper)
+            [Inject]ILoggerHelper loggerHelper,
+            [Inject]IDocumentDBProvider provider)
         {
 
             loggerHelper.LogMethodEnter(log);
@@ -146,11 +146,19 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
             var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
+            var di = await provider.GetIdentityForCustomerAsync(customerGuid);
+            if (di != null)
+            {
+                if(di.IdentityStoreId.HasValue)
+                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+            }
+
             if (updatedCustomer != null)
             {
                 loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", customerGuid));
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
             }
+
 
             loggerHelper.LogMethodExit(log);
 
