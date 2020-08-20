@@ -60,7 +60,8 @@ namespace NCS.DSS.Customer.ServiceBus
                 UpdateDigitalIdentity = customerPatch.UpdateDigitalIdentity,
                 FirstName = customerPatch.GivenName,
                 LastName = customerPatch.FamilyName,
-                IdentityStoreId = customerPatch.IdentityStoreId
+                IdentityStoreId = customerPatch.IdentityStoreId,
+                DeleteDigitalIdentity = customerPatch.DeleteDigitalIdentity
             };
 
             var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
@@ -86,6 +87,7 @@ namespace NCS.DSS.Customer.ServiceBus
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public Guid? IdentityStoreId { get; set; }
+            public bool? DeleteDigitalIdentity { get; set; }
         }
 
         private async Task AutoSubscribeCustomer(Models.Customer customer)

@@ -25,5 +25,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         Task<List<Models.Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId);
         Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions);
         Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId);
+        Task<DigitalIdentity> UpdateIdentityAsync(DigitalIdentity digitalIdentity);
     }
 }

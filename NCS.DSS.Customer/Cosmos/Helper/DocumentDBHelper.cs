@@ -51,5 +51,10 @@ namespace NCS.DSS.Customer.Cosmos.Helper
             return UriFactory.CreateDocumentCollectionUri(DigitalIdentityDatabaseId, DigitalIdentityCollectionId);
         }
 
+        public static Uri CreateDigitalIdentityDocumentUri(Guid identityId)
+        {
+            return UriFactory.CreateDocumentUri(DigitalIdentityDatabaseId, DigitalIdentityCollectionId, identityId.ToString());
+        }
+
     }
 }

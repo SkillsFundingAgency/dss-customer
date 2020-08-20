@@ -89,6 +89,8 @@ namespace NCS.DSS.Customer.Models
         [JsonIgnore]
         public bool? IsDigitalAccount { get; private set; }
         [JsonIgnore]
+        public bool? DeleteDigitalIdentity { get; private set; }
+        [JsonIgnore]
         public bool? UpdateDigitalIdentity { get; private set; }
         [JsonIgnore]
         public Guid? IdentityStoreId { get; private set; }
@@ -102,11 +104,17 @@ namespace NCS.DSS.Customer.Models
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
         }
 
+        public void SetDeleteDigitalIdentity()
+        {
+            UpdateDigitalIdentity = false;
+            DeleteDigitalIdentity = true;
+        }
+
         public void SetUpdateDigitalAccount(Guid identityStoreId)
         {
             IsDigitalAccount = true;
             UpdateDigitalIdentity = true;
-            IdentityStoreId = Guid.NewGuid();
+            IdentityStoreId = identityStoreId;
         }
 
         public void SetIds(string touchpointId, string subcontractorId)

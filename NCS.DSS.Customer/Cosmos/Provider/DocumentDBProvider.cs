@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
 
@@ -261,5 +262,18 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             return digitalIdentity?.FirstOrDefault();
         }
 
+        public async Task<Models.DigitalIdentity> UpdateIdentityAsync(Models.DigitalIdentity digitalIdentity)
+        {
+            var documentUri = DocumentDBHelper.CreateDigitalIdentityDocumentUri(digitalIdentity.IdentityID.GetValueOrDefault());
+
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            if (client == null)
+                return null;
+
+            var response = await client.ReplaceDocumentAsync(documentUri, digitalIdentity);
+
+            return response.StatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
+        }
     }
 }

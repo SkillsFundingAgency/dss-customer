@@ -15,5 +15,7 @@ namespace NCS.DSS.Customer.Models
         public string LastModifiedTouchpointId { get; set; }
         public DateTime? DateOfTermination { get; set; }
         public string CreatedBy { get; set; }
+        [Newtonsoft.Json.JsonProperty(PropertyName = "ttl", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? ttl { get; set; }
     }
 }

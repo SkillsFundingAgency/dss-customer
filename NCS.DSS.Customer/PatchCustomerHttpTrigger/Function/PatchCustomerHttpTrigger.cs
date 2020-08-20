@@ -31,16 +31,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch",
             Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]IValidate validate,
-            [Inject]IPatchCustomerHttpTriggerService customerPatchService,
-            [Inject]IJsonHelper jsonHelper,
-            [Inject]ILoggerHelper loggerHelper,
-            [Inject]IDocumentDBProvider provider)
+            [Inject] IResourceHelper resourceHelper,
+            [Inject] IHttpResponseMessageHelper httpResponseMessageHelper,
+            [Inject] IHttpRequestHelper httpRequestHelper,
+            [Inject] IValidate validate,
+            [Inject] IPatchCustomerHttpTriggerService customerPatchService,
+            [Inject] IJsonHelper jsonHelper,
+            [Inject] ILoggerHelper loggerHelper,
+            [Inject] IDocumentDBProvider provider)
         {
 
             loggerHelper.LogMethodEnter(log);
@@ -81,7 +81,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
                 loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
-            
+
             Models.CustomerPatch customerPatchRequest;
 
             try
@@ -149,8 +149,28 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var di = await provider.GetIdentityForCustomerAsync(customerGuid);
             if (di != null)
             {
-                if(di.IdentityStoreId.HasValue)
-                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+                //mark patch request as a di account
+                customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+
+                //if customer is marked as terminated, delete di
+                if (customerPatchRequest.DateOfTermination.HasValue)
+                {
+                    di.ttl = 10;
+                }
+
+                //only interested in digitial identities that have a identitystoreid
+                //e.g. ones that have had their corresponding accounts created in Azure B2C
+                if (di.IdentityStoreId.HasValue)
+                {
+                    var updated = await provider.UpdateIdentityAsync(di);
+
+                    //if digital identity was updated successfully, then mark request as a di
+                    //so that it can be queued up for deletetion on azure service bus.
+                    if (updated != null && customerPatchRequest.DateOfTermination.HasValue)
+                    {
+                        customerPatchRequest.SetDeleteDigitalIdentity();
+                    }
+                }
             }
 
             if (updatedCustomer != null)
