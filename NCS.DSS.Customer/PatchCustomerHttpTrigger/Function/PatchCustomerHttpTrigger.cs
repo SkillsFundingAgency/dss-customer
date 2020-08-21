@@ -149,9 +149,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var di = await provider.GetIdentityForCustomerAsync(customerGuid);
             if (di != null)
             {
-                //mark patch request as a di account
-                customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
-
                 //if customer is marked as terminated, delete di
                 if (customerPatchRequest.DateOfTermination.HasValue)
                 {
@@ -162,6 +159,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 //e.g. ones that have had their corresponding accounts created in Azure B2C
                 if (di.IdentityStoreId.HasValue)
                 {
+                    //mark patch request as a di account
+                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+
                     var updated = await provider.UpdateIdentityAsync(di);
 
                     //if digital identity was updated successfully, then mark request as a di
