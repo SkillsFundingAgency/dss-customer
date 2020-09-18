@@ -149,6 +149,12 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var di = await provider.GetIdentityForCustomerAsync(customerGuid);
             if (di != null)
             {
+                //Patches do not need to contain all the fields, only the fields that have changed, however
+                //messages that are pushed onto the service bus, need to have both fields set, otherwise
+                //the FamilyName/Given name are set to null in Azure B2C.
+                customerPatchRequest.FamilyName = updatedCustomer.FamilyName;
+                customerPatchRequest.GivenName = updatedCustomer.GivenName;
+
                 //if customer is marked as terminated, delete di
                 if (customerPatchRequest.DateOfTermination.HasValue)
                 {
