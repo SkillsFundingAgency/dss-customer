@@ -2,12 +2,14 @@ using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
+using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
@@ -16,9 +18,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Swagger.Standard.Annotations;
-using Newtonsoft.Json.Linq;
-using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -32,15 +31,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
+        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch",
             Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]IValidate validate,
-            [Inject]IPatchCustomerHttpTriggerService customerPatchService,
-            [Inject]IJsonHelper jsonHelper,
-            [Inject]ILoggerHelper loggerHelper)
+            [Inject] IResourceHelper resourceHelper,
+            [Inject] IHttpResponseMessageHelper httpResponseMessageHelper,
+            [Inject] IHttpRequestHelper httpRequestHelper,
+            [Inject] IValidate validate,
+            [Inject] IPatchCustomerHttpTriggerService customerPatchService,
+            [Inject] IJsonHelper jsonHelper,
+            [Inject] ILoggerHelper loggerHelper,
+            [Inject] IDocumentDBProvider provider)
         {
 
             loggerHelper.LogMethodEnter(log);
@@ -81,7 +81,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
                 loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
-            
+
             Models.CustomerPatch customerPatchRequest;
 
             try
@@ -146,11 +146,45 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
             var updatedCustomer = await customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
+            var di = await provider.GetIdentityForCustomerAsync(customerGuid);
+            if (di != null)
+            {
+                //Patches do not need to contain all the fields, only the fields that have changed, however
+                //messages that are pushed onto the service bus, need to have both fields set, otherwise
+                //the FamilyName/Given name are set to null in Azure B2C.
+                customerPatchRequest.FamilyName = updatedCustomer.FamilyName;
+                customerPatchRequest.GivenName = updatedCustomer.GivenName;
+
+                //if customer is marked as terminated, delete di
+                if (customerPatchRequest.DateOfTermination.HasValue)
+                {
+                    di.ttl = 10;
+                }
+
+                //only interested in digitial identities that have a identitystoreid
+                //e.g. ones that have had their corresponding accounts created in Azure B2C
+                if (di.IdentityStoreId.HasValue)
+                {
+                    //mark patch request as a di account
+                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+
+                    var updated = await provider.UpdateIdentityAsync(di);
+
+                    //if digital identity was updated successfully, then mark request as a di
+                    //so that it can be queued up for deletetion on azure service bus.
+                    if (updated != null && customerPatchRequest.DateOfTermination.HasValue)
+                    {
+                        customerPatchRequest.SetDeleteDigitalIdentity();
+                    }
+                }
+            }
+
             if (updatedCustomer != null)
             {
                 loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", customerGuid));
                 await customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
             }
+
 
             loggerHelper.LogMethodExit(log);
 
