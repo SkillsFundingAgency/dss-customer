@@ -1,6 +1,6 @@
-﻿using System;
-using NCS.DSS.Customer.ReferenceData;
+﻿using NCS.DSS.Customer.ReferenceData;
 using NUnit.Framework;
+using System;
 
 namespace NCS.DSS.Customer.Tests.ModelTests
 {
@@ -10,7 +10,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_PopulatesDefaultValues_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer();
+
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -26,8 +29,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckDateOfRegistrationDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
-            var customer = new Models.Customer {DateOfRegistration = DateTime.MaxValue};
-            
+            // Arrange
+            var customer = new Models.Customer { DateOfRegistration = DateTime.MaxValue };
+
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -37,8 +42,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckLastModifiedDateDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
-            var customer = new Models.Customer {LastModifiedDate = DateTime.MaxValue};
-            
+            // Arrange
+            var customer = new Models.Customer { LastModifiedDate = DateTime.MaxValue };
+
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -48,8 +55,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckOptInUserResearchDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer { OptInUserResearch = true };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -59,8 +68,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckOptInMarketResearchDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer { OptInMarketResearch = true };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -70,8 +81,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckTitleDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer { Title = Title.Mr };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -81,8 +94,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckGenderDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer { Gender = Gender.Male };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -92,8 +107,10 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckIntroducedByDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
-            var customer = new Models.Customer { IntroducedBy = IntroducedBy .Charity};
+            // Arrange
+            var customer = new Models.Customer { IntroducedBy = IntroducedBy.Charity };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
@@ -103,14 +120,14 @@ namespace NCS.DSS.Customer.Tests.ModelTests
         [Test]
         public void CustomerTests_CheckReasonForTerminationIsPopulated_WhenSetDefaultValuesIsCalled()
         {
+            // Arrange
             var customer = new Models.Customer { DateOfTermination = DateTime.UtcNow };
 
+            // Act
             customer.SetDefaultValues();
 
             // Assert
             Assert.AreEqual(ReasonForTermination.Other, customer.ReasonForTermination);
         }
-
-       
     }
 }

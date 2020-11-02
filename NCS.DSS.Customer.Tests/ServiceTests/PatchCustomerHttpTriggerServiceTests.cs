@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Moq;
+using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.Models;
+using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.ServiceBus;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using NCS.DSS.Customer.Cosmos.Provider;
-using NCS.DSS.Customer.Models;
-using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
-using Newtonsoft.Json;
-using NSubstitute;
-using NSubstitute.ReturnsExtensions;
-using NUnit.Framework;
 
 namespace NCS.DSS.Customer.Tests.ServiceTests
 {
@@ -20,8 +20,9 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
     public class PatchCustomerHttpTriggerServiceTests
     {
         private IPatchCustomerHttpTriggerService _patchCustomerHttpTrigger;
-        private ICustomerPatchService _customerPatchService;
-        private IDocumentDBProvider _documentDbProvider;
+        private Mock<ICustomerPatchService> _customerPatchService;
+        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<IServiceBusClient> _sbus;
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
         private string _json;
@@ -32,53 +33,56 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = Substitute.For<IDocumentDBProvider>();
-            _customerPatchService = Substitute.For<ICustomerPatchService>();
-            _patchCustomerHttpTrigger = Substitute.For<PatchCustomerHttpTriggerService>(_customerPatchService, _documentDbProvider);
-            _customer = Substitute.For<Models.Customer>();
-            _customerPatch = Substitute.For<CustomerPatch>();
+            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _customerPatchService = new Mock<ICustomerPatchService>();
+            _sbus = new Mock<IServiceBusClient>();
+            _patchCustomerHttpTrigger = new PatchCustomerHttpTriggerService(_customerPatchService.Object, _documentDbProvider.Object, _sbus.Object);
+            _customer = new Models.Customer();
+            _customerPatch = new CustomerPatch();
             _json = JsonConvert.SerializeObject(_customerPatch);
             _customerString = JsonConvert.SerializeObject(_customer);
-            _customerPatchService.Patch(_json, _customerPatch).Returns(_customerString);
         }
 
-        //[Test]
-        //public void PatchCustomerHttpTriggerServiceTests_PatchResource_ReturnsNullWhenCustomerJsonIsNullOrEmpty()
-        //{
-        //     Act
-        //    var result = _patchCustomerHttpTrigger.PatchResource(null, Arg.Any<CustomerPatch>());
+        [Test]
+        public void PatchCustomerHttpTriggerServiceTests_PatchResource_ReturnsNullWhenCustomerJsonIsNullOrEmpty()
+        {
+            // Act
+            var result = _patchCustomerHttpTrigger.PatchResource(null, It.IsAny<CustomerPatch>());
 
-        //     Assert
-        //    Assert.IsNull(result);
-        //}
+            // Assert
+            Assert.IsNull(result);
+        }
 
-        //[Test]
-        //public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenCustomerPatchServicePatchJsonIsNullOrEmpty()
-        //{
-        //    _customerPatchService.Patch(Arg.Any<string>(), Arg.Any<CustomerPatch>()).ReturnsNullForAnyArgs();
+        [Test]
+        public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenCustomerPatchServicePatchJsonIsNullOrEmpty()
+        {
+            // Arrange
+            _customerPatchService.Setup(x => x.Patch(It.IsAny<string>(), It.IsAny<CustomerPatch>())).Returns<string>(null);
 
-        //    // Act
-        //    var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
+            // Act
+            var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
-        //    // Assert
-        //    Assert.IsNull(result);
-        //}
+            // Assert
+            Assert.IsNull(result);
+        }
 
-        //[Test]
-        //public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenResourceCannotBeUpdated()
-        //{
-        //    _documentDbProvider.UpdateCustomerAsync(_customerString, _customerId).ReturnsNull();
+        [Test]
+        public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenResourceCannotBeUpdated()
+        {
+            // Arrange
+            _documentDbProvider.Setup(x=>x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult<ResourceResponse<Document>>(null));
 
-        //    // Act
-        //    var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
+            // Act
+            var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
-        //    // Assert
-        //    Assert.IsNull(result);
-        //}
+            // Assert
+            Assert.IsNull(result);
+        }
 
         [Test]
         public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsResourceWhenUpdated()
         {
+            // Arrange
             const string documentServiceResponseClass = "Microsoft.Azure.Documents.DocumentServiceResponse, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
             const string dictionaryNameValueCollectionClass = "Microsoft.Azure.Documents.Collections.DictionaryNameValueCollection, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
 
@@ -101,7 +105,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.UpdateCustomerAsync(_customerString, _customerId).Returns(Task.FromResult(resourceResponse).Result);
+            _documentDbProvider.Setup(x=>x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult(resourceResponse));
 
             // Act
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
@@ -109,34 +113,34 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             // Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOf<Models.Customer>(result);
-
         }
 
-        //[Test]
-        //public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsNullWhenResourceHasNotBeenFound()
-        //{
-        //    _documentDbProvider.GetCustomerByIdForUpdateAsync(_customerId).ReturnsNull();
+        [Test]
+        public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsNullWhenResourceHasNotBeenFound()
+        {
+            // Arrange
+            _documentDbProvider.Setup(x=>x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult<string>(string.Empty));
 
-        //    // Act
-        //    var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(Arg.Any<Guid>());
+            // Act
+            var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
-        //    // Assert
-        //    Assert.IsInstanceOf<string>(result);
-        //    Assert.IsEmpty(result);
-        //}
+            // Assert
+            Assert.IsInstanceOf<string>(result);
+            Assert.IsEmpty(result);
+        }
 
-        //[Test]
-        //public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsResourceWhenResourceHasBeenFound()
-        //{
-        //    _documentDbProvider.GetCustomerByIdForUpdateAsync(_customerId).Returns(Task.FromResult(_json).Result);
+        [Test]
+        public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsResourceWhenResourceHasBeenFound()
+        {
+            // Arrange
+            _documentDbProvider.Setup(x=>x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult(_json));
 
-        //    // Act
-        //    var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
+            // Act
+            var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
-        //    // Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<string>(result);
-        //}
-
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<string>(result);
+        }
     }
 }

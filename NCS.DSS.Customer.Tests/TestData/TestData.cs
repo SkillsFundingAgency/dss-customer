@@ -15,10 +15,5 @@
         public string DateOfTermination = "2018-06-21T14:45:00Z";
         public string ReasonForTermination = "2018-06-21T14:45:00Z";
         public string IntroducedBy = "2018-06-21T14:45:00Z";
-
-
-
-
-
     }
 }
