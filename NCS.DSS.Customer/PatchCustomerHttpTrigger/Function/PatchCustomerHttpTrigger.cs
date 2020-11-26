@@ -29,6 +29,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
         private readonly ILoggerHelper _loggerHelper;
+        private readonly IDocumentDBProvider _provider;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpResponseMessageHelper httpResponseMessageHelper,
@@ -36,7 +37,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
              IValidate validate,
              IPatchCustomerHttpTriggerService customerPatchService,
              IJsonHelper jsonHelper,
-             ILoggerHelper loggerHelper)
+             ILoggerHelper loggerHelper,
+             IDocumentDBProvider provider)
         {
             _resourceHelper = resourceHelper;
             _httpResponseMessageHelper = httpResponseMessageHelper;
@@ -45,6 +47,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _customerPatchService = customerPatchService;
             _jsonHelper = jsonHelper;
             _loggerHelper = loggerHelper;
+            _provider = provider;
         }
 
         [FunctionName("PATCH")]
@@ -162,7 +165,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
             var updatedCustomer = await _customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
-            var di = await provider.GetIdentityForCustomerAsync(customerGuid);
+            var di = await _provider.GetIdentityForCustomerAsync(customerGuid);
             if (di != null)
             {
                 //Patches do not need to contain all the fields, only the fields that have changed, however
@@ -184,7 +187,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                     //mark patch request as a di account
                     customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
 
-                    var updated = await provider.UpdateIdentityAsync(di);
+                    var updated = await _provider.UpdateIdentityAsync(di);
 
                     //if digital identity was updated successfully, then mark request as a di
                     //so that it can be queued up for deletetion on azure service bus.

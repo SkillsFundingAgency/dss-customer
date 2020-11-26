@@ -38,6 +38,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
         private string _customerString;
+        private Mock<IDocumentDBProvider> _provider;
         private PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger _function;
 
         [SetUp]
@@ -56,6 +57,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _jsonHelper = new JsonHelper();
             _patchCustomerHttpTriggerService = new Mock<IPatchCustomerHttpTriggerService>();
             _customerString = JsonConvert.SerializeObject(_customer);
+            _provider = new Mock<IDocumentDBProvider>();
+
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object, 
                 _httpResponseMessageHelper,
@@ -63,7 +66,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _validate, 
                 _patchCustomerHttpTriggerService.Object, 
                 _jsonHelper, 
-                _loggerHelper.Object);
+                _loggerHelper.Object,
+                _provider.Object);
         }
 
         [Test]
@@ -109,7 +113,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _patchCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object);
+                _loggerHelper.Object,
+                _provider.Object);
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
