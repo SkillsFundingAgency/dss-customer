@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Models;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
@@ -241,6 +243,37 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             return response;
 
         }
-        
+
+        public async Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId)
+        {
+            var collectionUri = DocumentDBHelper.CreateDigitalIdentityDocumentUri();
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            var identityForCustomerQuery = client
+                ?.CreateDocumentQuery<Models.DigitalIdentity>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerId == customerId)
+                .AsDocumentQuery();
+
+            if (identityForCustomerQuery == null)
+                return null;
+
+            var digitalIdentity = await identityForCustomerQuery.ExecuteNextAsync<Models.DigitalIdentity>();
+
+            return digitalIdentity?.FirstOrDefault();
+        }
+
+        public async Task<Models.DigitalIdentity> UpdateIdentityAsync(Models.DigitalIdentity digitalIdentity)
+        {
+            var documentUri = DocumentDBHelper.CreateDigitalIdentityDocumentUri(digitalIdentity.IdentityID.GetValueOrDefault());
+
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            if (client == null)
+                return null;
+
+            var response = await client.ReplaceDocumentAsync(documentUri, digitalIdentity);
+
+            return response.StatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
+        }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
@@ -160,6 +161,39 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
             var updatedCustomer = await _customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
+
+            var di = await provider.GetIdentityForCustomerAsync(customerGuid);
+            if (di != null)
+            {
+                //Patches do not need to contain all the fields, only the fields that have changed, however
+                //messages that are pushed onto the service bus, need to have both fields set, otherwise
+                //the FamilyName/Given name are set to null in Azure B2C.
+                customerPatchRequest.FamilyName = updatedCustomer.FamilyName;
+                customerPatchRequest.GivenName = updatedCustomer.GivenName;
+
+                //if customer is marked as terminated, delete di
+                if (customerPatchRequest.DateOfTermination.HasValue)
+                {
+                    di.ttl = 10;
+                }
+
+                //only interested in digitial identities that have a identitystoreid
+                //e.g. ones that have had their corresponding accounts created in Azure B2C
+                if (di.IdentityStoreId.HasValue)
+                {
+                    //mark patch request as a di account
+                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
+
+                    var updated = await provider.UpdateIdentityAsync(di);
+
+                    //if digital identity was updated successfully, then mark request as a di
+                    //so that it can be queued up for deletetion on azure service bus.
+                    if (updated != null && customerPatchRequest.DateOfTermination.HasValue)
+                    {
+                        customerPatchRequest.SetDeleteDigitalIdentity();
+                    }
+                }
+            }
 
             if (updatedCustomer != null)
             {

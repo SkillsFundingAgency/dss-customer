@@ -12,6 +12,8 @@ namespace NCS.DSS.Customer.Cosmos.Helper
         private static Uri _subscriptionDocumentCollectionUri;
         private static readonly string SubscriptionDatabaseId = Environment.GetEnvironmentVariable("SubscriptionDatabaseId");
         private static readonly string SubscriptionCollectionId = Environment.GetEnvironmentVariable("SubscriptionCollectionId");
+        private static readonly string DigitalIdentityDatabaseId = Environment.GetEnvironmentVariable("DigitalIdentityDatabaseId");
+        private static readonly string DigitalIdentityCollectionId = Environment.GetEnvironmentVariable("DigitalIdentityCollectionId");
 
         public static Uri CreateDocumentCollectionUri()
         {
@@ -42,8 +44,17 @@ namespace NCS.DSS.Customer.Cosmos.Helper
 
             return _subscriptionDocumentCollectionUri;
         }
+        #endregion
 
-        #endregion 
-        
+        public static Uri CreateDigitalIdentityDocumentUri()
+        {
+            return UriFactory.CreateDocumentCollectionUri(DigitalIdentityDatabaseId, DigitalIdentityCollectionId);
+        }
+
+        public static Uri CreateDigitalIdentityDocumentUri(Guid identityId)
+        {
+            return UriFactory.CreateDocumentUri(DigitalIdentityDatabaseId, DigitalIdentityCollectionId, identityId.ToString());
+        }
+
     }
 }

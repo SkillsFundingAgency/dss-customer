@@ -1,14 +1,14 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using NCS.DSS.Customer.Cosmos.Helper;
 
 namespace NCS.DSS.Customer.ServiceBus
 {
-    
+
     public class ServiceBusClient : IServiceBusClient
     {
         private readonly ISubscriptionHelper _subscriptionHelper;
@@ -55,7 +55,13 @@ namespace NCS.DSS.Customer.ServiceBus
                 LastModifiedDate = customerPatch.LastModifiedDate,
                 URL = reqUrl,
                 IsNewCustomer = false,
-                TouchpointId = customerPatch.LastModifiedTouchpointId
+                TouchpointId = customerPatch.LastModifiedTouchpointId,
+                IsDigitalAccount = customerPatch.IsDigitalAccount,
+                UpdateDigitalIdentity = customerPatch.UpdateDigitalIdentity,
+                FirstName = customerPatch.GivenName,
+                LastName = customerPatch.FamilyName,
+                IdentityStoreId = customerPatch.IdentityStoreId,
+                DeleteDigitalIdentity = customerPatch.DeleteDigitalIdentity
             };
 
             var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
@@ -76,6 +82,12 @@ namespace NCS.DSS.Customer.ServiceBus
             public string URL { get; set; }
             public bool IsNewCustomer { get; set; }
             public string TouchpointId { get; set; }
+            public bool? IsDigitalAccount { get; set; }
+            public bool? UpdateDigitalIdentity { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public Guid? IdentityStoreId { get; set; }
+            public bool? DeleteDigitalIdentity { get; set; }
         }
 
         private async Task AutoSubscribeCustomer(Models.Customer customer)
