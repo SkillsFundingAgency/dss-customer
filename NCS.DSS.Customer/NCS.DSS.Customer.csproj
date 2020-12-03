@@ -11,7 +11,7 @@
     <PackageReference Include="DFC.Common.Standard" Version="0.1.4" />
     <PackageReference Include="DFC.HTTP.Standard" Version="0.1.11" />
     <PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
-    <PackageReference Include="DFC.Swagger.Standard" Version="0.1.16" />
+    <PackageReference Include="DFC.Swagger.Standard" Version="0.1.15" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.2.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
