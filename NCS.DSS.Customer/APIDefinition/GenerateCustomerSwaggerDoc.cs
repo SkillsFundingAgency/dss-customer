@@ -1,5 +1,4 @@
-﻿using DFC.Functions.DI.Standard.Attributes;
-using DFC.Swagger.Standard;
+﻿using DFC.Swagger.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -9,7 +8,7 @@ using System.Reflection;
 
 namespace NCS.DSS.Customer.APIDefinition
 {
-    public static class GenerateCustomerSwaggerDoc
+    public class GenerateCustomerSwaggerDoc
     {
         public const string ApiTitle = "Customers";
         public const string ApiDefinitionName = "API-Definition";
@@ -17,12 +16,17 @@ namespace NCS.DSS.Customer.APIDefinition
         public const string ApiDescription = "To support the Data Collections integration with DSS  PriorityGroups has been added as an attribute "
             + "and it supports multiple values in the form of a JSON array. With multiple groups we also now have new validation rules.";
         public const string ApiVersion = "3.0.0";
+        private readonly ISwaggerDocumentGenerator _swaggerDocumentGenerator;
+
+        public GenerateCustomerSwaggerDoc(ISwaggerDocumentGenerator swaggerDocumentGenerator)
+        {
+            _swaggerDocumentGenerator = swaggerDocumentGenerator;
+        }
 
         [FunctionName(ApiDefinitionName)]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefRoute)]HttpRequest req,
-            [Inject]ISwaggerDocumentGenerator swaggerDocumentGenerator)
+        public HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = ApiDefRoute)]HttpRequest req)
         {
-            var swagger = swaggerDocumentGenerator.GenerateSwaggerDocument(req, ApiTitle, ApiDescription,
+            var swagger = _swaggerDocumentGenerator.GenerateSwaggerDocument(req, ApiTitle, ApiDescription,
                 ApiDefinitionName, ApiVersion, Assembly.GetExecutingAssembly());
 
             if (string.IsNullOrEmpty(swagger))

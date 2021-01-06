@@ -1,7 +1,7 @@
 using DFC.Common.Standard.Logging;
-using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
+using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -16,12 +16,36 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Swagger.Standard.Annotations;
 
 namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
 {
-    public static class SearchCustomerHttpTrigger
+    public class SearchCustomerHttpTrigger
     {
+        private readonly ILogger _log;
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly ISearchCustomerHttpTriggerService _searchCustomerService;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly IJsonHelper _jsonHelper;
+        private readonly ILoggerHelper _loggerHelper;
+
+        public SearchCustomerHttpTrigger(ILogger log,
+             IResourceHelper resourceHelper,
+             IHttpRequestHelper httpRequestHelper,
+             ISearchCustomerHttpTriggerService searchCustomerService,
+             IHttpResponseMessageHelper httpResponseMessageHelper,
+             IJsonHelper jsonHelper,
+             ILoggerHelper loggerHelper)
+        {
+            _log = log;
+            _resourceHelper = resourceHelper;
+            _httpRequestHelper = httpRequestHelper;
+            _searchCustomerService = searchCustomerService;
+            _httpResponseMessageHelper = httpResponseMessageHelper;
+            _jsonHelper = jsonHelper;
+            _loggerHelper = loggerHelper;
+        }
+
         [FunctionName("SEARCH")]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Retrieved", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
@@ -32,33 +56,27 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
         [Display(Name = "SEARCH", Description = "Ability to partially search for customers using query strings: </br> Examples </br> ?GivenName=Fred </br> ?FamilyName=Bloggs </br> ?DateofBirth=2018-01-01 </br> ?UniqueLearnerNumber=0123456789 </br>" +
                                                 "You can also query a customer on multiple fields: </br> Examples: </br> ?GivenName=Fred&FamilyName=Bloggs </br> ?UniqueLearnerNumber=0123456789&DateofBirth=2018-01-01 </br>" +
                                                 "When searching by Given Name or Family Name you need to supply a minimum of 2 characters")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
-            Route = "CustomerSearch")]HttpRequest req, ILogger log,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]ISearchCustomerHttpTriggerService searchCustomerService,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IJsonHelper jsonHelper,
-            [Inject]ILoggerHelper loggerHelper)
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+            Route = "CustomerSearch")]HttpRequest req)
         {
-            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
-                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
+                _log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
 
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
-                log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
+                _log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
                 correlationGuid = Guid.NewGuid();
             }
 
-            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformationMessage(_log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
+            _loggerHelper.LogInformationMessage(_log, correlationGuid, "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             SearchHelper.GetSearchServiceClient();
             var indexClient = SearchHelper.GetIndexClient();
@@ -67,24 +85,24 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
             var filter = string.Empty;
 
             // Parse query parameter
-            var givenName = httpRequestHelper.GetQueryString(req, "GivenName");
-            var familyName = httpRequestHelper.GetQueryString(req, "FamilyName");
+            var givenName = _httpRequestHelper.GetQueryString(req, "GivenName");
+            var familyName = _httpRequestHelper.GetQueryString(req, "FamilyName");
 
             if (givenName != null && givenName.Length < 3)
             {
-                log.LogWarning("Given Name must have a minimum of 3 characters");
-                return httpResponseMessageHelper.NoContent();
+                _log.LogWarning("Given Name must have a minimum of 3 characters");
+                return _httpResponseMessageHelper.NoContent();
             }
 
             if (!string.IsNullOrEmpty(givenName))
             {
-                query += string.Format("GivenName:({0}* OR {0}) ",givenName.Trim());
+                query += string.Format("GivenName:({0}* OR {0}) ", givenName.Trim());
             }
 
             if (familyName != null && familyName.Length < 3)
             {
-                log.LogWarning("Family Name must have a minimum of 3 characters");
-                return httpResponseMessageHelper.NoContent();
+                _log.LogWarning("Family Name must have a minimum of 3 characters");
+                return _httpResponseMessageHelper.NoContent();
             }
 
             if (!string.IsNullOrEmpty(familyName))
@@ -92,36 +110,35 @@ namespace NCS.DSS.Customer.SearchCustomerHttpTrigger.Function
                 query += string.Format("FamilyName:({0}* OR {0}) ", familyName.Trim());
             }
 
-            var uniqueLearnerNumber = httpRequestHelper.GetQueryString(req, "UniqueLearnerNumber");
+            var uniqueLearnerNumber = _httpRequestHelper.GetQueryString(req, "UniqueLearnerNumber");
 
             if (!string.IsNullOrEmpty(uniqueLearnerNumber))
             {
                 query += string.Format("UniqueLearnerNumber:{0}", uniqueLearnerNumber.Trim());
             }
 
-            var dob = httpRequestHelper.GetQueryString(req, "DateofBirth");
+            var dob = _httpRequestHelper.GetQueryString(req, "DateofBirth");
 
             if (!string.IsNullOrEmpty(dob))
             {
                 if (DateTime.TryParse(dob.Trim(), CultureInfo.CurrentCulture, DateTimeStyles.None, out var dateOfBirth))
                     filter = string.Format("DateofBirth eq {0:yyyy-MM-dd}", dateOfBirth);
                 else
-                    return httpResponseMessageHelper.NoContent();
+                    return _httpResponseMessageHelper.NoContent();
             }
 
-            if(string.IsNullOrWhiteSpace(query) && string.IsNullOrWhiteSpace(filter))
-                return httpResponseMessageHelper.NoContent();
+            if (string.IsNullOrWhiteSpace(query) && string.IsNullOrWhiteSpace(filter))
+                return _httpResponseMessageHelper.NoContent();
 
-            log.LogInformation("Attempting to search customers");
+            _log.LogInformation("Attempting to search customers");
 
-            var customer = await searchCustomerService.SearchCustomerAsync(indexClient, query, filter);
+            var customer = await _searchCustomerService.SearchCustomerAsync(indexClient, query, filter);
 
-            log.LogInformation("Search completed");
+            _log.LogInformation("Search completed");
 
             return customer == null ?
-                httpResponseMessageHelper.NoContent() :
-                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectsAndRenameIdProperty(customer, "id", "CustomerId"));
+                _httpResponseMessageHelper.NoContent() :
+                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectsAndRenameIdProperty(customer, "id", "CustomerId"));
         }
-
     }
 }

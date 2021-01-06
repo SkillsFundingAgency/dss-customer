@@ -1,65 +1,68 @@
-﻿using DFC.HTTP.Standard;
-using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.Models;
-using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
-using NCS.DSS.Customer.Validation;
-using NSubstitute;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
+﻿using DFC.Common.Standard.Logging;
+using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.Search;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.Validation;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
 {
     [TestFixture]
     public class SearchCustomerHttpTriggerTests
     {
-        private ILogger _log;
+        private Mock<ILogger> _log;
         private HttpRequest _request;
-        private IResourceHelper _resourceHelper;        
-        private IValidate _validate;        
+        private Mock<IResourceHelper> _resourceHelper;
+        private IValidate _validate;
         private IHttpResponseMessageHelper _httpResponseMessageHelper;
-        private ISearchCustomerHttpTriggerService _searchCustomerHttpTriggerService;
+        private Mock<ISearchCustomerHttpTriggerService> _searchCustomerHttpTriggerService;
         private Models.Customer _customer;
-        private IHttpRequestHelper _httpRequestHelper;
+        private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IJsonHelper _jsonHelper;
-        private ISearchIndexClient _searchIndexClient;
-        private ILoggerHelper _loggerHelper;
+        private Mock<ISearchIndexClient> _searchIndexClient;
+        private Mock<ILoggerHelper> _loggerHelper;
+        private SearchCustomerHttpTrigger.Function.SearchCustomerHttpTrigger _function;
 
         [SetUp]
         public void Setup()
         {
-            _customer = Substitute.For<Models.Customer>();
-
+            _customer = new Models.Customer();
             _request = new DefaultHttpRequest(new DefaultHttpContext());
 
-            _log = Substitute.For<ILogger>();
-            _resourceHelper = Substitute.For<IResourceHelper>();
-            _validate = Substitute.For<IValidate>();
-            _httpRequestHelper = Substitute.For<IHttpRequestHelper>();
-            _searchCustomerHttpTriggerService = Substitute.For<ISearchCustomerHttpTriggerService>();
-            _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
-            _httpRequestHelper.GetQueryString(_request, Arg.Any<string>()).Returns("TestValues");
-            _validate.ValidateResource(Arg.Any<CustomerPatch>(), Arg.Any<bool>()).Returns(new List<ValidationResult>());
-            _httpRequestHelper = Substitute.For<IHttpRequestHelper>();
-            _jsonHelper = Substitute.For<IJsonHelper>();
-            _httpResponseMessageHelper = new HttpResponseMessageHelper(); //Substitute.For<IHttpResponseMessageHelper>();
-            _searchIndexClient = Substitute.For<ISearchIndexClient>();
-            _loggerHelper = Substitute.For<ILoggerHelper>();
+            _log = new Mock<ILogger>();
+            _resourceHelper = new Mock<IResourceHelper>();
+            _validate = new Validate();
+            _httpRequestHelper = new Mock<IHttpRequestHelper>();
+            _searchCustomerHttpTriggerService = new Mock<ISearchCustomerHttpTriggerService>();
+            _jsonHelper = new JsonHelper();
+            _httpResponseMessageHelper = new HttpResponseMessageHelper();
+            _searchIndexClient = new Mock<ISearchIndexClient>();
+            _loggerHelper = new Mock<ILoggerHelper>();
+            _function = new SearchCustomerHttpTrigger.Function.SearchCustomerHttpTrigger(
+                _log.Object,
+                _resourceHelper.Object, 
+                _httpRequestHelper.Object, 
+                _searchCustomerHttpTriggerService.Object, 
+                _httpResponseMessageHelper, 
+                _jsonHelper, 
+                _loggerHelper.Object);
         }
 
         [Test]
         public async Task SearchCustomerHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
         {
-            _httpRequestHelper.GetDssTouchpointId(_request).Returns((string)null);
+            // Arrange
+            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction();
@@ -73,7 +76,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Ignore("No Environment Variables")]
         public async Task SearchCustomerHttpTrigger_ReturnsStatusCodeNoContent_WhenQueryStringIsLessThan3Chars()
         {
-            _httpRequestHelper.GetQueryString(_request, "GivenName").Returns("AB");
+            // Arrange
+            _httpRequestHelper.Setup(x=>x.GetQueryString(_request, "GivenName")).Returns("AB");
+            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x=>x.GetQueryString(_request, It.IsAny<string>())).Returns("TestValues");
 
             // Act
             var result = await RunFunction();
@@ -87,7 +93,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Ignore("No Environment Variables")]
         public async Task SearchCustomerHttpTrigger_ReturnsStatusCodeNoContent_WhenFamilyNameIsLessThan3Chars()
         {
-            _httpRequestHelper.GetQueryString(_request, "FamilyName").Returns("CD");
+            // Arrange
+            _httpRequestHelper.Setup(x => x.GetQueryString(_request, "GivenName")).Returns("AB");
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x=>x.GetQueryString(_request, "FamilyName")).Returns("CD");
 
             // Act
             var result = await RunFunction();
@@ -101,9 +110,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Ignore("No Environment Variables")]
         public async Task SearchCustomerHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExist()
         {
-            _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000001");
-
-            _searchCustomerHttpTriggerService.SearchCustomerAsync(Arg.Any<ISearchIndexClient>(), Arg.Any<string>()).Returns(Task.FromResult<List<Models.Customer>>(null).Result);
+            // Arrange
+            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns("0000001");
+            _searchCustomerHttpTriggerService.Setup(x=>x.SearchCustomerAsync(It.IsAny<ISearchIndexClient>(), It.IsAny<string>(), null, null, null)).Returns(Task.FromResult<List<Models.Customer>>(null));
 
             // Act
             var result = await RunFunction();
@@ -117,7 +126,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Ignore("No Environment Variables")]
         public async Task SearchCustomerHttpTrigger_ReturnsStatusCodeOk_WhenCustomerExist()
         {
-            _searchCustomerHttpTriggerService.SearchCustomerAsync(Arg.Any<ISearchIndexClient>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<List<string>>(), Arg.Any<List<string>>()).Returns(Task.FromResult<List<Models.Customer>>(new List<Models.Customer>{_customer}).Result);
+            // Arrange
+            _httpRequestHelper.Setup(x => x.GetQueryString(_request, "GivenName")).Returns("AB");
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _searchCustomerHttpTriggerService.Setup(x=>x.SearchCustomerAsync(It.IsAny<ISearchIndexClient>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<List<string>>())).Returns(Task.FromResult<List<Models.Customer>>(new List<Models.Customer> { _customer }));
 
             // Act
             var result = await RunFunction();
@@ -130,9 +142,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private async Task<HttpResponseMessage> RunFunction()
         {
-            return await SearchCustomerHttpTrigger.Function.SearchCustomerHttpTrigger.Run(
-                _request, _log, _resourceHelper, _httpRequestHelper, _searchCustomerHttpTriggerService, _httpResponseMessageHelper,
-                _jsonHelper, _loggerHelper).ConfigureAwait(false);
+            return await _function.Run(
+                _request).ConfigureAwait(false);
         }
 
     }

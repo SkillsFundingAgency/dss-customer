@@ -1,7 +1,7 @@
 using DFC.Common.Standard.Logging;
-using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
+using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -16,15 +16,37 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Swagger.Standard.Annotations;
-using Newtonsoft.Json.Linq;
-using NCS.DSS.Customer.Helpers;
-using System.IO;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
-    public static class PostCustomerHttpTrigger
+    public class PostCustomerHttpTrigger
     {
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly IValidate _validate;
+        private readonly IPostCustomerHttpTriggerService _customerPostService;
+        private readonly IJsonHelper _jsonHelper;
+        private readonly ILoggerHelper _loggerHelper;
+
+        public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
+             IHttpRequestHelper httpRequestHelper,
+             IHttpResponseMessageHelper httpResponseMessageHelper,
+             IValidate validate,
+             IPostCustomerHttpTriggerService customerPostService,
+             IJsonHelper jsonHelper,
+             ILoggerHelper loggerHelper
+        )
+        {
+            _resourceHelper = resourceHelper;
+            _httpRequestHelper = httpRequestHelper;
+            _httpResponseMessageHelper = httpResponseMessageHelper;
+            _validate = validate;
+            _customerPostService = customerPostService;
+            _jsonHelper = jsonHelper;
+            _loggerHelper = loggerHelper;
+        }
+
         [FunctionName("POST")]
         [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Added", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
@@ -33,18 +55,11 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public static async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")]HttpRequest req, ILogger log,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IValidate validate,
-            [Inject]IPostCustomerHttpTriggerService customerPostService,
-            [Inject]IJsonHelper jsonHelper,
-            [Inject]ILoggerHelper loggerHelper)
+        public async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req, ILogger log)
         {
-            loggerHelper.LogMethodEnter(log);
+            _loggerHelper.LogMethodEnter(log);
 
-            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
                 log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
 
@@ -54,25 +69,25 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
             }
 
-            var ApimURL = httpRequestHelper.GetDssApimUrl(req);
+            var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
-                return httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
+                return _httpResponseMessageHelper.BadRequest();
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
 
-            var subContractorId = httpRequestHelper.GetDssSubcontractorId(req);
+            var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
 
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
@@ -80,8 +95,8 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             try
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
-                customerRequest = await httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
+                customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
                 /*if (tempRequest != null)
                 {
                     customerRequest = RequestHelper.GetCustomerFromRequest(tempRequest).ToObject<Models.Customer>();
@@ -89,33 +104,32 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
-                return httpResponseMessageHelper.UnprocessableEntity(ex);
+                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
+                return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (customerRequest == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Customer request is null");
-                return httpResponseMessageHelper.UnprocessableEntity(req);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Customer request is null");
+                return _httpResponseMessageHelper.UnprocessableEntity(req);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
-            customerRequest.SetIds(touchpointId, subContractorId);            
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
+            customerRequest.SetIds(touchpointId, subContractorId);
 
-            var errors = validate.ValidateResource(customerRequest,true);
+            var errors = _validate.ValidateResource(customerRequest, true);
 
             if (errors != null && errors.Any())
-                return httpResponseMessageHelper.UnprocessableEntity(errors);
-            
-            var customer = await customerPostService.CreateNewCustomerAsync(customerRequest);
+                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+
+            var customer = await _customerPostService.CreateNewCustomerAsync(customerRequest);
 
             if (customer != null)
-                await customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+                await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
             return customer == null
-                ? httpResponseMessageHelper.BadRequest()
-                : httpResponseMessageHelper.Created(jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
-
+                ? _httpResponseMessageHelper.BadRequest()
+                : _httpResponseMessageHelper.Created(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
         }
     }
 }
