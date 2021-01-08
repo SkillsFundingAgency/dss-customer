@@ -13,7 +13,7 @@ namespace NCS.DSS.Customer.Models
         public DateTime? LastLoggedInDateTime { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public string LastModifiedTouchpointId { get; set; }
-        public DateTime? DateOfTermination { get; set; }
+        public DateTime? DateOfClosure { get; set; }
         public string CreatedBy { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "ttl", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? ttl { get; set; }

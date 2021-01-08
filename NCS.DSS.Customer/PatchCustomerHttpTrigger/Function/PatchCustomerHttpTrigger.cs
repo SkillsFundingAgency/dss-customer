@@ -158,6 +158,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 //if customer is marked as terminated, delete di
                 if (customerPatchRequest.DateOfTermination.HasValue)
                 {
+                    di.DateOfClosure = DateTime.Now;
+                    di.LastModifiedTouchpointId = touchpointId;
                     di.ttl = 10;
                 }
 
