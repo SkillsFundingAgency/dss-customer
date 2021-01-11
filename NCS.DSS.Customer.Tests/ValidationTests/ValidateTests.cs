@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Customer.ReferenceData;
+﻿using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Customer.Tests.ValidationTests
 {
@@ -21,8 +21,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenGivenNameAndFamilyNameIsNotPopulatedForPost()
         {
+            // Arrange
             var customer = new Models.Customer();
 
+            // Act
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
@@ -35,8 +37,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenGivenNameIsNotPopulatedForPost()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
@@ -48,8 +52,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenFamilyNameIsNotPopulatedForPost()
         {
+            // Arrange
             var customer = new Models.Customer { FamilyName = "Smith", PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
@@ -61,8 +67,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateOfTerminationNotPopulatedButReasonForTerminationHasAValueForPost()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", ReasonForTermination = ReasonForTermination.CustomerChoice, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
@@ -74,8 +82,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenUniqueLearnerNumberIsNotValid()
         {
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", UniqueLearnerNumber = "10000000000", PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };            
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", UniqueLearnerNumber = "10000000000", PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -87,8 +97,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnNoValidationResult_WhenUniqueLearnerNumberIsValid()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", UniqueLearnerNumber = "5000000000", PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -100,8 +112,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateOfRegistrationIsInTheFuture()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", DateOfRegistration = DateTime.MaxValue, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -113,8 +127,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenUserIsYoungerThan13()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", DateofBirth = DateTime.UtcNow.AddYears(-12), PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -126,8 +142,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenTitleIsNotValid()
         {
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", Title = (Title) 100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", Title = (Title)100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -139,8 +157,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenGenderIsNotValid()
         {
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", Gender = (Gender) 100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", Gender = (Gender)100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -152,8 +172,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenReasonForTerminationIsNotValid()
         {
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", ReasonForTermination = (ReasonForTermination) 100, DateOfTermination = DateTime.Now, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", ReasonForTermination = (ReasonForTermination)100, DateOfTermination = DateTime.Now, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -165,8 +187,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenIntroducedByIsNotValid()
         {
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = (IntroducedBy) 100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = (IntroducedBy)100, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -178,8 +202,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateOfTerminationIsInTheFuture()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", DateOfTermination = DateTime.MaxValue, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
@@ -191,8 +217,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         [Test]
         public void ValidateTests_ReturnValidationResult_WhenLastModifiedDateIsInTheFuture()
         {
+            // Arrange
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", LastModifiedDate = DateTime.MaxValue, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
+            // Act
             var result = _validate.ValidateResource(customer, false);
 
             // Assert

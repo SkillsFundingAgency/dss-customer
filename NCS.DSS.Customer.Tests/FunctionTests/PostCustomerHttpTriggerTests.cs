@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using DFC.Common.Standard.Logging;
+﻿using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
 {
@@ -26,50 +24,46 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private const string ValidCustomerId = "7E467BDB-213F-407A-B86A-1954053D3C24";
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
-        private ILogger _log;
+        private Mock<ILogger> _log;
         private HttpRequest _request;
-        private IResourceHelper _resourceHelper;
+        private Mock<IResourceHelper> _resourceHelper;
         private IValidate _validate;
-        private ILoggerHelper _loggerHelper;
-        private IHttpRequestHelper _httpRequestHelper;
+        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IHttpResponseMessageHelper _httpResponseMessageHelper;
         private IJsonHelper _jsonHelper;
-        private IPostCustomerHttpTriggerService _postCustomerHttpTriggerService;
+        private Mock<IPostCustomerHttpTriggerService> _postCustomerHttpTriggerService;
         private Models.Customer _customer;
+        private PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger _function;
 
         [SetUp]
         public void Setup()
         {
-            _customer = Substitute.For<Models.Customer>();
-
+            _customer = new Models.Customer();
             _request = new DefaultHttpRequest(new DefaultHttpContext());
 
-            _log = Substitute.For<ILogger>();
-            _resourceHelper = Substitute.For<IResourceHelper>();
-            _validate = Substitute.For<IValidate>();
-            _loggerHelper = Substitute.For<ILoggerHelper>();
-            _httpRequestHelper = Substitute.For<IHttpRequestHelper>();
-            _httpResponseMessageHelper = Substitute.For<IHttpResponseMessageHelper>();
-            _jsonHelper = Substitute.For<IJsonHelper>();
-            _log = Substitute.For<ILogger>();
-            _resourceHelper = Substitute.For<IResourceHelper>();
-            _postCustomerHttpTriggerService = Substitute.For<IPostCustomerHttpTriggerService>();
-
-            _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
-            _httpRequestHelper.GetDssApimUrl(_request).Returns("http://localhost:7071/");
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
-
-            _httpRequestHelper.GetResourceFromRequest<Models.Customer>(_request).Returns(Task.FromResult(_customer).Result);
-
+            _log = new Mock<ILogger>();
+            _resourceHelper = new Mock<IResourceHelper>();
+            _validate = new Validate();
+            _loggerHelper = new Mock<ILoggerHelper>();
+            _httpRequestHelper = new Mock<IHttpRequestHelper>();
+            _httpResponseMessageHelper = new HttpResponseMessageHelper();
+            _jsonHelper = new JsonHelper();
+            _postCustomerHttpTriggerService = new Mock<IPostCustomerHttpTriggerService>();
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+                _httpRequestHelper.Object,
+                _httpResponseMessageHelper,
+                _validate,
+                _postCustomerHttpTriggerService.Object,
+                _jsonHelper,
+                _loggerHelper.Object);
         }
 
         [Test]
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
         {
-            _httpRequestHelper.GetDssTouchpointId(_request).Returns((string)null);
-
-            _httpResponseMessageHelper
-                .BadRequest().Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
+            // Arrange
+            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction(InValidId);
@@ -78,17 +72,26 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             Assert.IsInstanceOf<HttpResponseMessage>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
         }
-        
+
         [Test]
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenCustomerHasFailedValidation()
         {
+            // Arrange
+            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x=>x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
             var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
-            _validate.ValidateResource(Arg.Any<Models.Customer>(), Arg.Any<bool>()).Returns(validationResults);
+            var val = new Mock<IValidate>();
+            val.Setup(x=>x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+                _httpRequestHelper.Object,
+                _httpResponseMessageHelper,
+                val.Object,
+                _postCustomerHttpTriggerService.Object,
+                _jsonHelper,
+                _loggerHelper.Object);
 
-            _httpResponseMessageHelper
-                .UnprocessableEntity(Arg.Any<List<ValidationResult>>())
-                .Returns(x => new HttpResponseMessage((HttpStatusCode)422));
-
+            // Act
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
@@ -99,27 +102,40 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Test]
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenCustomerRequestIsInvalid()
         {
-            _httpRequestHelper.GetResourceFromRequest<Models.Customer>(_request).Throws(new JsonException());
+            // Arrange
+            _postCustomerHttpTriggerService.Setup(x => x.CreateNewCustomerAsync(It.IsAny<Models.Customer>())).Returns(Task.FromResult(_customer));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x=>x.GetResourceFromRequest<Models.Customer>(It.IsAny<HttpRequest>())).ThrowsAsync(new JsonException());
 
-            _httpResponseMessageHelper
-                .UnprocessableEntity(Arg.Any<JsonException>()).Returns(x => new HttpResponseMessage((HttpStatusCode)422));
-
+            // Act
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
             Assert.IsInstanceOf<HttpResponseMessage>(result);
             Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
         }
-        
+
         [Test]
-        public async Task PostCustomerHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsNotValid()
+        public async Task PostCustomerHttpTrigger_ReturnsStatusBadRequest_WhenRequestIsNotValid()
         {
+            // Arrange
+            _postCustomerHttpTriggerService.Setup(x=>x.CreateNewCustomerAsync(It.IsAny<Models.Customer>())).Returns(Task.FromResult<Models.Customer>(null));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
+            var validationResults = new List<ValidationResult>();
+            var val = new Mock<IValidate>();
+            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+                _httpRequestHelper.Object,
+                _httpResponseMessageHelper,
+                val.Object,
+                _postCustomerHttpTriggerService.Object,
+                _jsonHelper,
+                _loggerHelper.Object);
 
-            _postCustomerHttpTriggerService.CreateNewCustomerAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult<Models.Customer>(null).Result);
-
-            _httpResponseMessageHelper
-                .BadRequest().Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
-
+            // Act
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
@@ -130,11 +146,23 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [Test]
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeCreated_WhenRequestIsValid()
         {
-            _postCustomerHttpTriggerService.CreateNewCustomerAsync(Arg.Any<Models.Customer>()).Returns(Task.FromResult(_customer).Result);
+            // Arrange
+            _postCustomerHttpTriggerService.Setup(x=>x.CreateNewCustomerAsync(It.IsAny<Models.Customer>())).Returns(Task.FromResult(_customer));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
+            var validationResults = new List<ValidationResult>();
+            var val = new Mock<IValidate>();
+            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+                _httpRequestHelper.Object,
+                _httpResponseMessageHelper,
+                val.Object,
+                _postCustomerHttpTriggerService.Object,
+                _jsonHelper,
+                _loggerHelper.Object);
 
-            _httpResponseMessageHelper
-                .Created(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.Created));
-
+            // Act
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
@@ -144,16 +172,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private async Task<HttpResponseMessage> RunFunction(string customerId)
         {
-            return await PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger.RunAsync(
+            return await _function.RunAsync(
                 _request,
-                _log,
-                _resourceHelper,
-                _httpRequestHelper,
-                _httpResponseMessageHelper,
-                _validate,
-                _postCustomerHttpTriggerService,
-                _jsonHelper,
-                _loggerHelper).ConfigureAwait(false);
+                _log.Object).ConfigureAwait(false);
         }
     }
 }

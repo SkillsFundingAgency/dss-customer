@@ -1,7 +1,7 @@
 using DFC.Common.Standard.Logging;
-using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
+using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -13,30 +13,45 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DFC.Swagger.Standard.Annotations;
 
-namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function  
+namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 {
-    public static class GetCustomerByIdHttpTrigger
+    public class GetCustomerByIdHttpTrigger
     {
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IGetCustomerByIdHttpTriggerService _customerByIdService;
+        private readonly ILoggerHelper _loggerHelper;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly IJsonHelper _jsonHelper;
+
+        public GetCustomerByIdHttpTrigger(IResourceHelper resourceHelper,
+            IGetCustomerByIdHttpTriggerService customerByIdService,
+            ILoggerHelper loggerHelper,
+            IHttpRequestHelper httpRequestHelper,
+            IHttpResponseMessageHelper httpResponseMessageHelper,
+            IJsonHelper jsonHelper)
+        {
+            _resourceHelper = resourceHelper;
+            _customerByIdService = customerByIdService;
+            _loggerHelper = loggerHelper;
+            _httpRequestHelper = httpRequestHelper;
+            _httpResponseMessageHelper = httpResponseMessageHelper;
+            _jsonHelper = jsonHelper;
+        }
+
         [FunctionName("GETByID")]
         [ProducesResponseType(typeof(Models.Customer), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer found", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Customer does not exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
-        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]        
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IGetCustomerByIdHttpTriggerService customerByIdService,
-            [Inject]ILoggerHelper loggerHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IJsonHelper jsonHelper)
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, ILogger log, string customerId)
         {
-            loggerHelper.LogMethodEnter(log);
+            _loggerHelper.LogMethodEnter(log);
 
-            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
                 log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
 
@@ -46,30 +61,30 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return httpResponseMessageHelper.BadRequest();
-            }           
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid,
+            _loggerHelper.LogInformationMessage(log, correlationGuid,
                 "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return httpResponseMessageHelper.BadRequest(customerGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
+                return _httpResponseMessageHelper.BadRequest(customerGuid);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get  customer {0}", customerGuid));
-            var customer = await customerByIdService.GetCustomerAsync(customerGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get  customer {0}", customerGuid));
+            var customer = await _customerByIdService.GetCustomerAsync(customerGuid);
 
-            loggerHelper.LogMethodExit(log);
+            _loggerHelper.LogMethodExit(log);
 
             return customer == null ?
-                httpResponseMessageHelper.NoContent(customerGuid) :
-                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                _httpResponseMessageHelper.NoContent(customerGuid) :
+                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
         }
     }
 }
