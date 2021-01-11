@@ -180,7 +180,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                     di.DateOfClosure = DateTime.Now;
                     di.LastModifiedTouchpointId = touchpointId;
                     di.ttl = 10;
-                    await provider.UpdateIdentityAsync(di);
+                    await _provider.UpdateIdentityAsync(di);
                 }
 
                 //only interested in digitial identities that have a identitystoreid
