@@ -177,7 +177,10 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 //if customer is marked as terminated, delete di
                 if (customerPatchRequest.DateOfTermination.HasValue)
                 {
+                    di.DateOfClosure = DateTime.Now;
+                    di.LastModifiedTouchpointId = touchpointId;
                     di.ttl = 10;
+                    await _provider.UpdateIdentityAsync(di);
                 }
 
                 //only interested in digitial identities that have a identitystoreid
@@ -196,6 +199,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                         customerPatchRequest.SetDeleteDigitalIdentity();
                     }
                 }
+
             }
 
             if (updatedCustomer != null)
