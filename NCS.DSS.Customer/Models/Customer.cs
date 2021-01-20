@@ -93,7 +93,7 @@ namespace NCS.DSS.Customer.Models
         [Required]
         [Display(Description = "Priority Customer reference data.")]
         [Example(Description = "[2,3]")]
-        //[JsonConverter(typeof(PriorityGroupConverter))]
+        [JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
         [JsonIgnoreOnSerialize]
