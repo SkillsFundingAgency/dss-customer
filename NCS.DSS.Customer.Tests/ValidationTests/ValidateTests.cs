@@ -173,7 +173,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
         public void ValidateTests_ReturnValidationResult_WhenReasonForTerminationIsNotValid()
         {
             // Arrange
-            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", ReasonForTermination = (ReasonForTermination)100, DateOfTermination = DateTime.Now, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", ReasonForTermination = (ReasonForTermination)100, DateOfTermination = DateTime.Now.AddDays(-1), PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
             // Act
             var result = _validate.ValidateResource(customer, false);

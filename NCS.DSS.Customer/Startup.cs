@@ -10,7 +10,6 @@ using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
-using NCS.DSS.Customer.SearchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.ServiceBus;
 using NCS.DSS.Customer.Validation;
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -33,7 +32,6 @@ namespace NCS.DSS.Customer
             builder.Services.AddScoped<IGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService>();
             builder.Services.AddScoped<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
             builder.Services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
-            builder.Services.AddScoped<ISearchCustomerHttpTriggerService, SearchCustomerHttpTriggerService>();
             builder.Services.AddScoped<ICustomerPatchService, CustomerPatchService>();
             builder.Services.AddScoped<IServiceBusClient, ServiceBusClient>();
             builder.Services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
