@@ -54,8 +54,6 @@ namespace NCS.DSS.Customer.ReferenceData
         WorldSkillsUKLive = 24,
         [Description("NationalRetrainingScheme")]
         NationalRetrainingScheme = 25,
-        [Description("RedundancySupportServiceforApprentices")]
-        RedundancySupportServiceforApprentices = 26,
         [Description("Other")]
         Other = 98,
         [Description("Not provided")]
