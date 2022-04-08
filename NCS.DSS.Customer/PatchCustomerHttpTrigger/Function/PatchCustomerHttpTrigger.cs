@@ -99,8 +99,11 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
-            
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-subContractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
+
             Models.CustomerPatch customerPatchRequest;
 
             try

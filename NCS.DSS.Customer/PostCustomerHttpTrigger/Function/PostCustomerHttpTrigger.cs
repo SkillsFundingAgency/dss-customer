@@ -87,7 +87,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-SubcontractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
 
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
