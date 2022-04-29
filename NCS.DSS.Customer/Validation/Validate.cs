@@ -68,6 +68,9 @@ namespace NCS.DSS.Customer.Validation
             if (customerResource.IntroducedBy.HasValue && !Enum.IsDefined(typeof(IntroducedBy), customerResource.IntroducedBy.Value))
                 results.Add(new ValidationResult("Please supply a valid Introduced By value", new[] { "IntroducedBy" }));
 
+            if (!customerResource.IntroducedBy.HasValue)
+                results.Add(new ValidationResult("Introduced By is a required field. If not known, use 99.", new[] { "IntroducedBy" }));
+
             if (customerResource.PriorityGroups != null && customerResource.PriorityGroups.Count == 0)
             {
                 results.Add(new ValidationResult("Please supply a valid Priority Group", new[] { "PriorityCustomer" }));

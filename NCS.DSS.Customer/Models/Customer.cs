@@ -67,6 +67,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "3")]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
+        [Required]
         [Display(Description = "Introduced By.")]
         [Example(Description = "12345")]
         public IntroducedBy? IntroducedBy { get; set; }
@@ -126,7 +127,7 @@ namespace NCS.DSS.Customer.Models
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
 
             if (IntroducedBy == null)
-                IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
+               IntroducedBy = ReferenceData.IntroducedBy.NotProvided;
 
         }
 

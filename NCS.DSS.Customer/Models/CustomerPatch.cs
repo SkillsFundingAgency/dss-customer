@@ -59,6 +59,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "3")]
         public ReasonForTermination? ReasonForTermination { get; set; }
 
+
         [Display(Description = "Introduced By.")]
         [Example(Description = "12345")]
         public IntroducedBy? IntroducedBy { get; set; }
