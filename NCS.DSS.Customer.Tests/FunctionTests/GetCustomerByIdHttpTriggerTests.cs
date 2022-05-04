@@ -106,6 +106,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _getCustomerByIdHttpTriggerService.Setup(x => x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
 
