@@ -70,6 +70,19 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
+        public async Task GetCustomerByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenSubcontractorIdIsNotProvided()
+        {
+            // Arrange
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns((string)null);
+
+            // Act
+            var result = await RunFunction(InValidId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
         [Test]
         public async Task GetCustomerByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
@@ -90,6 +103,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _getCustomerByIdHttpTriggerService.Setup(x=>x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult<Models.Customer>(null));
 
