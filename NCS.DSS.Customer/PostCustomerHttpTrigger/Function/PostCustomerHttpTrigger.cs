@@ -76,6 +76,13 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
+            var subcontractorId = _httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-SubcontractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
+
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
@@ -85,8 +92,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
 
-            var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
-            if (string.IsNullOrEmpty(subContractorId))
+            if (string.IsNullOrEmpty(subcontractorId))
                 _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
 
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
@@ -115,7 +121,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
-            customerRequest.SetIds(touchpointId, subContractorId);
+            customerRequest.SetIds(touchpointId, subcontractorId);
 
             var errors = _validate.ValidateResource(customerRequest, true);
 
