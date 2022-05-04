@@ -45,7 +45,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public void Setup()
         {
             _customer = new Models.Customer();
-            _customerPatch = new CustomerPatch();
+            _customerPatch = new CustomerPatch {IntroducedBy = ReferenceData.IntroducedBy.NotProvided };
             _request = new DefaultHttpRequest(new DefaultHttpContext());
 
             _log = new Mock<ILogger>();
