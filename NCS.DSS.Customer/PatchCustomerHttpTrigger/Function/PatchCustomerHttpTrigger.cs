@@ -12,10 +12,12 @@ using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
@@ -108,7 +110,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
-            catch (JsonException ex)
+            catch (Newtonsoft.Json.JsonException ex)
             {
                 _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
                 return _httpResponseMessageHelper.UnprocessableEntity(ex);
@@ -122,15 +124,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
             customerPatchRequest.SetIds(touchpointId, subContractorId);
-
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
-            var errors = _validate.ValidateResource(customerPatchRequest, false);
-
-            if (errors != null && errors.Any())
-            {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
-                return _httpResponseMessageHelper.UnprocessableEntity(errors);
-            }
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
@@ -159,6 +152,20 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return _httpResponseMessageHelper.NoContent(customerGuid);
             }
 
+
+            dynamic data = JObject.Parse(customer);
+            customerPatchRequest.IntroducedBy = data.IntroducedBy;
+
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
+            var errors = _validate.ValidateResource(customerPatchRequest, false);
+
+            if (errors != null && errors.Any())
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
+                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+            }
+
+
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to patch customer resource {0}", customerGuid));
             var patchedCustomer = _customerPatchService.PatchResource(customer, customerPatchRequest);
 
@@ -170,9 +177,11 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             {
                 //Patches do not need to contain all the fields, only the fields that have changed, however
                 //messages that are pushed onto the service bus, need to have both fields set, otherwise
-                //the FamilyName/Given name are set to null in Azure B2C.
+                //the FamilyName/Given/IntroducedBy name are set to null in Azure B2C.
                 customerPatchRequest.FamilyName = updatedCustomer.FamilyName;
                 customerPatchRequest.GivenName = updatedCustomer.GivenName;
+                customerPatchRequest.IntroducedBy = updatedCustomer.IntroducedBy;
+
 
                 //if customer is marked as terminated, delete di
                 if (customerPatchRequest.DateOfTermination.HasValue)
