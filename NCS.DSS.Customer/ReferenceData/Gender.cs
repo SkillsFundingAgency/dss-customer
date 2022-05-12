@@ -13,6 +13,12 @@ namespace NCS.DSS.Customer.ReferenceData
         [Description("Not Applicable")]
         NotApplicable = 3,
 
+        [Description("Another Gender")]
+        AnotherGender = 4,
+
+        [Description("Prefer not to say")]
+        PreferNotToSay = 5,
+
         [Description("Not Provided")]
         NotProvided = 99
             
