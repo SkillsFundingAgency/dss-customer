@@ -241,7 +241,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(2, result.Count);
         }
 
 
@@ -257,7 +257,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(2, result.Count);
         }
 
         [Test]
@@ -272,7 +272,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.IsNotNull(result);
-            Assert.AreEqual(6, result.Count);
+            Assert.AreEqual(7, result.Count);
         }
     }
 }
