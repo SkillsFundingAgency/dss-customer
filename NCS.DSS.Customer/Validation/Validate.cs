@@ -34,6 +34,10 @@ namespace NCS.DSS.Customer.Validation
                     results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
             }
 
+
+            if (!customerResource.IntroducedBy.HasValue)
+                results.Add(new ValidationResult("Introduced By is a required field", new[] { "IntroducedBy" }));
+
             if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
                 results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
 

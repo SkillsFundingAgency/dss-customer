@@ -44,7 +44,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         [SetUp]
         public void Setup()
         {
-            _customer = new Models.Customer();
+            _customer = new Models.Customer { IntroducedBy = ReferenceData.IntroducedBy.NotProvided };
             _customerPatch = new CustomerPatch();
             _request = new DefaultHttpRequest(new DefaultHttpContext());
 
