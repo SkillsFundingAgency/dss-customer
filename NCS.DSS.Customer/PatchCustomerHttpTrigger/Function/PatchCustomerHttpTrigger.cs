@@ -123,15 +123,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
             customerPatchRequest.SetIds(touchpointId, subContractorId);
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
-            var errors = _validate.ValidateResource(customerPatchRequest, false);
-
-            if (errors != null && errors.Any())
-            {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
-                return _httpResponseMessageHelper.UnprocessableEntity(errors);
-            }
-
+          
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
@@ -158,6 +150,21 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to get Customer resource {0}", customerGuid));
                 return _httpResponseMessageHelper.NoContent(customerGuid);
             }
+
+            dynamic data = Newtonsoft.Json.Linq.JObject.Parse(customer);
+            if (data.IntroducedBy != null && customerPatchRequest.IntroducedBy == null)
+                customerPatchRequest.IntroducedBy = data.IntroducedBy;
+
+
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
+            var errors = _validate.ValidateResource(customerPatchRequest, false);
+
+            if (errors != null && errors.Any())
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
+                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+            }
+
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to patch customer resource {0}", customerGuid));
             var patchedCustomer = _customerPatchService.PatchResource(customer, customerPatchRequest);
@@ -217,3 +224,5 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         }
     }
 }
+
+
