@@ -40,7 +40,7 @@ jobs:
     inputs:
      targetType: 'filePath'
      filePath: $(TestBranchNameScriptFilePath)
-     arguments: '-BranchName $(Build.SourceBranch	) -PullRequestBranchName $(if ("$(Build.SourceBranchName)" -eq "merge") { "$(System.PullRequest.SourceBranch)" } else { "NotAPullRequest" } ) -PipelineType Build -Verbose'
+     arguments: '-BranchName $(Build.SourceBranch) -PullRequestBranchName $(if ("$(Build.SourceBranchName)" -eq "merge") { "$(System.PullRequest.SourceBranch)" } else { "NotAPullRequest" } ) -PipelineType Build -Verbose'
 
 # Build the app with the dfc-dotnetframework-build template.  Runs if the output of TestBranchName is Version1
 - job: BuildDotNetFramework
