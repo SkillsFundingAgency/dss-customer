@@ -1,7 +1,7 @@
+using Azure;
+using Azure.Search.Documents.Models;
 using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
@@ -35,11 +35,10 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
             _loggerHelper.LogMethodEnter(log);
 
-            SearchHelper.GetSearchServiceClient();
+            var client = SearchHelper.GetSearchServiceClient();
 
             _loggerHelper.LogInformationMessage(log, _correlationId, "get search service client");
 
-            var indexClient = SearchHelper.GetIndexClient();
 
             _loggerHelper.LogInformationMessage(log, _correlationId, "get index client");
 
@@ -68,23 +67,29 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 })
                     .ToList();
 
-                var batch = IndexBatch.MergeOrUpload(customers);
+                var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+
 
                 try
                 {
                     log.LogInformation("attempting to merge docs to azure search");
 
-                    await indexClient.Documents.IndexAsync(batch);
+                    var results = await client.IndexDocumentsAsync(batch);
+
+                    var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
+
+                    if (failed.Count > 0)
+                    {
+                        _loggerHelper.LogInformationMessage(log, _correlationId, string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
+                    }
 
                     log.LogInformation("successfully merged docs to azure search");
 
                 }
-                catch (IndexBatchException e)
+                catch (RequestFailedException e)
                 {
-                    _loggerHelper.LogInformationMessage(log, _correlationId, string.Format("Failed to index some of the documents: {0}",
-                        string.Join(", ", e.IndexingResults.Where(r => !r.Succeeded).Select(r => r.Key))));
-
                     _loggerHelper.LogException(log, _correlationId, e);
+                    
                 }
             }
         }
