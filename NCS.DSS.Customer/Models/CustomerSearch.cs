@@ -37,9 +37,6 @@ namespace NCS.DSS.Customer.Models
         public DateTime? LastModifiedDate { get; set; }
 
         public string LastModifiedTouchpointId { get; set; }
-
-        public List<PriorityCustomer> PriorityGroups { get; set; }
-
     }
 
 }
