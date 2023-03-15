@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Models;
@@ -62,43 +60,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             {
                 return false;
             }
-        }
-
-        public async Task<List<Models.Customer>> SearchCustomer(ISearchIndexClient indexClient, string searchText,
-            string filter = null, IList<string> order = null, IList<string> facets = null)
-        {
-            var sp = new SearchParameters
-            {
-                QueryType = QueryType.Full,
-                SearchMode = SearchMode.All,
-                IncludeTotalResultCount = true,
-                Top = 1000
-            };
-
-            //Add Filter
-            if (!string.IsNullOrEmpty(filter))
-            {
-                sp.Filter = filter;
-            }
-
-            //Order
-            if (order != null && order.Count > 0)
-            {
-                sp.OrderBy = order;
-            }
-
-            //facets
-            if (facets != null && facets.Count > 0)
-            {
-                sp.Facets = facets;
-            }
-
-            DocumentSearchResult<Models.Customer> response;
-
-            //Search
-            response = await indexClient.Documents.SearchAsync<Models.Customer>(searchText, sp);
-
-            return response?.Results.Count == 0 ? null : response?.Results.Select(result => result.Document).ToList();
         }
 
         public async Task<List<Models.Customer>> GetAllCustomer()
