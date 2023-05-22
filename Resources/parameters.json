@@ -19,6 +19,33 @@
         },
         "appInsightsInstrumentationKey": {
             "value": "__appInsightsInstrumentationKey__" 
+        },
+        "cosmosDbCollectionId": {
+            "value": "__ApiResourceName__" 
+        },
+        "cosmosDbDatabaseId": {
+            "value": "__ApiResourceName__"
+        },
+        "customerConnectionString": {
+            "value": "__customerConnectionString__"
+        },
+        "searchServiceName": {
+            "value": "__searchServiceName__"
+        },
+        "searchServiceAdminApiKey": {
+            "value": "__searchServiceAdminKey__"
+        },
+        "serviceBusConnectionString": {
+            "value": "__serviceBusConnectionString__"
+        },
+        "serviceBusQueueName": {
+            "value": "__serviceBusQueueName__"
+        },
+        "storageAccountName": {
+            "value": "__storageAccountName__"
+        },
+        "storageAccountKey": {
+            "value": "__storageAccountKey__"
         }
     }
 }
