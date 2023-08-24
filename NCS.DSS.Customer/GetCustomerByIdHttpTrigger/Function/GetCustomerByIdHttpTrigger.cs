@@ -49,7 +49,6 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, ILogger log, string customerId)
         {
-            _loggerHelper.LogMethodEnter(log);
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
@@ -61,30 +60,41 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
+             log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
+
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                var response = _httpResponseMessageHelper.BadRequest();
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
-                "C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
+            log.LogInformation($"C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get  customer {0}", customerGuid));
+            log.LogInformation($"Attempting to get customer {customerId}");
             var customer = await _customerByIdService.GetCustomerAsync(customerGuid);
 
-            _loggerHelper.LogMethodExit(log);
 
-            return customer == null ?
-                _httpResponseMessageHelper.NoContent(customerGuid) :
-                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+            if (customer == null)
+            {
+                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer not found {customerId}");
+                return response;
+            }
+            else
+            {
+                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
+                return response;
+            }
         }
     }
 }

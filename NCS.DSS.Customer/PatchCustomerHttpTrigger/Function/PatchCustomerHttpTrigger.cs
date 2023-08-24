@@ -28,7 +28,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILoggerHelper _loggerHelper; 
         private readonly IDocumentDBProvider _provider;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
@@ -46,7 +46,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _validate = validate;
             _customerPatchService = customerPatchService;
             _jsonHelper = jsonHelper;
-            _loggerHelper = loggerHelper;
+            _loggerHelper= loggerHelper; 
             _provider = provider;
         }
 
@@ -62,8 +62,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId)
         {
 
-            _loggerHelper.LogMethodEnter(log);
-
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
                 log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
@@ -73,82 +71,90 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
                 correlationGuid = Guid.NewGuid();
             }
+            log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                var response = _httpResponseMessageHelper.BadRequest();
+                log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'APIM-TouchpointId' in request header");
+                return response;
             }
 
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                var response = _httpResponseMessageHelper.BadRequest();
+                log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'apimurl' in request header");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
-                "C# HTTP trigger function Patch Customer processed a request. By Touchpoint " + touchpointId);
+            log.LogInformation($"C# HTTP trigger function Patch Customer processed a request. By Touchpoint {touchpointId}");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
+                return response;
             }
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+                log.LogInformation($"Unable to locate 'SubContractorId' in request header");
             
             Models.CustomerPatch customerPatchRequest;
 
             try
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
+                log.LogInformation($"Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
             catch (JsonException ex)
             {
-                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
-                return _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
+                return response;
             }
 
             if (customerPatchRequest == null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "customer patch request is null");
-                return _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response = _httpResponseMessageHelper.UnprocessableEntity(req);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. customer patch request is null");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
+            log.LogInformation($"Attempt to set id's for action plan patch");
             customerPatchRequest.SetIds(touchpointId, subContractorId);
 
           
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
+            log.LogInformation($"Attempting to see if customer exists {customerId}");
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
-                return _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer does not exist {customerGuid}");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
+            log.LogInformation($"Attempting to see if this is a read only customer {customerGuid}");
             var isCustomerReadOnly = await _resourceHelper.IsCustomerReadOnly(customerGuid);
 
             if (isCustomerReadOnly)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is readonly {0}", customerGuid));
-                return _httpResponseMessageHelper.Forbidden(customerGuid);
+                var response = _httpResponseMessageHelper.Forbidden(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer is readonly {customerGuid}");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Customer {0}", customerGuid));
+            log.LogInformation($"Attempting to get Customer {customerGuid}");
             var customer = await _customerPatchService.GetCustomerByIdAsync(customerGuid);
 
             if (customer == null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to get Customer resource {0}", customerGuid));
-                return _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to get Customer resource {customerGuid}");
+                return response;
             }
 
             dynamic data = Newtonsoft.Json.Linq.JObject.Parse(customer);
@@ -156,20 +162,21 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 customerPatchRequest.IntroducedBy = data.IntroducedBy;
 
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
+            log.LogInformation($"Attempt to validate resource");
             var errors = _validate.ValidateResource(customerPatchRequest, false);
 
             if (errors != null && errors.Any())
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
-                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+                var response = _httpResponseMessageHelper.UnprocessableEntity(errors);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. validation errors with resource", errors);
+                return response;
             }
 
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to patch customer resource {0}", customerGuid));
+            log.LogInformation($"Attempting to patch customer resource {customerGuid}");
             var patchedCustomer = _customerPatchService.PatchResource(customer, customerPatchRequest);
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update Customer {0}", customerGuid));
+            log.LogInformation($"Attempting to update Customer {customerGuid}");
             var updatedCustomer = await _customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
             var di = await _provider.GetIdentityForCustomerAsync(customerGuid);
@@ -211,15 +218,23 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (updatedCustomer != null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", customerGuid));
+                log.LogInformation($"attempting to send to service bus {customerGuid}");
                 await _customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
             }
 
-            _loggerHelper.LogMethodExit(log);
+            if (updatedCustomer == null)
+            {
 
-            return updatedCustomer == null ?
-                _httpResponseMessageHelper.BadRequest(customerGuid) :
-                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");    
+                return response;
+            }
+            else
+            {
+                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                log.LogInformation($"Response Status Code: [{response.StatusCode}]. Update customer succeeded");
+                return response;
+            }
 
         }
     }
