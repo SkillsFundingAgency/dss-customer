@@ -57,8 +57,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         [ProducesResponseType(typeof(Models.Customer), 200)]
         public async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req, ILogger log)
         {
-            _loggerHelper.LogMethodEnter(log);
-
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
                 log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
@@ -69,25 +67,29 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
+            log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
+
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'APIM-TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                var response =  _httpResponseMessageHelper.BadRequest();
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
+                return response;
             }
 
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                var response =  _httpResponseMessageHelper.BadRequest();
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Apimurl:  " + ApimURL);
+            log.LogInformation($"Apimurl:  " + ApimURL);
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubContractorId' in request header");
+                log.LogInformation($"Unable to locate 'SubContractorId' in request header");
 
             log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
@@ -95,41 +97,57 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             try
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
+                log.LogInformation($"Attempt to get resource from body of the request");
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
-                /*if (tempRequest != null)
-                {
-                    customerRequest = RequestHelper.GetCustomerFromRequest(tempRequest).ToObject<Models.Customer>();
-                }*/
+                
             }
             catch (JsonException ex)
             {
-                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
-                return _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response =  _httpResponseMessageHelper.UnprocessableEntity(ex);
+                log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
+                return response;
             }
 
             if (customerRequest == null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Customer request is null");
-                return _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response =  _httpResponseMessageHelper.UnprocessableEntity(req);
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
+                return response;
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action plan patch");
+            log.LogInformation($"Attempt to set id's for action plan patch");
             customerRequest.SetIds(touchpointId, subContractorId);
 
             var errors = _validate.ValidateResource(customerRequest, true);
 
             if (errors != null && errors.Any())
-                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+            {
+                var response =  _httpResponseMessageHelper.UnprocessableEntity(errors);
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Validation errors.", errors);
+                return response;
+            }
 
+            log.LogInformation($"Attempt to create a new Customer");
             var customer = await _customerPostService.CreateNewCustomerAsync(customerRequest);
 
-            if (customer != null)
-                await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
 
-            return customer == null
-                ? _httpResponseMessageHelper.BadRequest()
-                : _httpResponseMessageHelper.Created(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+            if (customer != null)
+            {
+                log.LogInformation($"Attempt to send to service bus");
+                await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+            }
+            if (customer == null)
+            {
+                var response =  _httpResponseMessageHelper.BadRequest();
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Post a customer failed.");
+                return response;
+            }
+            else
+            {
+                var response =  _httpResponseMessageHelper.Created(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                log.LogInformation($"Response status code: [{response.StatusCode}]. Post a customer succeeded");
+                return response;
+            }
         }
     }
 }
