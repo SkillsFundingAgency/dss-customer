@@ -72,11 +72,13 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "12345")]
         public IntroducedBy? IntroducedBy { get; set; }
 
+        [RegularExpression(@"^[^<>]+$")]
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
         [StringLength(100)]
         public string IntroducedByAdditionalInfo { get; set; }
 
+        [RegularExpression(@"^[0-9]+$")]
         [StringLength(50)]
         [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
         [Example(Description = "01234567899876543210")]
@@ -86,6 +88,7 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "2018-06-21T14:45:00")]
         public DateTime? LastModifiedDate { get; set; }
 
+        [RegularExpression(@"^[0-9]+$")]
         [StringLength(10, MinimumLength = 10)]
         [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
         [Example(Description = "0000000001")]

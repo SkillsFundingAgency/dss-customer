@@ -217,6 +217,98 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             Assert.IsInstanceOf<HttpResponseMessage>(result);
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
         }
+        
+        [TestCase("<script>alert(1)</script>")]
+        [TestCase("Isobel.testing@dwp.gov.uk <script> Bridgewater JC")]
+        public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenIntroducedByAdditionalInfoRequestIsInValid(string additionalInfo)
+        {
+            // Arrange
+            _customerPatch = new CustomerPatch { IntroducedByAdditionalInfo = additionalInfo };
+
+            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
+            _patchCustomerHttpTriggerService.Setup(x => x.GetCustomerByIdAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customerString));
+            _patchCustomerHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
+
+            // Act
+            var result = await RunFunction(ValidCustomerId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
+            var error = await result.Content.ReadAsStringAsync();
+
+            Assert.IsTrue(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"));
+        }
+
+        [TestCase("Universal Credit work coach holly")]
+        [TestCase("Isobel.testing@dwp.gov.uk Bridgewater PC")]
+        public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenIntroducedByAdditionalInfoRequestIsValid(string additionalInfo)
+        {
+            // Arrange
+            _customerPatch = new CustomerPatch { IntroducedByAdditionalInfo = additionalInfo };
+
+            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
+            _patchCustomerHttpTriggerService.Setup(x => x.GetCustomerByIdAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customerString));
+            _patchCustomerHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
+
+            // Act
+            var result = await RunFunction(ValidCustomerId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        [TestCase("<script>alert(1)</script>")]
+        [TestCase("13231FDGD6")]
+        public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenSubcontractorIdRequestIsInValid(string subcontractorId)
+        {
+            // Arrange
+            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
+            _patchCustomerHttpTriggerService.Setup(x => x.GetCustomerByIdAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customerString));
+            _patchCustomerHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
+
+            // Act
+            var result = await RunFunction(ValidCustomerId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
+            var error = await result.Content.ReadAsStringAsync();
+
+            Assert.IsTrue(error.Contains("The field SubcontractorId must match the regular expression"));
+        }
+
+        [TestCase("12345678910")]
+        [TestCase("10001647")]
+        public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenSubcontractorIdRequestIsValid(string subcontractorId)
+        {
+            // Arrange
+            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
+            _patchCustomerHttpTriggerService.Setup(x => x.GetCustomerByIdAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customerString));
+            _patchCustomerHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
+
+            // Act
+            var result = await RunFunction(ValidCustomerId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+        }
 
         private async Task<HttpResponseMessage> RunFunction(string customerId)
         {
