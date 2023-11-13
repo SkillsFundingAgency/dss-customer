@@ -16,6 +16,9 @@ namespace NCS.DSS.Customer.ReferenceData
         [Description("Dr")]
         Dr = 4,
 
+        [Description("Ms")]
+        Ms = 6,
+
         [Description("Other")]
         Other = 5,
 
