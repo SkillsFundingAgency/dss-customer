@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
 using System;
@@ -112,6 +113,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             {
                 var response =  _httpResponseMessageHelper.UnprocessableEntity(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
+                return response;
+            }
+
+            //Validate customer IntroducedBy Enum is defined
+            if (!Enum.IsDefined(typeof(IntroducedBy), customerRequest.IntroducedBy)) 
+            {
+                var response = _httpResponseMessageHelper.UnprocessableEntity(req);
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value");
                 return response;
             }
 
