@@ -78,15 +78,15 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return response;
             }
 
-            //var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
-            //if (string.IsNullOrEmpty(ApimURL))
-            //{
-            //    var response =  _httpResponseMessageHelper.BadRequest();
-            //    log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
-            //    return response;
-            //}
+            var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
+            if (string.IsNullOrEmpty(ApimURL))
+            {
+                var response = _httpResponseMessageHelper.BadRequest();
+                log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
+                return response;
+            }
 
-            //log.LogInformation($"Apimurl:  " + ApimURL);
+            log.LogInformation($"Apimurl:  " + ApimURL);
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
