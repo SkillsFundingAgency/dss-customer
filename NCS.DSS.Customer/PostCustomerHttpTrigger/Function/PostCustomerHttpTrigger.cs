@@ -13,6 +13,7 @@ using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -107,6 +108,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
                 if (ex.Message.Contains("IntroducedBy"))
                 {
+                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By valuel");
                     log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By valuel");
                 }
                 else
@@ -148,7 +150,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             if (customer != null)
             {
                 log.LogInformation($"Attempt to send to service bus");
-                //await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+                await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
             }
             if (customer == null)
             {
