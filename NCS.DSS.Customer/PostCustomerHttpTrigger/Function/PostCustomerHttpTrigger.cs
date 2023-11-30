@@ -78,15 +78,15 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return response;
             }
 
-            var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
-            if (string.IsNullOrEmpty(ApimURL))
-            {
-                var response =  _httpResponseMessageHelper.BadRequest();
-                log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
-                return response;
-            }
+            //var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
+            //if (string.IsNullOrEmpty(ApimURL))
+            //{
+            //    var response =  _httpResponseMessageHelper.BadRequest();
+            //    log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
+            //    return response;
+            //}
 
-            log.LogInformation($"Apimurl:  " + ApimURL);
+            //log.LogInformation($"Apimurl:  " + ApimURL);
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
@@ -102,6 +102,19 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
                 
             }
+            catch (JsonSerializationException ex)
+            {
+                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                if (ex.Message.Contains("IntroducedBy"))
+                {
+                    log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By valuel");
+                }
+                else
+                {
+                    log.LogError($"Response status code: [{response.StatusCode}]. JsonSerializationException error: ", ex.Message);
+                }
+                return response;
+            }
             catch (JsonException ex)
             {
                 var response =  _httpResponseMessageHelper.UnprocessableEntity(ex);
@@ -113,14 +126,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             {
                 var response =  _httpResponseMessageHelper.UnprocessableEntity(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
-                return response;
-            }
-
-            //Validate customer IntroducedBy Enum is defined
-            if (!Enum.IsDefined(typeof(IntroducedBy), customerRequest.IntroducedBy)) 
-            {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(req);
-                log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value");
                 return response;
             }
 
@@ -143,7 +148,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             if (customer != null)
             {
                 log.LogInformation($"Attempt to send to service bus");
-                await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
+                //await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
             }
             if (customer == null)
             {
