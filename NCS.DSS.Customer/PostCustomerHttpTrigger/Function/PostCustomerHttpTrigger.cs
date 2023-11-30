@@ -108,8 +108,8 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
                 if (ex.Message.Contains("IntroducedBy"))
                 {
-                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By valuel");
-                    log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By valuel");
+                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By value.");
+                    log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value.");
                 }
                 else
                 {
