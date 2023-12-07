@@ -9,9 +9,11 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -80,7 +82,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response =  _httpResponseMessageHelper.BadRequest();
+                var response = _httpResponseMessageHelper.BadRequest();
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
                 return response;
             }
@@ -100,6 +102,20 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
                 
+            }
+            catch (JsonSerializationException ex)
+            {
+                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                if (ex.Message.Contains("IntroducedBy"))
+                {
+                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By value.");
+                    log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value.");
+                }
+                else
+                {
+                    log.LogError($"Response status code: [{response.StatusCode}]. JsonSerializationException error: ", ex.Message);
+                }
+                return response;
             }
             catch (JsonException ex)
             {
