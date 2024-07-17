@@ -22,7 +22,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
     public class PatchCustomerHttpTrigger
     {
         private readonly IResourceHelper _resourceHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
@@ -31,7 +30,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IDocumentDBProvider _provider;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
-             IHttpResponseMessageHelper httpResponseMessageHelper,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPatchCustomerHttpTriggerService customerPatchService,
@@ -40,7 +38,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
              IDocumentDBProvider provider)
         {
             _resourceHelper = resourceHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _httpRequestHelper = httpRequestHelper;
             _validate = validate;
             _customerPatchService = customerPatchService;
@@ -75,7 +72,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -83,7 +80,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'apimurl' in request header");
                 return response;
             }
@@ -92,7 +89,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(customerGuid);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -110,14 +107,14 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = new UnprocessableEntityObjectResult(ex);
                 log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
             if (customerPatchRequest == null)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response =new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. customer patch request is null");
                 return response;
             }
@@ -131,7 +128,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (!doesCustomerExist)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer does not exist {customerGuid}");
                 return response;
             }
@@ -141,7 +138,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (isCustomerReadOnly)
             {
-                var response = _httpResponseMessageHelper.Forbidden(customerGuid);
+                var response = new StatusCodeResult(403);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer is readonly {customerGuid}");
                 return response;
             }
@@ -151,7 +148,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (customer == null)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to get Customer resource {customerGuid}");
                 return response;
             }
@@ -166,7 +163,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(errors);
+                var response = new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. validation errors with resource", errors);
                 return response;
             }
@@ -224,13 +221,13 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (updatedCustomer == null)
             {
 
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");    
                 return response;
             }
             else
             {
-                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Update customer succeeded");
                 return response;
             }

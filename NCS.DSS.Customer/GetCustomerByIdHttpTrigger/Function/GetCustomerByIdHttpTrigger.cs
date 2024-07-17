@@ -21,21 +21,18 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
         private readonly IGetCustomerByIdHttpTriggerService _customerByIdService;
         private readonly ILoggerHelper _loggerHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IJsonHelper _jsonHelper;
 
         public GetCustomerByIdHttpTrigger(IResourceHelper resourceHelper,
             IGetCustomerByIdHttpTriggerService customerByIdService,
             ILoggerHelper loggerHelper,
             IHttpRequestHelper httpRequestHelper,
-            IHttpResponseMessageHelper httpResponseMessageHelper,
             IJsonHelper jsonHelper)
         {
             _resourceHelper = resourceHelper;
             _customerByIdService = customerByIdService;
             _loggerHelper = loggerHelper;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _jsonHelper = jsonHelper;
         }
 
@@ -64,7 +61,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -73,7 +70,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(customerGuid);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -84,13 +81,13 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 
             if (customer == null)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer not found {customerId}");
                 return response;
             }
             else
             {
-                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
                 return response;
             }

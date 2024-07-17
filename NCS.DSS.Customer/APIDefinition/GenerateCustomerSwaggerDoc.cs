@@ -30,12 +30,9 @@ namespace NCS.DSS.Customer.APIDefinition
                 ApiDefinitionName, ApiVersion, Assembly.GetExecutingAssembly());
 
             if (string.IsNullOrEmpty(swagger))
-                return new HttpResponseMessage(HttpStatusCode.NoContent);
+                return new NoContentResult();
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(swagger)
-            };
+            return new OkObjectResult(new StringContent(swagger));
         }
     }
 }

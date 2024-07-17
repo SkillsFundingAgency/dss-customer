@@ -2,7 +2,7 @@
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
@@ -15,6 +15,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             _customer = new Models.Customer { IntroducedBy = ReferenceData.IntroducedBy.NotProvided };
             _customerPatch = new CustomerPatch();
-            _request = new DefaultHttpRequest(new DefaultHttpContext());
+            _request = new DefaultHttpContext().Request;
 
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
@@ -61,7 +62,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object, 
-                _httpResponseMessageHelper,
                 _httpRequestHelper.Object, 
                 _validate, 
                 _patchCustomerHttpTriggerService.Object, 
@@ -80,8 +80,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
 
         [Test]
@@ -95,8 +94,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
 
         [Test]
@@ -108,7 +106,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             val.Setup(x=>x.ValidateResource(It.IsAny<CustomerPatch>(), It.IsAny<bool>())).Returns(validationResults);
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object,
-                _httpResponseMessageHelper,
                 _httpRequestHelper.Object,
                 val.Object,
                 _patchCustomerHttpTriggerService.Object,
@@ -125,8 +122,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
         }
 
         [Test]
@@ -141,8 +137,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
         }
 
         [Test]
@@ -158,8 +153,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.IsInstanceOf<NoContentResult>(result);
         }
 
         [Test]
@@ -176,8 +170,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.IsInstanceOf<NoContentResult>(result);
         }
 
         [Test]
@@ -195,8 +188,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
 
         [Test]
@@ -214,8 +206,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.IsInstanceOf<OkObjectResult>(result);
         }
         
         [TestCase("<script>alert(1)</script>")]
@@ -236,9 +227,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
-            var error = await result.Content.ReadAsStringAsync();
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+
+            var unprocessableResult = result as UnprocessableEntityObjectResult;
+            var errorList = unprocessableResult.Value as List<ValidationResult>;
+            var error = errorList.FirstOrDefault().ErrorMessage;
 
             Assert.IsTrue(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"));
         }
@@ -261,8 +254,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -282,9 +274,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
-            var error = await result.Content.ReadAsStringAsync();
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+
+            var unprocessableResult = result as UnprocessableEntityObjectResult;
+            var errorList = unprocessableResult.Value as List<ValidationResult>;
+            var error = errorList.FirstOrDefault().ErrorMessage;
 
             Assert.IsTrue(error.Contains("The field SubcontractorId must match the regular expression"));
         }
@@ -306,11 +300,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId)
+        private async Task<IActionResult> RunFunction(string customerId)
         {
             return await _function.RunAsync(
                 _request,

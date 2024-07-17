@@ -24,7 +24,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
     {
         private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IValidate _validate;
         private readonly IPostCustomerHttpTriggerService _customerPostService;
         private readonly IJsonHelper _jsonHelper;
@@ -32,7 +31,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
         public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpRequestHelper httpRequestHelper,
-             IHttpResponseMessageHelper httpResponseMessageHelper,
              IValidate validate,
              IPostCustomerHttpTriggerService customerPostService,
              IJsonHelper jsonHelper,
@@ -41,7 +39,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         {
             _resourceHelper = resourceHelper;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _validate = validate;
             _customerPostService = customerPostService;
             _jsonHelper = jsonHelper;
@@ -73,7 +70,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response =  _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -81,7 +78,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
                 return response;
             }
@@ -104,10 +101,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             catch (JsonSerializationException ex)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = new UnprocessableEntityObjectResult(ex);
                 if (ex.Message.Contains("IntroducedBy"))
                 {
-                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By value.");
+                    response = new UnprocessableEntityObjectResult("Please supply a valid Introduced By value.");
                     log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value.");
                 }
                 else
@@ -118,14 +115,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = new UnprocessableEntityObjectResult(ex);
                 log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
             if (customerRequest == null)
             {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response =  new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
                 return response;
             }
@@ -137,7 +134,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(errors);
+                var response =  new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Validation errors.", errors);
                 return response;
             }
@@ -153,13 +150,16 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             if (customer == null)
             {
-                var response =  _httpResponseMessageHelper.BadRequest();
+                var response =  new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Post a customer failed.");
                 return response;
             }
             else
             {
-                var response =  _httpResponseMessageHelper.Created(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                var response =  new ObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId")) 
+                { 
+                    StatusCode = StatusCodes.Status201Created
+                };
                 log.LogInformation($"Response status code: [{response.StatusCode}]. Post a customer succeeded");
                 return response;
             }
