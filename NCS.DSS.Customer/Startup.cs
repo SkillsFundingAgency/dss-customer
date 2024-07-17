@@ -25,7 +25,6 @@ namespace NCS.DSS.Customer
             builder.Services.AddSingleton<IValidate, Validate>();
             builder.Services.AddSingleton<ILoggerHelper, LoggerHelper>();
             builder.Services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
-            builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
             builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
             builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
             builder.Services.AddScoped<ISubscriptionHelper, SubscriptionHelper>();
