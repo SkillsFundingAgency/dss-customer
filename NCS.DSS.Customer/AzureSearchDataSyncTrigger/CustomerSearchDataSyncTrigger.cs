@@ -2,7 +2,6 @@ using Azure;
 using Azure.Search.Documents.Models;
 using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.ReferenceData;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
+using Microsoft.Azure.Functions.Worker;
 
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 {
@@ -24,7 +24,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             _httpRequestHelper = httpRequestHelper;
         }
 
-        [FunctionName("SyncDataForCustomerSearchTrigger")]
+        [Function("SyncDataForCustomerSearchTrigger")]
         public async Task Run(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
