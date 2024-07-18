@@ -34,7 +34,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = _customerPatchService.Patch(string.Empty, It.IsAny<CustomerPatch>());
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.DateOfRegistration);
+            Assert.That(customer.DateOfRegistration, Is.EqualTo(DateTime.MaxValue));
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(Title.Dr, customer.Title);
+            Assert.That(customer.Title, Is.EqualTo(Title.Dr));
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(givenName, customer.GivenName);
+            Assert.That(customer.GivenName, Is.EqualTo(givenName));
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(familyName, customer.FamilyName);
+            Assert.That(customer.FamilyName, Is.EqualTo(familyName));
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.DateofBirth);
+            Assert.That(customer.DateofBirth, Is.EqualTo(DateTime.MaxValue));
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(Gender.NotApplicable, customer.Gender);
+            Assert.That(customer.Gender, Is.EqualTo(Gender.NotApplicable));
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual("0000000111", customer.UniqueLearnerNumber);
+            Assert.That(customer.UniqueLearnerNumber, Is.EqualTo("0000000111"));
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(true, customer.OptInUserResearch);
+            Assert.That(customer.OptInUserResearch, Is.True);
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(true, customer.OptInMarketResearch);
+            Assert.That(customer.OptInMarketResearch, Is.True);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.DateOfTermination);
+            Assert.That(customer.DateOfTermination, Is.EqualTo(DateTime.MaxValue));
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(ReasonForTermination.Duplicate, customer.ReasonForTermination);
+            Assert.That(customer.ReasonForTermination, Is.EqualTo(ReasonForTermination.Duplicate));
         }
 
         [Test]
@@ -204,7 +204,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(IntroducedBy.NotProvided, customer.IntroducedBy);
+            Assert.That(customer.IntroducedBy, Is.EqualTo(IntroducedBy.NotProvided));
         }
 
         [Test]
@@ -218,7 +218,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual("More Info", customer.IntroducedByAdditionalInfo);
+            Assert.That(customer.IntroducedByAdditionalInfo, Is.EqualTo("More Info"));
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.LastModifiedDate);
+            Assert.That(customer.LastModifiedDate, Is.EqualTo(DateTime.MaxValue));
         }
 
 
@@ -247,7 +247,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual("0000000111", customer.LastModifiedTouchpointId);
+            Assert.That(customer.LastModifiedTouchpointId, Is.EqualTo("0000000111"));
         }
 
         [Test]
@@ -261,7 +261,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var customer = JsonConvert.DeserializeObject<Models.Customer>(patchedCustomer);
 
             // Assert
-            Assert.AreEqual("0000000111", customer.SubcontractorId);
+            Assert.That(customer.SubcontractorId, Is.EqualTo("0000000111"));
         }
     }
 }

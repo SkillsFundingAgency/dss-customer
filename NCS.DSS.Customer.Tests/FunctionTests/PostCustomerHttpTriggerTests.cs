@@ -69,7 +69,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -159,7 +159,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<ObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
+            var objectResult = result as ObjectResult;
+
+            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -178,13 +181,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
 
             var unprocessableResult = result as UnprocessableEntityObjectResult;
             var errorList = unprocessableResult.Value as List<ValidationResult>;
-            var error = errorList.FirstOrDefault().ErrorMessage;
+            var error = errorList.FirstOrDefault(t => t.ErrorMessage.Contains("The field IntroducedByAdditionalInfo must match the regular expression")).ErrorMessage;
 
-            //Assert.IsTrue(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"));
+            Assert.That(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"), Is.True);
         }
 
         [TestCase("Universal Credit work coach holly")]
@@ -209,7 +212,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<ObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
+
+            var objectResult = result as ObjectResult;
+
+            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -227,13 +234,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
 
             var unprocessableResult = result as UnprocessableEntityObjectResult;
             var errorList = unprocessableResult.Value as List<ValidationResult>;
-            var error = errorList.FirstOrDefault().ErrorMessage;
+            var error = errorList.FirstOrDefault(t => t.ErrorMessage.Contains("The field SubcontractorId must match the regular expression")).ErrorMessage;
 
-            //Assert.IsTrue(error.Contains("The field SubcontractorId must match the regular expression"));
+            Assert.That(error.Contains("The field SubcontractorId must match the regular expression"), Is.True);
         }
 
         [TestCase("12345678910")]
@@ -258,7 +265,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<ObjectResult>(result);
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
+
+            var objectResult = result as ObjectResult;
+
+            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
         }
 
         private async Task<IActionResult> RunFunction(string customerId)
