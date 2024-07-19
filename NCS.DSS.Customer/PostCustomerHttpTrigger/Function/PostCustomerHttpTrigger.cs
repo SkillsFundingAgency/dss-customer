@@ -27,14 +27,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPostCustomerHttpTriggerService _customerPostService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger log;
 
         public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPostCustomerHttpTriggerService customerPostService,
              IJsonHelper jsonHelper,
-             ILoggerHelper loggerHelper
+             ILogger<PostCustomerHttpTrigger> logger
         )
         {
             _resourceHelper = resourceHelper;
@@ -42,7 +42,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             _validate = validate;
             _customerPostService = customerPostService;
             _jsonHelper = jsonHelper;
-            _loggerHelper = loggerHelper;
+            log = logger;
         }
 
         [Function("POST")]
@@ -53,7 +53,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req, ILogger log)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req)
         {
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))

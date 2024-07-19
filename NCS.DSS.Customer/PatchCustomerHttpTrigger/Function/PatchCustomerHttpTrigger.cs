@@ -26,7 +26,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILoggerHelper _loggerHelper; 
+        private readonly ILogger log; 
         private readonly IDocumentDBProvider _provider;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
@@ -34,7 +34,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
              IValidate validate,
              IPatchCustomerHttpTriggerService customerPatchService,
              IJsonHelper jsonHelper,
-             ILoggerHelper loggerHelper,
+             ILogger<PatchCustomerHttpTrigger> logger,
              IDocumentDBProvider provider)
         {
             _resourceHelper = resourceHelper;
@@ -42,7 +42,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _validate = validate;
             _customerPatchService = customerPatchService;
             _jsonHelper = jsonHelper;
-            _loggerHelper= loggerHelper; 
+            log = logger; 
             _provider = provider;
         }
 
@@ -55,7 +55,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
         public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
-            Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId)
+            Route = "Customers/{customerId}")]HttpRequest req, string customerId)
         {
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
