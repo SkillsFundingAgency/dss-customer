@@ -25,7 +25,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private Mock<ILogger> _log;
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
-        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IJsonHelper _jsonHelper;
         private Mock<IGetCustomerByIdHttpTriggerService> _getCustomerByIdHttpTriggerService;
@@ -40,7 +40,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _request = new DefaultHttpContext().Request;
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
-            _loggerHelper = new Mock<ILoggerHelper>();
+            _logger = new Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _jsonHelper = new JsonHelper();
             _documentDbProvider = new Mock<IDocumentDBProvider>();
@@ -48,7 +48,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _function = new GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger(
                 _resourceHelper.Object,
                 _getCustomerByIdHttpTriggerService.Object,
-                _loggerHelper.Object,
+                _logger.Object,
                 _httpRequestHelper.Object,
                 _jsonHelper);
         }
@@ -113,7 +113,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private async Task<IActionResult> RunFunction(string customerId)
         {
             return await _function.Run(
-                _request, _log.Object, customerId).ConfigureAwait(false);
+                _request, customerId).ConfigureAwait(false);
         }
 
     }

@@ -29,7 +29,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
         private IValidate _validate;
-        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<ILogger<PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IHttpResponseMessageHelper _httpResponseMessageHelper;
         private IJsonHelper _jsonHelper;
@@ -46,7 +46,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
             _validate = new Validate();
-            _loggerHelper = new Mock<ILoggerHelper>();
+            _logger = new Mock<ILogger<PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _httpResponseMessageHelper = new HttpResponseMessageHelper();
             _jsonHelper = new JsonHelper();
@@ -56,7 +56,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _validate,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object);
+                _logger.Object);
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object);
+                _logger.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -128,7 +128,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object);
+                _logger.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -153,7 +153,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object);
+                _logger.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -275,8 +275,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private async Task<IActionResult> RunFunction(string customerId)
         {
             return await _function.RunAsync(
-                _request,
-                _log.Object).ConfigureAwait(false);
+                _request).ConfigureAwait(false);
         }
     }
 }

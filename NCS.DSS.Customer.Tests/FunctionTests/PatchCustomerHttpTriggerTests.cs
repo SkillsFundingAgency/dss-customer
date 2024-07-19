@@ -31,7 +31,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
         private IValidate _validate;
-        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IHttpResponseMessageHelper _httpResponseMessageHelper;
         private IJsonHelper _jsonHelper;
@@ -52,7 +52,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
             _validate = new Validate();
-            _loggerHelper = new Mock<ILoggerHelper>();
+            _logger = new Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _httpResponseMessageHelper = new HttpResponseMessageHelper();
             _jsonHelper = new JsonHelper();
@@ -66,7 +66,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _validate, 
                 _patchCustomerHttpTriggerService.Object, 
                 _jsonHelper, 
-                _loggerHelper.Object,
+                _logger.Object,
                 _provider.Object);
         }
 
@@ -110,7 +110,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _patchCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object,
+                _logger.Object,
                 _provider.Object);
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
@@ -307,7 +307,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             return await _function.RunAsync(
                 _request,
-                _log.Object,
                 customerId).ConfigureAwait(false);
         }
     }
