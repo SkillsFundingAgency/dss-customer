@@ -12,6 +12,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 {
@@ -61,7 +63,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -70,7 +72,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = new BadRequestObjectResult(customerGuid);
+                var response = new BadRequestObjectResult(new StringContent(JsonConvert.SerializeObject(customerGuid), Encoding.UTF8, ContentApplicationType.ApplicationJSON));
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -87,7 +89,8 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             }
             else
             {
-                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                var response = new OkObjectResult(new StringContent(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"), Encoding.UTF8,
+                    ContentApplicationType.ApplicationJSON));
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
                 return response;
             }
