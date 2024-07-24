@@ -17,7 +17,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
-using System.Text;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -71,7 +70,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -79,7 +78,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
                 return response;
             }
@@ -102,8 +101,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             catch (JsonSerializationException ex)
             {
-                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(ex), Encoding.UTF8,
-                    ContentApplicationType.ApplicationJSON));
+                var response = new UnprocessableEntityObjectResult(ex);
                 if (ex.Message.Contains("IntroducedBy"))
                 {
                     response = new UnprocessableEntityObjectResult("Please supply a valid Introduced By value.");
@@ -117,16 +115,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(ex), Encoding.UTF8,
-                    ContentApplicationType.ApplicationJSON));
+                var response = new UnprocessableEntityObjectResult(ex);
                 log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
             if (customerRequest == null)
             {
-                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(req),
-                    Encoding.UTF8, ContentApplicationType.ApplicationJSON));
+                var response =  new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
                 return response;
             }
@@ -138,8 +134,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(errors),
-                    Encoding.UTF8, ContentApplicationType.ApplicationJSON));
+                var response =  new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Validation errors.", errors);
                 return response;
             }
@@ -155,15 +150,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             if (customer == null)
             {
-                var response =  new BadRequestObjectResult(HttpStatusCode.BadRequest);
+                var response =  new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Post a customer failed.");
                 return response;
             }
             else
             {
-                var response = new ObjectResult(new StringContent(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"), Encoding.UTF8,
-                    ContentApplicationType.ApplicationJSON))
-                {
+                var response =  new ObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId")) 
+                { 
                     StatusCode = StatusCodes.Status201Created
                 };
                 log.LogInformation($"Response status code: [{response.StatusCode}]. Post a customer succeeded");
