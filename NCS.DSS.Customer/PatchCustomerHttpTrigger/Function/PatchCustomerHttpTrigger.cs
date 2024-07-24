@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
+using System.Text;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -72,7 +73,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -80,7 +81,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'apimurl' in request header");
                 return response;
             }
@@ -89,7 +90,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = new BadRequestObjectResult(customerGuid);
+                var response = new BadRequestObjectResult(new StringContent(JsonConvert.SerializeObject(customerGuid), Encoding.UTF8, ContentApplicationType.ApplicationJSON));
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -107,14 +108,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                var response = new UnprocessableEntityObjectResult(ex);
+                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(ex), Encoding.UTF8,
+                    ContentApplicationType.ApplicationJSON));
                 log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
             if (customerPatchRequest == null)
             {
-                var response =new UnprocessableEntityObjectResult(req);
+                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(req),
+                    Encoding.UTF8, ContentApplicationType.ApplicationJSON));
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. customer patch request is null");
                 return response;
             }
@@ -138,8 +141,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (isCustomerReadOnly)
             {
-                var response = new StatusCodeResult(403);
-                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer is readonly {customerGuid}");
+                var response = new ForbidResult(new StringContent(JsonConvert.SerializeObject(customerGuid),
+                    Encoding.UTF8, ContentApplicationType.ApplicationJSON).ToString());
+                log.LogWarning($"Response Status Code: [{HttpStatusCode.Forbidden}]. Customer is readonly {customerGuid}");
                 return response;
             }
 
@@ -163,7 +167,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response = new UnprocessableEntityObjectResult(errors);
+                var response = new UnprocessableEntityObjectResult(new StringContent(JsonConvert.SerializeObject(errors),
+                    Encoding.UTF8, ContentApplicationType.ApplicationJSON));
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. validation errors with resource", errors);
                 return response;
             }
@@ -221,13 +226,14 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (updatedCustomer == null)
             {
 
-                var response = new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");    
                 return response;
             }
             else
             {
-                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                var response = new OkObjectResult(new StringContent(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"), Encoding.UTF8,
+                    ContentApplicationType.ApplicationJSON));
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Update customer succeeded");
                 return response;
             }
