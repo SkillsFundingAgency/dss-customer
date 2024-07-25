@@ -32,7 +32,7 @@ namespace NCS.DSS.Customer.APIDefinition
             if (string.IsNullOrEmpty(swagger))
                 return new NoContentResult();
 
-            return new OkObjectResult(new StringContent(swagger));
+            return new OkObjectResult(swagger);
         }
     }
 }
