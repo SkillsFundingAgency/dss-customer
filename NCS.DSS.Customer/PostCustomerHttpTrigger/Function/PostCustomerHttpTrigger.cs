@@ -17,6 +17,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -113,7 +114,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 }
                 return response;
             }
-            catch (JsonException ex)
+            catch (Newtonsoft.Json.JsonException ex)
             {
                 var response = new UnprocessableEntityObjectResult(ex);
                 log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
@@ -156,9 +157,9 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             else
             {
-                var response =  new ObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId")) 
-                { 
-                    StatusCode = StatusCodes.Status201Created
+                var response = new JsonResult(customer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.Created
                 };
                 log.LogInformation($"Response status code: [{response.StatusCode}]. Post a customer succeeded");
                 return response;

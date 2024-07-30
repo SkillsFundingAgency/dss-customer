@@ -204,9 +204,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
         
         [TestCase("<script>alert(1)</script>")]
@@ -252,9 +253,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -298,9 +300,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
         private async Task<IActionResult> RunFunction(string customerId)

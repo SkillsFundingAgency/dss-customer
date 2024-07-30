@@ -104,10 +104,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _getCustomerByIdHttpTriggerService.Setup(x => x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
 
             // Act
-            var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var result = await RunFunction(ValidCustomerId); 
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
         private async Task<IActionResult> RunFunction(string customerId)

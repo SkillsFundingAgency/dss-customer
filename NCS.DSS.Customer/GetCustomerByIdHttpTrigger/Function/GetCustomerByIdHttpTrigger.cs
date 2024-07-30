@@ -12,6 +12,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 {
@@ -87,7 +88,11 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             }
             else
             {
-                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                
+                var response = new JsonResult(customer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.OK
+                };
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
                 return response;
             }

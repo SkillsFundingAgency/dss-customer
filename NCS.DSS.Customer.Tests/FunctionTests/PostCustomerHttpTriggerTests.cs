@@ -157,12 +157,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<ObjectResult>());
-            var objectResult = result as ObjectResult;
-
-            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.Created));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -210,13 +208,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<ObjectResult>());
-
-            var objectResult = result as ObjectResult;
-
-            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.Created));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -263,13 +258,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<ObjectResult>());
-
-            var objectResult = result as ObjectResult;
-
-            Assert.That(objectResult.StatusCode, Is.EqualTo(201));
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.Created));
         }
 
         private async Task<IActionResult> RunFunction(string customerId)

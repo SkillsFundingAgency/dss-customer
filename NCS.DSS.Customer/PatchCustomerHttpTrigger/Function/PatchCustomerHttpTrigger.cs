@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -105,7 +106,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
-            catch (JsonException ex)
+            catch (Newtonsoft.Json.JsonException ex)
             {
                 var response = new UnprocessableEntityObjectResult(ex);
                 log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
@@ -227,7 +228,10 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
             else
             {
-                var response = new OkObjectResult(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                var response = new JsonResult(updatedCustomer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.OK
+                };
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Update customer succeeded");
                 return response;
             }
