@@ -1,8 +1,11 @@
-# dss-customer
+# DSS Customer
+
+> [!NOTE]  
+> The latest version of this API is `v3`
 
 [![Build Status](https://sfa-gov-uk.visualstudio.com/CDS%202.0/_apis/build/status/Yaml/dss-customer?repoName=SkillsFundingAgency%2Fdss-customer&branchName=master-v3)](https://sfa-gov-uk.visualstudio.com/CDS%202.0/_build/latest?definitionId=1451&repoName=SkillsFundingAgency%2Fdss-customer&branchName=master-v3)
 
-Function app to provide api for maintaining a customer.
+Function App to provide an API for maintaining a customer.
 
 ## Developer Setup
 
