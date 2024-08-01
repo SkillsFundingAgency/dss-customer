@@ -1,7 +1,7 @@
 using Azure;
 using Azure.Search.Documents.Models;
 using DFC.Common.Standard.Logging;
-using DFC.HTTP.Standard;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.ReferenceData;
@@ -10,39 +10,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
-using Microsoft.Azure.Functions.Worker;
 
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 {
     public class CustomerSearchDataSyncTrigger
     {
         private readonly ILoggerHelper _loggerHelper;
-        private readonly IHttpRequestHelper _httpRequestHelper;
-        public CustomerSearchDataSyncTrigger(ILoggerHelper loggerHelper, IHttpRequestHelper httpRequestHelper)
+        private readonly ILogger<CustomerSearchDataSyncTrigger> _log;
+        public CustomerSearchDataSyncTrigger(ILoggerHelper loggerHelper, ILogger<CustomerSearchDataSyncTrigger> log)
         {
             _loggerHelper = loggerHelper;
-            _httpRequestHelper = httpRequestHelper;
+            _log = log;
         }
 
         [Function("SyncDataForCustomerSearchTrigger")]
         public async Task Run(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Document> documents,
-            ILogger log)
+            IReadOnlyList<Document> documents)
         {
-            var _correlationId = Guid.NewGuid();
+            var correlationId = Guid.NewGuid();
 
-            _loggerHelper.LogMethodEnter(log);
+            _loggerHelper.LogMethodEnter(_log);
 
             var client = SearchHelper.GetSearchServiceClient();
 
-            _loggerHelper.LogInformationMessage(log, _correlationId, "get search service client");
+            _loggerHelper.LogInformationMessage(_log, correlationId, "get search service client");
 
 
-            _loggerHelper.LogInformationMessage(log, _correlationId, "get index client");
+            _loggerHelper.LogInformationMessage(_log, correlationId, "get index client");
 
-            _loggerHelper.LogInformationMessage(log, _correlationId, "Documents modified " + documents.Count);
+            _loggerHelper.LogInformationMessage(_log, correlationId, "Documents modified " + documents.Count);
 
             if (documents.Count > 0)
             {
@@ -72,7 +70,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                 try
                 {
-                    log.LogInformation("attempting to merge docs to azure search");
+                    _log.LogInformation("attempting to merge docs to azure search");
 
                     var results = await client.IndexDocumentsAsync(batch);
 
@@ -80,15 +78,15 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                     if (failed.Count > 0)
                     {
-                        _loggerHelper.LogInformationMessage(log, _correlationId, string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
+                        _loggerHelper.LogInformationMessage(_log, correlationId, string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
                     }
 
-                    log.LogInformation("successfully merged docs to azure search");
+                    _log.LogInformation("successfully merged docs to azure search");
 
                 }
                 catch (RequestFailedException e)
                 {
-                    _loggerHelper.LogException(log, _correlationId, e);
+                    _loggerHelper.LogException(_log, correlationId, e);
                     
                 }
             }
