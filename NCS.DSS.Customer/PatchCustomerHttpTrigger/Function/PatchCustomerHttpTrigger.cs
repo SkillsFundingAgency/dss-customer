@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
+using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -29,6 +30,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IJsonHelper _jsonHelper;
         private readonly ILogger log; 
         private readonly IDocumentDBProvider _provider;
+        private IDynamicHelper _dynamicHelper;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpRequestHelper httpRequestHelper,
@@ -36,7 +38,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
              IPatchCustomerHttpTriggerService customerPatchService,
              IJsonHelper jsonHelper,
              ILogger<PatchCustomerHttpTrigger> logger,
-             IDocumentDBProvider provider)
+             IDocumentDBProvider provider,
+             IDynamicHelper dynamicHelper)
         {
             _resourceHelper = resourceHelper;
             _httpRequestHelper = httpRequestHelper;
@@ -45,6 +48,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _jsonHelper = jsonHelper;
             log = logger; 
             _provider = provider;
+            _dynamicHelper = dynamicHelper;
         }
 
         [Function("PATCH")]
@@ -106,9 +110,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
-            catch (Newtonsoft.Json.JsonException ex)
+            catch (Exception ex)
             {
-                var response = new UnprocessableEntityObjectResult(ex);
+                var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
                 log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }

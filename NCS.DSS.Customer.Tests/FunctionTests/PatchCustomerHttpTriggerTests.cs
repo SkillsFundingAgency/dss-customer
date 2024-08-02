@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -41,6 +42,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private string _customerString;
         private Mock<IDocumentDBProvider> _provider;
         private PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger _function;
+        private Mock<IDynamicHelper> _dynamicHelper;
 
         [SetUp]
         public void Setup()
@@ -59,6 +61,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _patchCustomerHttpTriggerService = new Mock<IPatchCustomerHttpTriggerService>();
             _customerString = JsonConvert.SerializeObject(_customer);
             _provider = new Mock<IDocumentDBProvider>();
+            _dynamicHelper = new Mock<IDynamicHelper>();
 
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object, 
@@ -67,7 +70,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _patchCustomerHttpTriggerService.Object, 
                 _jsonHelper, 
                 _logger.Object,
-                _provider.Object);
+                _provider.Object,
+                _dynamicHelper.Object);
         }
 
         [Test]
@@ -111,7 +115,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _patchCustomerHttpTriggerService.Object,
                 _jsonHelper,
                 _logger.Object,
-                _provider.Object);
+                _provider.Object,
+                _dynamicHelper.Object);
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");

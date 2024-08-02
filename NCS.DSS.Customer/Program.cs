@@ -13,6 +13,7 @@ using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.ServiceBus;
 using NCS.DSS.Customer.Validation;
+using NCS.DSS.Customer.Helpers;
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
@@ -31,6 +32,7 @@ var host = new HostBuilder()
         services.AddScoped<ICustomerPatchService, CustomerPatchService>();
         services.AddScoped<IServiceBusClient, ServiceBusClient>();
         services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
+        services.AddSingleton<IDynamicHelper, DynamicHelper>();
     })
     .Build();
 

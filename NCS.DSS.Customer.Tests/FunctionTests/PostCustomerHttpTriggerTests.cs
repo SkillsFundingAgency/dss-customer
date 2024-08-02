@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
 using Newtonsoft.Json;
@@ -35,6 +36,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private IJsonHelper _jsonHelper;
         private Mock<IPostCustomerHttpTriggerService> _postCustomerHttpTriggerService;
         private Models.Customer _customer;
+        private Mock<IDynamicHelper> _dynamicHelper;
         private PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger _function;
 
         [SetUp]
@@ -50,13 +52,15 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _httpResponseMessageHelper = new HttpResponseMessageHelper();
             _jsonHelper = new JsonHelper();
+            _dynamicHelper = new Mock<IDynamicHelper>();
             _postCustomerHttpTriggerService = new Mock<IPostCustomerHttpTriggerService>();
             _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _validate,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _logger.Object);
+                _logger.Object,
+                _dynamicHelper.Object);
         }
 
         [Test]
@@ -87,7 +91,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _logger.Object);
+                _logger.Object,
+                _dynamicHelper.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -128,7 +133,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _logger.Object);
+                _logger.Object, _dynamicHelper.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -153,7 +158,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _logger.Object);
+                _logger.Object, _dynamicHelper.Object);
 
             // Act
             var result = await RunFunction(ValidCustomerId);

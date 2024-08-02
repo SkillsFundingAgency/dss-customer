@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
+using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -29,13 +30,15 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         private readonly IPostCustomerHttpTriggerService _customerPostService;
         private readonly IJsonHelper _jsonHelper;
         private readonly ILogger log;
+        private readonly IDynamicHelper _dynamicHelper;
 
         public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPostCustomerHttpTriggerService customerPostService,
              IJsonHelper jsonHelper,
-             ILogger<PostCustomerHttpTrigger> logger
+             ILogger<PostCustomerHttpTrigger> logger,
+             IDynamicHelper dynamicHelper
         )
         {
             _resourceHelper = resourceHelper;
@@ -44,6 +47,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             _customerPostService = customerPostService;
             _jsonHelper = jsonHelper;
             log = logger;
+            _dynamicHelper = dynamicHelper;
         }
 
         [Function("POST")]
@@ -100,9 +104,9 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
                 
             }
-            catch (JsonSerializationException ex)
+            catch (Exception ex)
             {
-                var response = new UnprocessableEntityObjectResult(ex);
+                var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
                 if (ex.Message.Contains("IntroducedBy"))
                 {
                     response = new UnprocessableEntityObjectResult("Please supply a valid Introduced By value.");
@@ -112,12 +116,6 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 {
                     log.LogError($"Response status code: [{response.StatusCode}]. JsonSerializationException error: ", ex.Message);
                 }
-                return response;
-            }
-            catch (Newtonsoft.Json.JsonException ex)
-            {
-                var response = new UnprocessableEntityObjectResult(ex);
-                log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
