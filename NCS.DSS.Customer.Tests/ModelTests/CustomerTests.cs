@@ -17,13 +17,13 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.IsNotNull(customer.DateOfRegistration);
-            Assert.IsNotNull(customer.LastModifiedDate);
-            Assert.AreEqual(false, customer.OptInUserResearch);
-            Assert.AreEqual(false, customer.OptInMarketResearch);
-            Assert.AreEqual(Title.NotProvided, customer.Title);
-            Assert.AreEqual(Gender.NotProvided, customer.Gender);
-            Assert.AreEqual(IntroducedBy.NotProvided, customer.IntroducedBy);
+            Assert.That(customer.DateOfRegistration, Is.Not.Null);
+            Assert.That(customer.LastModifiedDate, Is.Not.Null);
+            Assert.That(customer.OptInUserResearch, Is.False);
+            Assert.That(customer.OptInMarketResearch, Is.False);
+            Assert.That(customer.Title, Is.EqualTo(Title.NotProvided));
+            Assert.That(customer.Gender, Is.EqualTo(Gender.NotProvided));
+            Assert.That(customer.IntroducedBy, Is.EqualTo(IntroducedBy.NotProvided));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.DateOfRegistration);
+            Assert.That(customer.DateOfRegistration, Is.EqualTo(DateTime.MaxValue));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, customer.LastModifiedDate);
+            Assert.That(customer.LastModifiedDate, Is.EqualTo(DateTime.MaxValue));
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(true, customer.OptInUserResearch);
+            Assert.That(customer.OptInUserResearch, Is.True);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(true, customer.OptInMarketResearch);
+            Assert.That(customer.OptInMarketResearch, Is.True);
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(Title.Mr, customer.Title);
+            Assert.That(customer.Title, Is.EqualTo(Title.Mr));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(Gender.Male, customer.Gender);
+            Assert.That(customer.Gender, Is.EqualTo(Gender.Male));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(IntroducedBy.Charity, customer.IntroducedBy);
+            Assert.That(customer.IntroducedBy, Is.EqualTo(IntroducedBy.Charity));
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace NCS.DSS.Customer.Tests.ModelTests
             customer.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(ReasonForTermination.Other, customer.ReasonForTermination);
+            Assert.That(customer.ReasonForTermination, Is.EqualTo(ReasonForTermination.Other));
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿using NCS.DSS.Customer.ReferenceData;
-using System;
-using System.ComponentModel.DataAnnotations;
-using DFC.JSON.Standard.Attributes;
-using DFC.Swagger.Standard.Annotations;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.ReferenceData;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -97,10 +96,10 @@ namespace NCS.DSS.Customer.Models
         [Required]
         [Display(Description = "Priority Customer reference data.")]
         [Example(Description = "[2,3]")]
-        [JsonConverter(typeof(PriorityGroupConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
-        [JsonIgnoreOnSerialize]
+        [JsonIgnore]
         public string CreatedBy { get; set; }
 
         public void SetDefaultValues()

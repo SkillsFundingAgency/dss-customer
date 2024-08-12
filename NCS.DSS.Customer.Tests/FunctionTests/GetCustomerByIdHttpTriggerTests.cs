@@ -2,7 +2,7 @@
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
@@ -25,9 +25,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private Mock<ILogger> _log;
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
-        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
-        private IHttpResponseMessageHelper _httpResponseMessageHelper;
         private IJsonHelper _jsonHelper;
         private Mock<IGetCustomerByIdHttpTriggerService> _getCustomerByIdHttpTriggerService;
         private Models.Customer _customer;
@@ -38,21 +37,19 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public void Setup()
         {
             _customer = new Models.Customer();
-            _request = new DefaultHttpRequest(new DefaultHttpContext());
+            _request = new DefaultHttpContext().Request;
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
-            _loggerHelper = new Mock<ILoggerHelper>();
+            _logger = new Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            _httpResponseMessageHelper = new HttpResponseMessageHelper();
             _jsonHelper = new JsonHelper();
             _documentDbProvider = new Mock<IDocumentDBProvider>();
             _getCustomerByIdHttpTriggerService = new Mock<IGetCustomerByIdHttpTriggerService>();
             _function = new GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger(
                 _resourceHelper.Object,
                 _getCustomerByIdHttpTriggerService.Object,
-                _loggerHelper.Object,
+                _logger.Object,
                 _httpRequestHelper.Object,
-                _httpResponseMessageHelper,
                 _jsonHelper);
         }
 
@@ -66,8 +63,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -81,8 +77,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -97,8 +92,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -110,17 +104,17 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _getCustomerByIdHttpTriggerService.Setup(x => x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
 
             // Act
-            var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            var result = await RunFunction(ValidCustomerId); 
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId)
+        private async Task<IActionResult> RunFunction(string customerId)
         {
             return await _function.Run(
-                _request, _log.Object, customerId).ConfigureAwait(false);
+                _request, customerId).ConfigureAwait(false);
         }
 
     }

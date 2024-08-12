@@ -50,7 +50,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = _patchCustomerHttpTrigger.PatchResource(null, It.IsAny<CustomerPatch>());
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -111,8 +111,8 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Customer>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Customer>());
         }
 
         [Test]
@@ -125,8 +125,8 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
             // Assert
-            Assert.IsInstanceOf<string>(result);
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.InstanceOf<string>());
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
@@ -139,8 +139,8 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<string>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<string>());
         }
     }
 }

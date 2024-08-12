@@ -4,8 +4,6 @@ using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
@@ -17,40 +15,43 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.Functions.Worker;
+using System.Text.Json;
+using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
     public class PatchCustomerHttpTrigger
     {
         private readonly IResourceHelper _resourceHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILoggerHelper _loggerHelper; 
+        private readonly ILogger log; 
         private readonly IDocumentDBProvider _provider;
+        private IDynamicHelper _dynamicHelper;
 
         public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
-             IHttpResponseMessageHelper httpResponseMessageHelper,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPatchCustomerHttpTriggerService customerPatchService,
              IJsonHelper jsonHelper,
-             ILoggerHelper loggerHelper,
-             IDocumentDBProvider provider)
+             ILogger<PatchCustomerHttpTrigger> logger,
+             IDocumentDBProvider provider,
+             IDynamicHelper dynamicHelper)
         {
             _resourceHelper = resourceHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _httpRequestHelper = httpRequestHelper;
             _validate = validate;
             _customerPatchService = customerPatchService;
             _jsonHelper = jsonHelper;
-            _loggerHelper= loggerHelper; 
+            log = logger; 
             _provider = provider;
+            _dynamicHelper = dynamicHelper;
         }
 
-        [FunctionName("PATCH")]
+        [Function("PATCH")]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer Patched", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Patch request is malformed", ShowSchema = false)]
@@ -58,8 +59,8 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
-            Route = "Customers/{customerId}")]HttpRequest req, ILogger log, string customerId)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
+            Route = "Customers/{customerId}")]HttpRequest req, string customerId)
         {
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
@@ -76,7 +77,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -84,7 +85,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning("UResponse Status Code: [{response.StatusCode}]. nable to locate 'apimurl' in request header");
                 return response;
             }
@@ -93,7 +94,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(customerGuid);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -109,16 +110,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
                 log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
                 return response;
             }
 
             if (customerPatchRequest == null)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response =new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. customer patch request is null");
                 return response;
             }
@@ -132,7 +133,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (!doesCustomerExist)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer does not exist {customerGuid}");
                 return response;
             }
@@ -142,7 +143,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (isCustomerReadOnly)
             {
-                var response = _httpResponseMessageHelper.Forbidden(customerGuid);
+                var response = new StatusCodeResult(403);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer is readonly {customerGuid}");
                 return response;
             }
@@ -152,7 +153,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (customer == null)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to get Customer resource {customerGuid}");
                 return response;
             }
@@ -167,7 +168,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(errors);
+                var response = new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. validation errors with resource", errors);
                 return response;
             }
@@ -225,13 +226,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (updatedCustomer == null)
             {
 
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");    
                 return response;
             }
             else
             {
-                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedCustomer, "id", "CustomerId"));
+                var response = new JsonResult(updatedCustomer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.OK
+                };
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Update customer succeeded");
                 return response;
             }

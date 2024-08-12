@@ -2,11 +2,12 @@
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -15,6 +16,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -30,7 +32,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
         private IValidate _validate;
-        private Mock<ILoggerHelper> _loggerHelper;
+        private Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IHttpResponseMessageHelper _httpResponseMessageHelper;
         private IJsonHelper _jsonHelper;
@@ -40,34 +42,36 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private string _customerString;
         private Mock<IDocumentDBProvider> _provider;
         private PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger _function;
+        private Mock<IDynamicHelper> _dynamicHelper;
 
         [SetUp]
         public void Setup()
         {
             _customer = new Models.Customer { IntroducedBy = ReferenceData.IntroducedBy.NotProvided };
             _customerPatch = new CustomerPatch();
-            _request = new DefaultHttpRequest(new DefaultHttpContext());
+            _request = new DefaultHttpContext().Request;
 
             _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
             _validate = new Validate();
-            _loggerHelper = new Mock<ILoggerHelper>();
+            _logger = new Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _httpResponseMessageHelper = new HttpResponseMessageHelper();
             _jsonHelper = new JsonHelper();
             _patchCustomerHttpTriggerService = new Mock<IPatchCustomerHttpTriggerService>();
             _customerString = JsonConvert.SerializeObject(_customer);
             _provider = new Mock<IDocumentDBProvider>();
+            _dynamicHelper = new Mock<IDynamicHelper>();
 
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object, 
-                _httpResponseMessageHelper,
                 _httpRequestHelper.Object, 
                 _validate, 
                 _patchCustomerHttpTriggerService.Object, 
                 _jsonHelper, 
-                _loggerHelper.Object,
-                _provider.Object);
+                _logger.Object,
+                _provider.Object,
+                _dynamicHelper.Object);
         }
 
         [Test]
@@ -80,8 +84,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -95,8 +98,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -108,13 +110,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             val.Setup(x=>x.ValidateResource(It.IsAny<CustomerPatch>(), It.IsAny<bool>())).Returns(validationResults);
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _resourceHelper.Object,
-                _httpResponseMessageHelper,
                 _httpRequestHelper.Object,
                 val.Object,
                 _patchCustomerHttpTriggerService.Object,
                 _jsonHelper,
-                _loggerHelper.Object,
-                _provider.Object);
+                _logger.Object,
+                _provider.Object,
+                _dynamicHelper.Object);
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
@@ -125,8 +127,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -141,8 +142,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -158,8 +158,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -176,8 +175,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -195,8 +193,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -212,10 +209,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
         
         [TestCase("<script>alert(1)</script>")]
@@ -236,11 +233,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
-            var error = await result.Content.ReadAsStringAsync();
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
 
-            Assert.IsTrue(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"));
+            var unprocessableResult = result as UnprocessableEntityObjectResult;
+            var errorList = unprocessableResult.Value as List<ValidationResult>;
+            var error = errorList.FirstOrDefault().ErrorMessage;
+
+            Assert.That(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"), Is.True);
         }
 
         [TestCase("Universal Credit work coach holly")]
@@ -259,10 +258,10 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
         [TestCase("<script>alert(1)</script>")]
@@ -282,11 +281,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, result.StatusCode);
-            var error = await result.Content.ReadAsStringAsync();
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
 
-            Assert.IsTrue(error.Contains("The field SubcontractorId must match the regular expression"));
+            var unprocessableResult = result as UnprocessableEntityObjectResult;
+            var errorList = unprocessableResult.Value as List<ValidationResult>;
+            var error = errorList.FirstOrDefault().ErrorMessage;
+
+            Assert.That(error.Contains("The field SubcontractorId must match the regular expression"), Is.True);
         }
 
         [TestCase("12345678910")]
@@ -304,17 +305,16 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
             // Act
             var result = await RunFunction(ValidCustomerId);
-
-            // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            var responseResult = result as JsonResult;
+            //Assert
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId)
+        private async Task<IActionResult> RunFunction(string customerId)
         {
             return await _function.RunAsync(
                 _request,
-                _log.Object,
                 customerId).ConfigureAwait(false);
         }
     }

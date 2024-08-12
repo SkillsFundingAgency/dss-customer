@@ -28,10 +28,10 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             //Changed to 5 as PriorityGroups are now required
-            Assert.AreEqual(5, result.Count);
+            Assert.That(result.Count, Is.EqualTo(5));
         }
 
         [Test]
@@ -44,9 +44,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -59,9 +59,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -74,9 +74,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -89,9 +89,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -104,9 +104,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -119,9 +119,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -134,9 +134,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -149,9 +149,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -164,9 +164,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -179,9 +179,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -194,9 +194,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -209,9 +209,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -224,9 +224,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, false);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -239,9 +239,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
 
@@ -255,9 +255,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -270,9 +270,9 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var result = _validate.ValidateResource(customer, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(7, result.Count);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(7));
         }
     }
 }
