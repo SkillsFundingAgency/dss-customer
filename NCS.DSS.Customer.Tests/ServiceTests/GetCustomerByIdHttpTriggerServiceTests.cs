@@ -35,7 +35,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -48,8 +48,8 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Customer>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Customer>());
         }
     }
 }
