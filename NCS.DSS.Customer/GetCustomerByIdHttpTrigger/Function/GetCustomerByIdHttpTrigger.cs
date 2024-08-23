@@ -1,17 +1,13 @@
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
@@ -57,7 +53,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-             log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
+            log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
@@ -88,7 +84,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
             }
             else
             {
-                
+
                 var response = new JsonResult(customer, new JsonSerializerOptions())
                 {
                     StatusCode = (int)HttpStatusCode.OK

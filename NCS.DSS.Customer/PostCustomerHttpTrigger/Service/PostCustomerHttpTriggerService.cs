@@ -1,7 +1,6 @@
 ﻿using NCS.DSS.Customer.Cosmos.Provider;
-using System.Net;
-using System.Threading.Tasks;
 using NCS.DSS.Customer.ServiceBus;
+using System.Net;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
@@ -20,11 +19,11 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
             if (customer == null)
                 return null;
 
-            customer.SetDefaultValues();            
+            customer.SetDefaultValues();
 
             var response = await _documentDbProvider.CreateCustomerAsync(customer);
 
-            return response.StatusCode == HttpStatusCode.Created ? (dynamic) response.Resource : null;
+            return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : null;
 
         }
 

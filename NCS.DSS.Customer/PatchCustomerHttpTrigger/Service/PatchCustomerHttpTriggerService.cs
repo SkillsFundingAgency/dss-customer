@@ -1,11 +1,9 @@
 ﻿using NCS.DSS.Customer.Cosmos.Provider;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.ServiceBus;
+using System.Net;
 
-namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service 
+namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
     public class PatchCustomerHttpTriggerService : IPatchCustomerHttpTriggerService
     {

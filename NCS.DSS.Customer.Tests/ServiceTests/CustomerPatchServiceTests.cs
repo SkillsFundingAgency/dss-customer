@@ -1,11 +1,11 @@
-﻿using System;
-using DFC.JSON.Standard;
+﻿using DFC.JSON.Standard;
 using Moq;
 using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.ReferenceData;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 
 namespace NCS.DSS.Customer.Tests.ServiceTests
 {

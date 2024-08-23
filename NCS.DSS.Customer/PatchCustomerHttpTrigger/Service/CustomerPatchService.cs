@@ -1,7 +1,6 @@
 ﻿using DFC.JSON.Standard;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {
@@ -21,7 +20,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
                 return null;
 
             var obj = JObject.Parse(customerJson);
-            
+
             if (!string.IsNullOrEmpty(customerPatch.SubcontractorId))
             {
                 if (obj["SubcontractorId"] == null)
@@ -77,7 +76,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 
             if (customerPatch.PriorityGroups != null && customerPatch.PriorityGroups.Count() > 0)
             {
-                if(obj["PriorityGroups"] == null)
+                if (obj["PriorityGroups"] == null)
                 {
                     obj.Add("PriorityGroups", null);
                 }

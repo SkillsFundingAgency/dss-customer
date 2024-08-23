@@ -1,23 +1,17 @@
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
+using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
-using Newtonsoft.Json;
-using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
-using NCS.DSS.Customer.Helpers;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
@@ -28,7 +22,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILogger log; 
+        private readonly ILogger log;
         private readonly IDocumentDBProvider _provider;
         private IDynamicHelper _dynamicHelper;
 
@@ -46,7 +40,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             _validate = validate;
             _customerPatchService = customerPatchService;
             _jsonHelper = jsonHelper;
-            log = logger; 
+            log = logger;
             _provider = provider;
             _dynamicHelper = dynamicHelper;
         }
@@ -59,7 +53,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch", 
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "patch",
             Route = "Customers/{customerId}")]HttpRequest req, string customerId)
         {
 
@@ -102,7 +96,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
                 log.LogInformation($"Unable to locate 'SubContractorId' in request header");
-            
+
             Models.CustomerPatch customerPatchRequest;
 
             try
@@ -119,7 +113,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             if (customerPatchRequest == null)
             {
-                var response =new UnprocessableEntityObjectResult(req);
+                var response = new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. customer patch request is null");
                 return response;
             }
@@ -127,7 +121,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             log.LogInformation($"Attempt to set id's for action plan patch");
             customerPatchRequest.SetIds(touchpointId, subContractorId);
 
-          
+
             log.LogInformation($"Attempting to see if customer exists {customerId}");
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
@@ -227,7 +221,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             {
 
                 var response = new BadRequestObjectResult(400);
-                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");    
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to update customer {customerGuid}");
                 return response;
             }
             else

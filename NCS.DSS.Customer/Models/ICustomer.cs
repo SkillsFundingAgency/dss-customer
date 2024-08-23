@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NCS.DSS.Customer.ReferenceData;
+﻿using NCS.DSS.Customer.ReferenceData;
 
 namespace NCS.DSS.Customer.Models
 {

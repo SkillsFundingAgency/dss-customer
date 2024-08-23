@@ -2,9 +2,7 @@
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json;
-using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.ServiceBus
 {
@@ -14,7 +12,7 @@ namespace NCS.DSS.Customer.ServiceBus
         private readonly ISubscriptionHelper _subscriptionHelper;
         public readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
         public readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
-        
+
         public ServiceBusClient(ISubscriptionHelper subscriptionHelper)
         {
             _subscriptionHelper = subscriptionHelper;
