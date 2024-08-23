@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Dynamic;
-using System.Text.Json;
-using System.Xml.Linq;
-using static Azure.Core.HttpHeader;
+﻿using System.Dynamic;
 
 namespace NCS.DSS.Customer.Helpers
 {

@@ -1,10 +1,6 @@
-﻿using DFC.HTTP.Standard;
-using NCS.DSS.Customer.ReferenceData;
+﻿using NCS.DSS.Customer.ReferenceData;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 
 namespace NCS.DSS.Customer.Helpers

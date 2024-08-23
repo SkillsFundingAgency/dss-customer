@@ -1,5 +1,4 @@
-﻿using DFC.Common.Standard.Logging;
-using DFC.HTTP.Standard;
+﻿using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
@@ -209,7 +207,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _postCustomerHttpTriggerService.Setup(x => x.CreateNewCustomerAsync(It.IsAny<Models.Customer>())).Returns(Task.FromResult(_customer));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));            
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -224,7 +222,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenSubcontractorIdRequestIsInValid(string subcontractorId)
         {
             // Arrange            
-            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);            
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);
             _postCustomerHttpTriggerService.Setup(x => x.CreateNewCustomerAsync(It.IsAny<Models.Customer>())).Returns(Task.FromResult(_customer));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");

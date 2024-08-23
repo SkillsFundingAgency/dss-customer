@@ -1,6 +1,5 @@
 ﻿using Azure;
 using Azure.Search.Documents;
-using System;
 
 
 namespace NCS.DSS.Customer.Helpers
@@ -24,6 +23,6 @@ namespace NCS.DSS.Customer.Helpers
 
             return _client;
         }
-      
+
     }
 }

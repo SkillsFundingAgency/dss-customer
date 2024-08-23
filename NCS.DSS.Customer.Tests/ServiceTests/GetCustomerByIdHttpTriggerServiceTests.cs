@@ -29,7 +29,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         public async Task GetCustomerByIdHttpTriggerServiceTests_GetCustomerAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult<Models.Customer>(null));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult<Models.Customer>(null));
 
             // Act
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);
@@ -42,7 +42,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         public async Task GetCustomerByIdHttpTriggerServiceTests_GetCustomerAsync_ReturnsResource()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult(_customer));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult(_customer));
 
             // Act
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);

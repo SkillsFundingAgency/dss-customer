@@ -1,24 +1,16 @@
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
-using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
-using NCS.DSS.Customer.ReferenceData;
-using NCS.DSS.Customer.Validation;
-using Newtonsoft.Json;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
-using System.Text.Json;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
+using NCS.DSS.Customer.Validation;
+using System.Net;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -102,7 +94,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             {
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
-                
+
             }
             catch (Exception ex)
             {
@@ -121,7 +113,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             if (customerRequest == null)
             {
-                var response =  new UnprocessableEntityObjectResult(req);
+                var response = new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
                 return response;
             }
@@ -133,7 +125,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response =  new UnprocessableEntityObjectResult(errors);
+                var response = new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Validation errors.", errors);
                 return response;
             }
@@ -149,7 +141,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             if (customer == null)
             {
-                var response =  new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Post a customer failed.");
                 return response;
             }

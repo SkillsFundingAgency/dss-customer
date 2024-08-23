@@ -1,5 +1,4 @@
-﻿using DFC.Common.Standard.Logging;
-using DFC.HTTP.Standard;
+﻿using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,6 @@ using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NUnit.Framework;
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.Tests.FunctionTests
@@ -57,7 +55,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task GetCustomerByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
         {
             // Arrange
-            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns((string)null);
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction(InValidId);
@@ -70,8 +68,8 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task GetCustomerByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
             // Arrange
-            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns("0000000001");
-            _httpRequestHelper.Setup(x=>x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
 
             // Act
             var result = await RunFunction(InValidId);
@@ -86,7 +84,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
-            _getCustomerByIdHttpTriggerService.Setup(x=>x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult<Models.Customer>(null));
+            _getCustomerByIdHttpTriggerService.Setup(x => x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult<Models.Customer>(null));
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -104,7 +102,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _getCustomerByIdHttpTriggerService.Setup(x => x.GetCustomerAsync(It.IsAny<Guid>())).Returns(Task.FromResult(_customer));
 
             // Act
-            var result = await RunFunction(ValidCustomerId); 
+            var result = await RunFunction(ValidCustomerId);
             var responseResult = result as JsonResult;
             //Assert
             Assert.That(result, Is.InstanceOf<JsonResult>());

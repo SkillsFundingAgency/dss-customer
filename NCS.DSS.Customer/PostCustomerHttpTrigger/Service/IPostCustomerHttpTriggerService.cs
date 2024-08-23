@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
+﻿namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
     public interface IPostCustomerHttpTriggerService
     {

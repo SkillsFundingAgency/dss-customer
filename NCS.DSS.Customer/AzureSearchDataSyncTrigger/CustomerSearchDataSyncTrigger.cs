@@ -5,10 +5,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.ReferenceData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
 
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
@@ -87,7 +83,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 catch (RequestFailedException e)
                 {
                     _loggerHelper.LogException(_log, correlationId, e);
-                    
+
                 }
             }
         }

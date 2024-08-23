@@ -2,8 +2,6 @@
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.ReferenceData;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Customer.Models
