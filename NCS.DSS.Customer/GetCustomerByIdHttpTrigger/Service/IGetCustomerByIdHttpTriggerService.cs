@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
+﻿namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
     public interface IGetCustomerByIdHttpTriggerService
     {

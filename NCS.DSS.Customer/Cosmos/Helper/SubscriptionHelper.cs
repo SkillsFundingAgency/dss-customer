@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using NCS.DSS.Customer.Cosmos.Provider;
+﻿using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
+using System.Net;
 
 namespace NCS.DSS.Customer.Cosmos.Helper
 {
@@ -31,7 +28,7 @@ namespace NCS.DSS.Customer.Cosmos.Helper
             };
 
             if (!customer.LastModifiedDate.HasValue)
-                subscription.LastModifiedDate = DateTime.Now;            
+                subscription.LastModifiedDate = DateTime.Now;
 
             var response = await _documentDbProvider.CreateSubscriptionsAsync(subscription);
 
@@ -39,7 +36,7 @@ namespace NCS.DSS.Customer.Cosmos.Helper
         }
 
         public async Task<List<Subscriptions>> GetSubscriptionsAsync(Guid? customerGuid)
-        {            
+        {
             var subscriptions = await _documentDbProvider.GetSubscriptionsByCustomerIdAsync(customerGuid);
 
             return subscriptions;

@@ -1,23 +1,16 @@
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
-using NCS.DSS.Customer.ReferenceData;
 using NCS.DSS.Customer.Validation;
-using Newtonsoft.Json;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
@@ -25,31 +18,31 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
     {
         private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IValidate _validate;
         private readonly IPostCustomerHttpTriggerService _customerPostService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger log;
+        private readonly IDynamicHelper _dynamicHelper;
 
         public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
              IHttpRequestHelper httpRequestHelper,
-             IHttpResponseMessageHelper httpResponseMessageHelper,
              IValidate validate,
              IPostCustomerHttpTriggerService customerPostService,
              IJsonHelper jsonHelper,
-             ILoggerHelper loggerHelper
+             ILogger<PostCustomerHttpTrigger> logger,
+             IDynamicHelper dynamicHelper
         )
         {
             _resourceHelper = resourceHelper;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _validate = validate;
             _customerPostService = customerPostService;
             _jsonHelper = jsonHelper;
-            _loggerHelper = loggerHelper;
+            log = logger;
+            _dynamicHelper = dynamicHelper;
         }
 
-        [FunctionName("POST")]
+        [Function("POST")]
         [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Customer Added", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Resource Does Not Exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Post request is malformed", ShowSchema = false)]
@@ -57,7 +50,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient Access To This Resource", ShowSchema = false)]
         [Response(HttpStatusCode = (int)422, Description = "Customer resource validation error(s)", ShowSchema = false)]
         [ProducesResponseType(typeof(Models.Customer), 200)]
-        public async Task<HttpResponseMessage> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req, ILogger log)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req)
         {
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
             if (string.IsNullOrEmpty(correlationId))
@@ -74,7 +67,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response =  _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -82,7 +75,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Unable to locate 'apimurl' in request header");
                 return response;
             }
@@ -101,14 +94,14 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             {
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
-                
+
             }
-            catch (JsonSerializationException ex)
+            catch (Exception ex)
             {
-                var response = _httpResponseMessageHelper.UnprocessableEntity(ex);
+                var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
                 if (ex.Message.Contains("IntroducedBy"))
                 {
-                    response = _httpResponseMessageHelper.UnprocessableEntity("Please supply a valid Introduced By value.");
+                    response = new UnprocessableEntityObjectResult("Please supply a valid Introduced By value.");
                     log.LogWarning($"Response status code: [{response.StatusCode}]. Please supply a valid Introduced By value.");
                 }
                 else
@@ -117,16 +110,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 }
                 return response;
             }
-            catch (JsonException ex)
-            {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(ex);
-                log.LogError($"Response status code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
-                return response;
-            }
 
             if (customerRequest == null)
             {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(req);
+                var response = new UnprocessableEntityObjectResult(req);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Customer request is null");
                 return response;
             }
@@ -138,7 +125,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response =  _httpResponseMessageHelper.UnprocessableEntity(errors);
+                var response = new UnprocessableEntityObjectResult(errors);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Validation errors.", errors);
                 return response;
             }
@@ -154,13 +141,16 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             }
             if (customer == null)
             {
-                var response =  _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response status code: [{response.StatusCode}]. Post a customer failed.");
                 return response;
             }
             else
             {
-                var response =  _httpResponseMessageHelper.Created(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+                var response = new JsonResult(customer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.Created
+                };
                 log.LogInformation($"Response status code: [{response.StatusCode}]. Post a customer succeeded");
                 return response;
             }

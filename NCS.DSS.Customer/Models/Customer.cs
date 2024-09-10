@@ -1,11 +1,8 @@
-﻿using NCS.DSS.Customer.ReferenceData;
-using System;
-using System.ComponentModel.DataAnnotations;
-using DFC.JSON.Standard.Attributes;
-using DFC.Swagger.Standard.Annotations;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.ReferenceData;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NCS.DSS.Customer.Models
 {
@@ -45,7 +42,7 @@ namespace NCS.DSS.Customer.Models
         [Display(Description = "Customers gender.")]
         [Example(Description = "3")]
         public Gender? Gender { get; set; }
- 
+
         [Display(Description = "Customers unique learner number as issued by the learning record service")]
         [Example(Description = "3000000000")]
         [StringLength(10)]
@@ -97,10 +94,10 @@ namespace NCS.DSS.Customer.Models
         [Required]
         [Display(Description = "Priority Customer reference data.")]
         [Example(Description = "[2,3]")]
-        [JsonConverter(typeof(PriorityGroupConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
-        [JsonIgnoreOnSerialize]
+        [JsonIgnore]
         public string CreatedBy { get; set; }
 
         public void SetDefaultValues()
@@ -140,5 +137,5 @@ namespace NCS.DSS.Customer.Models
             SubcontractorId = subcontractorid;
             CreatedBy = touchpointId;
         }
-    }    
+    }
 }

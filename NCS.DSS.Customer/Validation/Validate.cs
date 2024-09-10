@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Customer.Models;
+﻿using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.ReferenceData;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Customer.Validation
 {
@@ -43,8 +41,8 @@ namespace NCS.DSS.Customer.Validation
 
             if (long.TryParse(customerResource.UniqueLearnerNumber, out var uln))
             {
-                if(uln < 1000000000 || uln > 9999999999)
-                    results.Add(new ValidationResult("Unique Learner Number must be greater than 1000000000 and less than 9999999999", 
+                if (uln < 1000000000 || uln > 9999999999)
+                    results.Add(new ValidationResult("Unique Learner Number must be greater than 1000000000 and less than 9999999999",
                         new[] { "UniqueLearnerNumber" }));
             }
 
@@ -81,7 +79,8 @@ namespace NCS.DSS.Customer.Validation
             {
                 //Can only have 99
                 if (customerResource.PriorityGroups.Contains(PriorityCustomer.NotAPriorityCustomer)
-                    && customerResource.PriorityGroups.Count > 1) {
+                    && customerResource.PriorityGroups.Count > 1)
+                {
                     results.Add(new ValidationResult("If not a priority customer is selected no other priority group is allowed", new[] { "PriorityCustomer" }));
                 }
 
@@ -94,7 +93,8 @@ namespace NCS.DSS.Customer.Validation
 
                 //Can't have 1 and 6 at the same time
                 if (customerResource.PriorityGroups.Contains(PriorityCustomer.EighteenToTwentyfourNotInEducationEmploymentOrTraining)
-                    && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment)){
+                    && customerResource.PriorityGroups.Contains(PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment))
+                {
                     results.Add(new ValidationResult("Can not be 18 to 24 and over 50 at the same time", new[] { "PriorityCustomer" }));
                 }
 

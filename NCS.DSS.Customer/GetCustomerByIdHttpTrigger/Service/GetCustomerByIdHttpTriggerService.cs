@@ -1,7 +1,4 @@
 ﻿using NCS.DSS.Customer.Cosmos.Provider;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
@@ -14,7 +11,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
         }
         public async Task<Models.Customer> GetCustomerAsync(Guid customerId)
         {
-            return await _documentDbProvider.GetCustomerByIdAsync(customerId);            
+            return await _documentDbProvider.GetCustomerByIdAsync(customerId);
         }
 
         public List<Models.Customer> CreateTempCustomers()

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NCS.DSS.Customer.Models
+﻿namespace NCS.DSS.Customer.Models
 {
     public class Subscriptions
     {

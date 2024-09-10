@@ -1,6 +1,4 @@
 ﻿using NCS.DSS.Customer.Models;
-using System;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
 {

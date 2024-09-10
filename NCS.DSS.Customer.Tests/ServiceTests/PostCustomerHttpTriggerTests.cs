@@ -39,7 +39,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _customerHttpTriggerService.CreateNewCustomerAsync(null);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -68,14 +68,14 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.Setup(x=>x.CreateCustomerAsync(_customer)).Returns(Task.FromResult(resourceResponse));
+            _documentDbProvider.Setup(x => x.CreateCustomerAsync(_customer)).Returns(Task.FromResult(resourceResponse));
 
             // Act
             var result = await _customerHttpTriggerService.CreateNewCustomerAsync(_customer);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Customer>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Customer>());
         }
     }
 }

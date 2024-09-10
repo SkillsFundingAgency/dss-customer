@@ -5,11 +5,7 @@ using NCS.DSS.Customer.Cosmos.Client;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Document = Microsoft.Azure.Documents.Document;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
@@ -81,9 +77,9 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 customers.AddRange(response);
             }
 
-            return customers.Any() ? customers: null;
+            return customers.Any() ? customers : null;
         }
-        
+
         public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {
             var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
@@ -97,7 +93,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             {
                 var response = await client.ReadDocumentAsync(documentUri);
                 if (response.Resource != null)
-                    return (dynamic) response.Resource;
+                    return (dynamic)response.Resource;
             }
             catch (DocumentClientException)
             {

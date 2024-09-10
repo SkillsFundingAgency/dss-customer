@@ -1,18 +1,14 @@
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 {
@@ -20,34 +16,31 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
     {
         private readonly IResourceHelper _resourceHelper;
         private readonly IGetCustomerByIdHttpTriggerService _customerByIdService;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger log;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly IJsonHelper _jsonHelper;
 
         public GetCustomerByIdHttpTrigger(IResourceHelper resourceHelper,
             IGetCustomerByIdHttpTriggerService customerByIdService,
-            ILoggerHelper loggerHelper,
+            ILogger<GetCustomerByIdHttpTrigger> logger,
             IHttpRequestHelper httpRequestHelper,
-            IHttpResponseMessageHelper httpResponseMessageHelper,
             IJsonHelper jsonHelper)
         {
             _resourceHelper = resourceHelper;
             _customerByIdService = customerByIdService;
-            _loggerHelper = loggerHelper;
+            log = logger;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
             _jsonHelper = jsonHelper;
         }
 
-        [FunctionName("GETByID")]
+        [Function("GETByID")]
         [ProducesResponseType(typeof(Models.Customer), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Customer found", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Customer does not exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, ILogger log, string customerId)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, string customerId)
         {
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
@@ -60,12 +53,12 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-             log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
+            log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = _httpResponseMessageHelper.BadRequest();
+                var response = new BadRequestObjectResult(400);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
                 return response;
             }
@@ -74,7 +67,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                var response = _httpResponseMessageHelper.BadRequest(customerGuid);
+                var response = new BadRequestObjectResult(customerGuid);
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
                 return response;
             }
@@ -85,13 +78,17 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 
             if (customer == null)
             {
-                var response = _httpResponseMessageHelper.NoContent(customerGuid);
+                var response = new NoContentResult();
                 log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer not found {customerId}");
                 return response;
             }
             else
             {
-                var response = _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(customer, "id", "CustomerId"));
+
+                var response = new JsonResult(customer, new JsonSerializerOptions())
+                {
+                    StatusCode = (int)HttpStatusCode.OK
+                };
                 log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
                 return response;
             }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Customer.Cosmos.Helper
 {
@@ -26,12 +25,12 @@ namespace NCS.DSS.Customer.Cosmos.Helper
 
             return _documentCollectionUri;
         }
-        
+
         public static Uri CreateDocumentUri(Guid? customerId)
         {
             return UriFactory.CreateDocumentUri(DatabaseId, CollectionId, customerId.ToString());
         }
-        
+
         #region SubscriptionDB
 
         public static Uri CreateSubscriptionDocumentCollectionUri()

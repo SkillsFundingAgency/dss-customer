@@ -50,7 +50,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = _patchCustomerHttpTrigger.PatchResource(null, It.IsAny<CustomerPatch>());
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -63,20 +63,20 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
         public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenResourceCannotBeUpdated()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult<ResourceResponse<Document>>(null));
+            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult<ResourceResponse<Document>>(null));
 
             // Act
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -105,42 +105,42 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.Setup(x=>x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult(resourceResponse));
+            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult(resourceResponse));
 
             // Act
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Customer>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Customer>());
         }
 
         [Test]
         public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsNullWhenResourceHasNotBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult<string>(string.Empty));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult<string>(string.Empty));
 
             // Act
             var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
             // Assert
-            Assert.IsInstanceOf<string>(result);
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.InstanceOf<string>());
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
         public async Task PatchCustomerHttpTriggerServiceTests_GetCustomerByIdAsync_ReturnsResourceWhenResourceHasBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult(_json));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdForUpdateAsync(_customerId)).Returns(Task.FromResult(_json));
 
             // Act
             var result = await _patchCustomerHttpTrigger.GetCustomerByIdAsync(_customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<string>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<string>());
         }
     }
 }

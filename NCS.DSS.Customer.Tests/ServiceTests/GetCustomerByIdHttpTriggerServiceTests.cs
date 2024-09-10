@@ -29,27 +29,27 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         public async Task GetCustomerByIdHttpTriggerServiceTests_GetCustomerAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult<Models.Customer>(null));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult<Models.Customer>(null));
 
             // Act
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
         public async Task GetCustomerByIdHttpTriggerServiceTests_GetCustomerAsync_ReturnsResource()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult(_customer));
+            _documentDbProvider.Setup(x => x.GetCustomerByIdAsync(_customerId)).Returns(Task.FromResult(_customer));
 
             // Act
             var result = await _customerByIdHttpTriggerService.GetCustomerAsync(_customerId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Customer>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Customer>());
         }
     }
 }
