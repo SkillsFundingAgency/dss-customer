@@ -16,7 +16,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
     {
         private readonly IResourceHelper _resourceHelper;
         private readonly IGetCustomerByIdHttpTriggerService _customerByIdService;
-        private readonly ILogger log;
+        private readonly ILogger<GetCustomerByIdHttpTrigger> log;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IJsonHelper _jsonHelper;
 
@@ -40,7 +40,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, string customerId)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}")] HttpRequest req, string customerId)
         {
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);

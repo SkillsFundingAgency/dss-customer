@@ -16,11 +16,12 @@
     <PackageReference Include="DFC.HTTP.Standard" Version="0.1.11" />
     <PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
     <PackageReference Include="DFC.Swagger.Standard" Version="0.1.30" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.41.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />

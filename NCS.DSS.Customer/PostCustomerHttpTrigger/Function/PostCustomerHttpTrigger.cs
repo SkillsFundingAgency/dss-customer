@@ -21,7 +21,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPostCustomerHttpTriggerService _customerPostService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILogger log;
+        private readonly ILogger<PostCustomerHttpTrigger> log;
         private readonly IDynamicHelper _dynamicHelper;
 
         public PostCustomerHttpTrigger(IResourceHelper resourceHelper,

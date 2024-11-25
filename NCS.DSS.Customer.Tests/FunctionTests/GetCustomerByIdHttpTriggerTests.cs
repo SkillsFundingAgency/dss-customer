@@ -20,7 +20,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private const string ValidCustomerId = "7E467BDB-213F-407A-B86A-1954053D3C24";
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
 
-        private Mock<ILogger> _log;
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
         private Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>> _logger;
@@ -36,7 +35,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             _customer = new Models.Customer();
             _request = new DefaultHttpContext().Request;
-            _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
             _logger = new Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
@@ -111,7 +109,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private async Task<IActionResult> RunFunction(string customerId)
         {
-            return await _function.Run(
+            return await _function.RunAsync(
                 _request, customerId).ConfigureAwait(false);
         }
 

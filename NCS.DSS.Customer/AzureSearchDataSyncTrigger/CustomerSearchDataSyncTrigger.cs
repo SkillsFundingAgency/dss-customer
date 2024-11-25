@@ -1,6 +1,5 @@
 using Azure;
 using Azure.Search.Documents.Models;
-using DFC.Common.Standard.Logging;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
@@ -11,32 +10,25 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 {
     public class CustomerSearchDataSyncTrigger
     {
-        private readonly ILoggerHelper _loggerHelper;
-        private readonly ILogger<CustomerSearchDataSyncTrigger> _log;
-        public CustomerSearchDataSyncTrigger(ILoggerHelper loggerHelper, ILogger<CustomerSearchDataSyncTrigger> log)
+        private readonly ILogger<CustomerSearchDataSyncTrigger> _logger;
+        public CustomerSearchDataSyncTrigger(ILogger<CustomerSearchDataSyncTrigger> logger)
         {
-            _loggerHelper = loggerHelper;
-            _log = log;
+            _logger = logger;
         }
 
         [Function("SyncDataForCustomerSearchTrigger")]
-        public async Task Run(
+        public async Task RunAsync(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
             IReadOnlyList<Document> documents)
         {
-            var correlationId = Guid.NewGuid();
+            var functionName = nameof(CustomerSearchDataSyncTrigger);
+            _logger.LogInformation($"Function {functionName} has been invoked");
 
-            _loggerHelper.LogMethodEnter(_log);
-
+            _logger.LogInformation("Initializing search service client");
             var client = SearchHelper.GetSearchServiceClient();
 
-            _loggerHelper.LogInformationMessage(_log, correlationId, "get search service client");
-
-
-            _loggerHelper.LogInformationMessage(_log, correlationId, "get index client");
-
-            _loggerHelper.LogInformationMessage(_log, correlationId, "Documents modified " + documents.Count);
+            _logger.LogInformation($"Attempting to process {documents.Count} document(s)");
 
             if (documents.Count > 0)
             {
@@ -66,24 +58,23 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                 try
                 {
-                    _log.LogInformation("attempting to merge docs to azure search");
-
+                    _logger.LogInformation($"Merging or uploading document batch for indexing with {documents.Count} document(s)");
                     var results = await client.IndexDocumentsAsync(batch);
 
                     var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
 
                     if (failed.Count > 0)
                     {
-                        _loggerHelper.LogInformationMessage(_log, correlationId, string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
+                        _logger.LogInformation(string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
                     }
 
-                    _log.LogInformation("successfully merged docs to azure search");
+                    _logger.LogInformation($"Function {functionName} has finished invoking");
 
                 }
-                catch (RequestFailedException e)
+                catch (RequestFailedException ex)
                 {
-                    _loggerHelper.LogException(_log, correlationId, e);
-
+                    _logger.LogError(ex, $"An unexpected error occurred in {functionName}. Exception: {ex.Message}");
+                    throw;
                 }
             }
         }

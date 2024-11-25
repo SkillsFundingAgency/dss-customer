@@ -22,7 +22,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
-        private readonly ILogger log;
+        private readonly ILogger<PatchCustomerHttpTrigger> log;
         private readonly IDocumentDBProvider _provider;
         private IDynamicHelper _dynamicHelper;
 

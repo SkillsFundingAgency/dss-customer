@@ -24,7 +24,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private const string ValidCustomerId = "7E467BDB-213F-407A-B86A-1954053D3C24";
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
-        private Mock<ILogger> _log;
         private HttpRequest _request;
         private Mock<IResourceHelper> _resourceHelper;
         private IValidate _validate;
@@ -43,7 +42,6 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _customer = new Models.Customer();
             _request = new DefaultHttpContext().Request;
 
-            _log = new Mock<ILogger>();
             _resourceHelper = new Mock<IResourceHelper>();
             _validate = new Validate();
             _logger = new Mock<ILogger<PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger>>();
