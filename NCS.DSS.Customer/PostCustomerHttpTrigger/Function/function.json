@@ -14,6 +14,6 @@
     }
   ],
   "disabled": false,
-  "entryPoint": "NCS.DSS.Customer.PostCustomerHttpTrigger.Run",
+  "entryPoint": "NCS.DSS.Customer.PostCustomerHttpTrigger.RunAsync",
   "scriptFile": "..\\bin\\NCS.DSS.Customer.dll"
 } 
