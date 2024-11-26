@@ -109,7 +109,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
 
         private async Task<IActionResult> RunFunction(string customerId)
         {
-            return await _function.RunAsync(
+            return await _function.Run(
                 _request, customerId).ConfigureAwait(false);
         }
 
