@@ -53,7 +53,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-            log.LogInformation("DssCorrelationId: [{correlationGuid}]");
+            log.LogInformation("DssCorrelationId: [{correlationGuid}]",correlationGuid);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
