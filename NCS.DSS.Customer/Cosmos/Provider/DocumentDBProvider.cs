@@ -2,8 +2,6 @@
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Models;
-using Newtonsoft.Json.Linq;
-using System.Net;
 using System.Text.Json;
 using Container = Microsoft.Azure.Cosmos.Container;
 

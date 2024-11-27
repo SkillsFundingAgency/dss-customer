@@ -19,7 +19,7 @@ namespace NCS.DSS.Customer.Helpers
             if (_client != null)
                 return _client;
 
-            _client = new SearchClient(new Uri($"https://{SearchServiceName}.search.windows.net"), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));
+            _client = new SearchClient(new Uri(string.Format("https://{SearchServiceName}.search.windows.net", SearchServiceName)), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));
 
             return _client;
         }

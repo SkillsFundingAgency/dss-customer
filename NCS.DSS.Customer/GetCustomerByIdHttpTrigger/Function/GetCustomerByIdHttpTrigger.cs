@@ -53,33 +53,33 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 correlationGuid = Guid.NewGuid();
             }
 
-            log.LogInformation($"DssCorrelationId: [{correlationGuid}]");
+            log.LogInformation("DssCorrelationId: [{correlationGuid}]");
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 var response = new BadRequestObjectResult(400);
-                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to locate 'APIM-TouchpointId' in request header");
+                log.LogWarning("Response Status Code: {StatusCode}. Unable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
                 return response;
             }
 
-            log.LogInformation($"C# HTTP trigger function GetCustomerById processed a request. By Touchpoint " + touchpointId);
+            log.LogInformation("C# HTTP trigger function GetCustomerById processed a request. By Touchpoint {TouchpointID}" + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
                 var response = new BadRequestObjectResult(customerGuid);
-                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to parse 'customerId' to a Guid: {customerId}");
+                log.LogWarning("Response Status Code: {StatusCode}. Unable to parse 'customerId' to a Guid: {customerId}", response.StatusCode,customerId);
                 return response;
             }
 
-            log.LogInformation($"Attempting to get customer {customerId}");
+            log.LogInformation("Attempting to get customer {customerId}",customerId);
             var customer = await _customerByIdService.GetCustomerAsync(customerGuid);
 
 
             if (customer == null)
             {
                 var response = new NoContentResult();
-                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Customer not found {customerId}");
+                log.LogWarning("Response Status Code: {StatusCode}. Customer not found {customerId}", response.StatusCode,customerId);
                 return response;
             }
             else
@@ -89,7 +89,7 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
                 {
                     StatusCode = (int)HttpStatusCode.OK
                 };
-                log.LogInformation($"Response Status Code: [{response.StatusCode}]. Get customer succeeded");
+                log.LogInformation("Response Status Code: {StatusCode}. Get customer succeeded", response.StatusCode);
                 return response;
             }
         }

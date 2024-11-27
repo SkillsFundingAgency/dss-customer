@@ -23,12 +23,12 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             IReadOnlyList<Document> documents)
         {
             var functionName = nameof(CustomerSearchDataSyncTrigger);
-            _logger.LogInformation($"Function {functionName} has been invoked");
+            _logger.LogInformation("Function {functionName} has been invoked",functionName);
 
             _logger.LogInformation("Initializing search service client");
             var client = SearchHelper.GetSearchServiceClient();
 
-            _logger.LogInformation($"Attempting to process {documents.Count} document(s)");
+            _logger.LogInformation("Attempting to process {Count} document(s)", documents.Count);
 
             if (documents.Count > 0)
             {
@@ -58,7 +58,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                 try
                 {
-                    _logger.LogInformation($"Merging or uploading document batch for indexing with {documents.Count} document(s)");
+                    _logger.LogInformation("Merging or uploading document batch for indexing with {Count} document(s)", documents.Count);
                     var results = await client.IndexDocumentsAsync(batch);
 
                     var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
@@ -68,12 +68,12 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                         _logger.LogInformation(string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
                     }
 
-                    _logger.LogInformation($"Function {functionName} has finished invoking");
+                    _logger.LogInformation("Function {functionName} has finished invoking",functionName);
 
                 }
                 catch (RequestFailedException ex)
                 {
-                    _logger.LogError(ex, $"An unexpected error occurred in {functionName}. Exception: {ex.Message}");
+                    _logger.LogError(ex, "An unexpected error occurred in {functionName}. Exception: {exMessage}",functionName,ex.Message);
                     throw;
                 }
             }
