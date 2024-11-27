@@ -1,176 +1,135 @@
-﻿using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
-using NCS.DSS.Customer.Cosmos.Client;
-using NCS.DSS.Customer.Cosmos.Helper;
+﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json.Linq;
 using System.Net;
-using Document = Microsoft.Azure.Documents.Document;
+using System.Text.Json;
+using Container = Microsoft.Azure.Cosmos.Container;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
+        private readonly Container _container;
+        private readonly string _databaseId = Environment.GetEnvironmentVariable("DatabaseId");
+        private readonly string _containerId = Environment.GetEnvironmentVariable("CollectionId");
+        private readonly ILogger<DocumentDBProvider> _logger;
+        public DocumentDBProvider(CosmosClient cosmosClient,ILogger<DocumentDBProvider> logger)
+        {
+            _container = cosmosClient.GetContainer(_databaseId, _containerId);
+            _logger = logger;
+        }
         public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return false;
-
             try
             {
-                var response = await client.ReadDocumentAsync(documentUri);
-                if (response.Resource != null)
-                    return true;
-            }
-            catch (DocumentClientException)
-            {
-                return false;
-            }
+                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
+                    partitionKey: new PartitionKey(customerId.ToString()),
+                    id: customerId.ToString());
 
-            return false;
+                return response.DocumentId() > 0;
+            }
+            catch (CosmosException ce)
+            {
+                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                throw;
+            }
+            
         }
 
         public async Task<bool> DoesCustomerHaveATerminationDate(Guid customerId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return false;
-
             try
             {
-                var response = await client.ReadDocumentAsync(documentUri);
+                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
+                    partitionKey: new PartitionKey(customerId.ToString()),
+                    id: customerId.ToString());
 
-                var dateOfTermination = response.Resource?.GetPropertyValue<DateTime?>("DateOfTermination");
-
-                return dateOfTermination.HasValue;
+                return response.Resource.DateOfTermination.HasValue;
             }
-            catch (DocumentClientException)
+            catch (CosmosException ce)
             {
-                return false;
+                _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                throw;
             }
         }
 
         public async Task<List<Models.Customer>> GetAllCustomer()
         {
-            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var queryCust = client.CreateDocumentQuery<Models.Customer>(collectionUri).AsDocumentQuery();
-
-            var customers = new List<Models.Customer>();
-
-            while (queryCust.HasMoreResults)
+            try
             {
-                var response = await queryCust.ExecuteNextAsync<Models.Customer>();
-                customers.AddRange(response);
-            }
+                var queryCust = _container.GetItemLinqQueryable<Models.Customer>().ToFeedIterator();
+                var customers = new List<Models.Customer>();
 
-            return customers.Any() ? customers : null;
+                while (queryCust.HasMoreResults)
+                {
+                    var response = await queryCust.ReadNextAsync();
+                    customers.AddRange(response);
+                }
+
+                return customers.Count != 0 ? customers : null;
+            }
+            catch (CosmosException ce)
+            {
+                _logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
+                
+                throw;
+            }
         }
 
         public async Task<Models.Customer> GetCustomerByIdAsync(Guid customerId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
             try
             {
-                var response = await client.ReadDocumentAsync(documentUri);
-                if (response.Resource != null)
-                    return (dynamic)response.Resource;
-            }
-            catch (DocumentClientException)
-            {
-                return null;
-            }
+                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
+                    partitionKey: new PartitionKey(customerId.ToString()),
+                    id: customerId.ToString());
 
-            return null;
+                return response.DocumentId() > 0 ? response.Resource : null;
+            }
+            catch (CosmosException ce)
+            {
+                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                throw;
+            }            
         }
 
         public async Task<string> GetCustomerByIdForUpdateAsync(Guid customerId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
             try
             {
-                var response = await client.ReadDocumentAsync(documentUri);
-                if (response.Resource != null)
-                    return response.Resource.ToString();
+                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
+                    partitionKey: new PartitionKey(customerId.ToString()),
+                    id: customerId.ToString());
+
+                return response.DocumentId() > 0 ? response.Resource.ToString() : null;
             }
-            catch (DocumentClientException)
+            catch (CosmosException ce)
             {
-                return null;
+                _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                throw;
             }
-
-            return null;
         }
 
-        public async Task<ResourceResponse<Document>> CreateCustomerAsync(Models.Customer customer)
+        public async Task<ItemResponse<Models.Customer>> CreateCustomerAsync(Models.Customer customer)
         {
-            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var response = await client.CreateDocumentAsync(collectionUri, customer);
-
-            return response;
+            return await _container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId.ToString()));
 
         }
 
-        public async Task<ResourceResponse<Document>> UpdateCustomerAsync(string customerJson, Guid customerId)
+        public async Task<ItemResponse<Models.Customer>> UpdateCustomerAsync(string customerJson, Guid customerId)
         {
-            if (string.IsNullOrEmpty(customerJson))
-                return null;
-
-            var documentUri = DocumentDBHelper.CreateDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var customerDocumentObject = JObject.Parse(customerJson);
-
-            var response = await client.ReplaceDocumentAsync(documentUri, customerDocumentObject);
-
-            return response;
+            var customer = JsonSerializer.Deserialize<Models.Customer>(customerJson);
+            return await _container.ReplaceItemAsync(customer, customerId.ToString());
         }
 
         public async Task<List<Models.Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId)
         {
-            var collectionUri = DocumentDBHelper.CreateSubscriptionDocumentCollectionUri();
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            var query = client
-                ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
+            var query = _container.GetItemLinqQueryable<Models.Subscriptions>()
                 .Where(x => x.CustomerId == customerId &&
                             x.Subscribe)
-                .AsDocumentQuery();
+                .ToFeedIterator();
 
             if (query == null)
                 return null;
@@ -179,58 +138,41 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
             while (query.HasMoreResults)
             {
-                var results = await query.ExecuteNextAsync<Models.Subscriptions>();
+                var results = await query.ReadNextAsync();
                 subscriptions.AddRange(results);
             }
 
-            return subscriptions.Any() ? subscriptions : null;
+            return subscriptions.Count != 0 ? subscriptions : null;
         }
 
-        public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
+        public async Task<ItemResponse<Models.Subscriptions>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {
-            var collectionUri = DocumentDBHelper.CreateSubscriptionDocumentCollectionUri();
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var response = await client.CreateDocumentAsync(collectionUri, subscriptions);
-
-            return response;
-
+            return await _container.CreateItemAsync(subscriptions, new PartitionKey(subscriptions.CustomerId.ToString()));     
         }
 
         public async Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId)
         {
-            var collectionUri = DocumentDBHelper.CreateDigitalIdentityDocumentUri();
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            var identityForCustomerQuery = client
-                ?.CreateDocumentQuery<Models.DigitalIdentity>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+            var query = _container.GetItemLinqQueryable<Models.DigitalIdentity>()
                 .Where(x => x.CustomerId == customerId)
-                .AsDocumentQuery();
+                .ToFeedIterator();
 
-            if (identityForCustomerQuery == null)
+            if (query == null)
                 return null;
+            if (query.HasMoreResults)
+            {
+                var digitalIdentity = await query.ReadNextAsync();
 
-            var digitalIdentity = await identityForCustomerQuery.ExecuteNextAsync<Models.DigitalIdentity>();
-
-            return digitalIdentity?.FirstOrDefault();
+                return digitalIdentity?.FirstOrDefault();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<Models.DigitalIdentity> UpdateIdentityAsync(Models.DigitalIdentity digitalIdentity)
         {
-            var documentUri = DocumentDBHelper.CreateDigitalIdentityDocumentUri(digitalIdentity.IdentityID.GetValueOrDefault());
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return null;
-
-            var response = await client.ReplaceDocumentAsync(documentUri, digitalIdentity);
-
-            return response.StatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
+            return await _container.ReplaceItemAsync(digitalIdentity, digitalIdentity.IdentityID.ToString());
         }
     }
 }
