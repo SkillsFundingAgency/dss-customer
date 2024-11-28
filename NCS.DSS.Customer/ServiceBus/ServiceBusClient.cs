@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
-using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json;
 using System.Text;
@@ -9,13 +9,13 @@ namespace NCS.DSS.Customer.ServiceBus
 
     public class ServiceBusClient : IServiceBusClient
     {
-        private readonly ISubscriptionHelper _subscriptionHelper;
+        private readonly ICosmosDBProvider _cosmosDBProvider;
         public readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
         public readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
 
-        public ServiceBusClient(ISubscriptionHelper subscriptionHelper)
+        public ServiceBusClient(ICosmosDBProvider cosmosDBProvider)
         {
-            _subscriptionHelper = subscriptionHelper;
+            _cosmosDBProvider = cosmosDBProvider;
         }
 
         public async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
@@ -91,7 +91,7 @@ namespace NCS.DSS.Customer.ServiceBus
         private async Task AutoSubscribeCustomer(Models.Customer customer)
         {
             //Auto subscribe last modified touchpoint to the newly posted customer
-            await _subscriptionHelper.CreateSubscriptionAsync(customer);
+            await _cosmosDBProvider.CreateSubscriptionsAsync(customer);
         }
 
     }

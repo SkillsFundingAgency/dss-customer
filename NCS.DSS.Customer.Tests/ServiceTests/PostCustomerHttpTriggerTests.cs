@@ -20,14 +20,14 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
     public class PostCustomerHttpTriggerTests
     {
         private IPostCustomerHttpTriggerService _customerHttpTriggerService;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
         private Models.Customer _customer;
         private Mock<IServiceBusClient> _sbus;
 
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _sbus = new Mock<IServiceBusClient>();
             _customerHttpTriggerService = new PostCustomerHttpTriggerService(_documentDbProvider.Object, _sbus.Object);
             _customer = new Models.Customer();

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NUnit.Framework;
@@ -21,13 +20,13 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
 
         private HttpRequest _request;
-        private Mock<IResourceHelper> _resourceHelper;
+        private Mock<ICosmosDBProvider> _cosmosProvider;
         private Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private IJsonHelper _jsonHelper;
         private Mock<IGetCustomerByIdHttpTriggerService> _getCustomerByIdHttpTriggerService;
         private Models.Customer _customer;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
         private GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger _function;
 
         [SetUp]
@@ -35,14 +34,14 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         {
             _customer = new Models.Customer();
             _request = new DefaultHttpContext().Request;
-            _resourceHelper = new Mock<IResourceHelper>();
+            _cosmosProvider = new Mock<ICosmosDBProvider>();
             _logger = new Mock<ILogger<GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _jsonHelper = new JsonHelper();
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _getCustomerByIdHttpTriggerService = new Mock<IGetCustomerByIdHttpTriggerService>();
             _function = new GetCustomerByIdHttpTrigger.Function.GetCustomerByIdHttpTrigger(
-                _resourceHelper.Object,
+                _cosmosProvider.Object,
                 _getCustomerByIdHttpTriggerService.Object,
                 _logger.Object,
                 _httpRequestHelper.Object,

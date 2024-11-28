@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
@@ -17,25 +16,25 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 {
     public class PatchCustomerHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
+        private readonly ICosmosDBProvider _cosmosProvider;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IValidate _validate;
         private readonly IPatchCustomerHttpTriggerService _customerPatchService;
         private readonly IJsonHelper _jsonHelper;
         private readonly ILogger<PatchCustomerHttpTrigger> log;
-        private readonly IDocumentDBProvider _provider;
+        private readonly ICosmosDBProvider _provider;
         private IDynamicHelper _dynamicHelper;
 
-        public PatchCustomerHttpTrigger(IResourceHelper resourceHelper,
+        public PatchCustomerHttpTrigger(ICosmosDBProvider cosmosProvider,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPatchCustomerHttpTriggerService customerPatchService,
              IJsonHelper jsonHelper,
              ILogger<PatchCustomerHttpTrigger> logger,
-             IDocumentDBProvider provider,
+             ICosmosDBProvider provider,
              IDynamicHelper dynamicHelper)
         {
-            _resourceHelper = resourceHelper;
+            _cosmosProvider = cosmosProvider;
             _httpRequestHelper = httpRequestHelper;
             _validate = validate;
             _customerPatchService = customerPatchService;
@@ -123,7 +122,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
 
             log.LogInformation("Attempting to see if customer exists {customerId}",customerId);
-            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await _cosmosProvider.DoesCustomerResourceExist(customerGuid);
 
             if (!doesCustomerExist)
             {
@@ -133,7 +132,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
 
             log.LogInformation("Attempting to see if this is a read only customer {customerGuid}",customerGuid);
-            var isCustomerReadOnly = await _resourceHelper.IsCustomerReadOnly(customerGuid);
+            var isCustomerReadOnly = await _cosmosProvider.DoesCustomerHaveATerminationDate(customerGuid);
 
             if (isCustomerReadOnly)
             {

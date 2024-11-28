@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -25,7 +25,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private const string ValidCustomerId = "7E467BDB-213F-407A-B86A-1954053D3C24";
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
         private HttpRequest _request;
-        private Mock<IResourceHelper> _resourceHelper;
+        private Mock<ICosmosDBProvider> _cosmosProvider;
         private IValidate _validate;
         private Mock<ILogger<PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
@@ -42,7 +42,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _customer = new Models.Customer();
             _request = new DefaultHttpContext().Request;
 
-            _resourceHelper = new Mock<IResourceHelper>();
+            _cosmosProvider = new Mock<ICosmosDBProvider>();
             _validate = new Validate();
             _logger = new Mock<ILogger<PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
@@ -50,7 +50,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _jsonHelper = new JsonHelper();
             _dynamicHelper = new Mock<IDynamicHelper>();
             _postCustomerHttpTriggerService = new Mock<IPostCustomerHttpTriggerService>();
-            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 _validate,
                 _postCustomerHttpTriggerService.Object,
@@ -82,7 +82,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
             var val = new Mock<IValidate>();
             val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
-            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
@@ -124,7 +124,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var validationResults = new List<ValidationResult>();
             var val = new Mock<IValidate>();
             val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
-            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
                 _postCustomerHttpTriggerService.Object,
@@ -149,7 +149,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var validationResults = new List<ValidationResult>();
             var val = new Mock<IValidate>();
             val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
-            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_resourceHelper.Object,
+            _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
                 _postCustomerHttpTriggerService.Object,

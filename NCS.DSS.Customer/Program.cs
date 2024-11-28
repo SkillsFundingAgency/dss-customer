@@ -6,7 +6,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NCS.DSS.Customer.Helpers;
@@ -27,25 +26,21 @@ namespace NCS.DSS.Customer
                     services.AddLogging();
                     services.AddApplicationInsightsTelemetryWorkerService(); 
                     services.ConfigureFunctionsApplicationInsights();
-                    services.AddSingleton<IResourceHelper, ResourceHelper>();
                     services.AddSingleton<IValidate, Validate>();        
                     services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
                     services.AddSingleton<IJsonHelper, JsonHelper>();
                     services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
-                    services.AddScoped<ISubscriptionHelper, SubscriptionHelper>();
                     services.AddScoped<IGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService>();
                     services.AddScoped<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
                     services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
                     services.AddScoped<ICustomerPatchService, CustomerPatchService>();
                     services.AddScoped<IServiceBusClient, ServiceBusClient>();
-                    services.AddTransient<IDocumentDBProvider, DocumentDBProvider>();
+                    services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton(s =>
                     {
                         var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
-                        var cosmosEndpoint = Environment.GetEnvironmentVariable("Endpoint");
-                        var cosmosKey = Environment.GetEnvironmentVariable("Key");
-
-                        return new CosmosClient(cosmosEndpoint, cosmosKey, options);
+                        var connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
+                        return new CosmosClient(connectionString, options);
                     });
                     services.AddSingleton<IDynamicHelper, DynamicHelper>();
                     services.Configure<LoggerFilterOptions>(options =>

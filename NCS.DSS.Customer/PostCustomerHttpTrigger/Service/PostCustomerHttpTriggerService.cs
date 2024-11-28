@@ -6,10 +6,10 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Service
 {
     public class PostCustomerHttpTriggerService : IPostCustomerHttpTriggerService
     {
-        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly ICosmosDBProvider _documentDbProvider;
         private readonly IServiceBusClient _serviceBusClient;
 
-        public PostCustomerHttpTriggerService(IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
+        public PostCustomerHttpTriggerService(ICosmosDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _documentDbProvider = documentDbProvider;
             _serviceBusClient = serviceBusClient;

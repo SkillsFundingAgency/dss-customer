@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using System.Net;
 using System.Text.Json;
@@ -14,19 +14,19 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
 {
     public class GetCustomerByIdHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
+        private readonly ICosmosDBProvider _cosmosProvider;
         private readonly IGetCustomerByIdHttpTriggerService _customerByIdService;
         private readonly ILogger<GetCustomerByIdHttpTrigger> log;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IJsonHelper _jsonHelper;
 
-        public GetCustomerByIdHttpTrigger(IResourceHelper resourceHelper,
+        public GetCustomerByIdHttpTrigger(ICosmosDBProvider cosmosProvider,
             IGetCustomerByIdHttpTriggerService customerByIdService,
             ILogger<GetCustomerByIdHttpTrigger> logger,
             IHttpRequestHelper httpRequestHelper,
             IJsonHelper jsonHelper)
         {
-            _resourceHelper = resourceHelper;
+            _cosmosProvider = cosmosProvider;
             _customerByIdService = customerByIdService;
             log = logger;
             _httpRequestHelper = httpRequestHelper;

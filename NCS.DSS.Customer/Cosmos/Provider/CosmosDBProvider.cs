@@ -2,35 +2,39 @@
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Models;
+using System.Net;
 using System.Text.Json;
 using Container = Microsoft.Azure.Cosmos.Container;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
-    public class DocumentDBProvider : IDocumentDBProvider
+    public class CosmosDBProvider : ICosmosDBProvider
     {
         private readonly Container _container;
         private readonly string _databaseId = Environment.GetEnvironmentVariable("DatabaseId");
         private readonly string _containerId = Environment.GetEnvironmentVariable("CollectionId");
-        private readonly ILogger<DocumentDBProvider> _logger;
-        public DocumentDBProvider(CosmosClient cosmosClient)
+        private readonly ILogger<CosmosDBProvider> _logger;
+        public CosmosDBProvider(CosmosClient cosmosClient,ILogger<CosmosDBProvider> logger)
         {
             _container = cosmosClient.GetContainer(_databaseId, _containerId);
-            //_logger = logger;
+            _logger = logger;
         }
         public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
             try
             {
-                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
-                    partitionKey: new PartitionKey(customerId.ToString()),
-                    id: customerId.ToString());
+                var queryCust = _container.GetItemLinqQueryable<Models.Customer>().Where(x => x.CustomerId == customerId).ToFeedIterator();
 
-                return response.DocumentId() > 0;
+                while (queryCust.HasMoreResults)
+                {
+                    var response = await queryCust.ReadNextAsync();
+                    return true;
+                }
+                return false;
             }
             catch (CosmosException ce)
             {
-               // _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
             
@@ -40,15 +44,18 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         {
             try
             {
-                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
-                    partitionKey: new PartitionKey(customerId.ToString()),
-                    id: customerId.ToString());
+                var queryCust = _container.GetItemLinqQueryable<Models.Customer>().Where(x => x.CustomerId == customerId).ToFeedIterator();
 
-                return response.Resource.DateOfTermination.HasValue;
+                while (queryCust.HasMoreResults)
+                {
+                    var response = await queryCust.ReadNextAsync();
+                    return response.Resource.FirstOrDefault().DateOfTermination.HasValue;
+                }
+                return false;
             }
             catch (CosmosException ce)
             {
-               // _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
         }
@@ -70,7 +77,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                //_logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
+                _logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
                 
                 throw;
             }
@@ -80,15 +87,18 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         {
             try
             {
-                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
-                    partitionKey: new PartitionKey(customerId.ToString()),
-                    id: customerId.ToString());
+                var queryCust = _container.GetItemLinqQueryable<Models.Customer>(). Where(x => x.CustomerId == customerId).ToFeedIterator();
 
-                return response.DocumentId() > 0 ? response.Resource : null;
+                while (queryCust.HasMoreResults)
+                {
+                    var response = await queryCust.ReadNextAsync();
+                    return response.Resource.FirstOrDefault();
+                }
+                return null;
             }
             catch (CosmosException ce)
             {
-               // _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }            
         }
@@ -97,22 +107,25 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         {
             try
             {
-                ItemResponse<Models.Customer> response = await _container.ReadItemAsync<Models.Customer>(
-                    partitionKey: new PartitionKey(customerId.ToString()),
-                    id: customerId.ToString());
+                var queryCust = _container.GetItemLinqQueryable<Models.Customer>().Where(x => x.CustomerId == customerId).ToFeedIterator();
 
-                return response.DocumentId() > 0 ? response.Resource.ToString() : null;
+                while (queryCust.HasMoreResults)
+                {
+                    var response = await queryCust.ReadNextAsync();
+                    return response.Resource.FirstOrDefault().ToString();
+                }
+                return null;
             }
             catch (CosmosException ce)
             {
-               // _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+                _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
         }
 
         public async Task<ItemResponse<Models.Customer>> CreateCustomerAsync(Models.Customer customer)
         {
-            return await _container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId.ToString()));
+            return await _container.CreateItemAsync(customer, null);
 
         }
 
@@ -143,14 +156,31 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             return subscriptions.Count != 0 ? subscriptions : null;
         }
 
-        public async Task<ItemResponse<Models.Subscriptions>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
+        public async Task<Subscriptions> CreateSubscriptionsAsync(Models.Customer customer)
         {
-            return await _container.CreateItemAsync(subscriptions, new PartitionKey(subscriptions.CustomerId.ToString()));     
+            if (customer == null)
+                return null;
+
+            var subscription = new Subscriptions
+            {
+                SubscriptionId = Guid.NewGuid(),
+                CustomerId = customer.CustomerId,
+                TouchPointId = customer.LastModifiedTouchpointId,
+                Subscribe = true,
+                LastModifiedDate = customer.LastModifiedDate,
+
+            };
+
+            if (!customer.LastModifiedDate.HasValue)
+                subscription.LastModifiedDate = DateTime.Now;
+            var response = await _container.CreateItemAsync(subscription, null);
+
+            return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : (Guid?)null; 
         }
 
         public async Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId)
         {
-            var query = _container.GetItemLinqQueryable<Models.DigitalIdentity>()
+            var query = _container.GetItemLinqQueryable<DigitalIdentity>()
                 .Where(x => x.CustomerId == customerId)
                 .ToFeedIterator();
 
@@ -168,7 +198,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
         }
 
-        public async Task<Models.DigitalIdentity> UpdateIdentityAsync(Models.DigitalIdentity digitalIdentity)
+        public async Task<DigitalIdentity> UpdateIdentityAsync(DigitalIdentity digitalIdentity)
         {
             return await _container.ReplaceItemAsync(digitalIdentity, digitalIdentity.IdentityID.ToString());
         }

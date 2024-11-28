@@ -3,7 +3,7 @@ using NCS.DSS.Customer.Models;
 
 namespace NCS.DSS.Customer.Cosmos.Provider
 {
-    public interface IDocumentDBProvider
+    public interface ICosmosDBProvider
     {
         Task<bool> DoesCustomerResourceExist(Guid customerId);
         Task<bool> DoesCustomerHaveATerminationDate(Guid customerId);
@@ -12,8 +12,8 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         Task<string> GetCustomerByIdForUpdateAsync(Guid customerId);
         Task<ItemResponse<Models.Customer>> CreateCustomerAsync(Models.Customer customer);
         Task<ItemResponse<Models.Customer>> UpdateCustomerAsync(string customerJson, Guid customerId);
-        Task<List<Models.Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId);
-        Task<ItemResponse<Models.Subscriptions>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions);
+        Task<List<Subscriptions>> GetSubscriptionsByCustomerIdAsync(Guid? customerId);
+        Task<Subscriptions> CreateSubscriptionsAsync(Models.Customer customer);
         Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId);
         Task<DigitalIdentity> UpdateIdentityAsync(DigitalIdentity digitalIdentity);
     }

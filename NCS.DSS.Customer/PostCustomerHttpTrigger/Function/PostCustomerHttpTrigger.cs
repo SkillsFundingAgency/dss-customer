@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Customer.Cosmos.Helper;
+using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.Validation;
@@ -16,7 +16,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
 {
     public class PostCustomerHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
+        private readonly ICosmosDBProvider _cosmosProvider;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IValidate _validate;
         private readonly IPostCustomerHttpTriggerService _customerPostService;
@@ -24,7 +24,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         private readonly ILogger<PostCustomerHttpTrigger> log;
         private readonly IDynamicHelper _dynamicHelper;
 
-        public PostCustomerHttpTrigger(IResourceHelper resourceHelper,
+        public PostCustomerHttpTrigger(ICosmosDBProvider cosmosProvider,
              IHttpRequestHelper httpRequestHelper,
              IValidate validate,
              IPostCustomerHttpTriggerService customerPostService,
@@ -33,7 +33,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
              IDynamicHelper dynamicHelper
         )
         {
-            _resourceHelper = resourceHelper;
+            _cosmosProvider = cosmosProvider;
             _httpRequestHelper = httpRequestHelper;
             _validate = validate;
             _customerPostService = customerPostService;

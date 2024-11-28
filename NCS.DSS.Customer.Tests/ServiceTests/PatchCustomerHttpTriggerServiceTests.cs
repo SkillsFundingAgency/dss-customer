@@ -22,7 +22,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
     {
         private IPatchCustomerHttpTriggerService _patchCustomerHttpTrigger;
         private Mock<ICustomerPatchService> _customerPatchService;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
         private Mock<IServiceBusClient> _sbus;
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
@@ -34,7 +34,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _customerPatchService = new Mock<ICustomerPatchService>();
             _sbus = new Mock<IServiceBusClient>();
             _patchCustomerHttpTrigger = new PatchCustomerHttpTriggerService(_customerPatchService.Object, _documentDbProvider.Object, _sbus.Object);
