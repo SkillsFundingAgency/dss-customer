@@ -34,7 +34,7 @@ namespace NCS.DSS.Customer
                     services.AddScoped<IPostCustomerHttpTriggerService, PostCustomerHttpTriggerService>();
                     services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
                     services.AddScoped<ICustomerPatchService, CustomerPatchService>();
-                    services.AddScoped<IServiceBusClient, ServiceBusClient>();
+                    services.AddScoped<ICustomerServiceBusClient, CustomerServiceBusClient>();
                     services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton(s =>
                     {

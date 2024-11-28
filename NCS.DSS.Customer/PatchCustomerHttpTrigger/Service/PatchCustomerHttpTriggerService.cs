@@ -9,9 +9,9 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Service
     {
         private readonly ICosmosDBProvider _documentDbProvider;
         private readonly ICustomerPatchService _customerPatchService;
-        private readonly IServiceBusClient _serviceBusClient;
+        private readonly ICustomerServiceBusClient _serviceBusClient;
 
-        public PatchCustomerHttpTriggerService(ICustomerPatchService customerPatchService, ICosmosDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
+        public PatchCustomerHttpTriggerService(ICustomerPatchService customerPatchService, ICosmosDBProvider documentDbProvider, ICustomerServiceBusClient serviceBusClient)
         {
             _documentDbProvider = documentDbProvider;
             _serviceBusClient = serviceBusClient;

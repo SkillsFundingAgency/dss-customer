@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using Azure.Messaging.ServiceBus;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Models;
 using Newtonsoft.Json;
@@ -6,21 +6,22 @@ using System.Text;
 
 namespace NCS.DSS.Customer.ServiceBus
 {
-
-    public class ServiceBusClient : IServiceBusClient
+    public class CustomerServiceBusClient : ICustomerServiceBusClient
     {
         private readonly ICosmosDBProvider _cosmosDBProvider;
         public readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
         public readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+        private readonly ServiceBusClient _serviceBusClient;
 
-        public ServiceBusClient(ICosmosDBProvider cosmosDBProvider)
+        public CustomerServiceBusClient(ICosmosDBProvider cosmosDBProvider, ServiceBusClient serviceBusClient)
         {
             _cosmosDBProvider = cosmosDBProvider;
+            _serviceBusClient = serviceBusClient;
         }
 
         public async Task SendPostMessageAsync(Models.Customer customer, string reqUrl)
         {
-            var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            var serviceBusSender = _serviceBusClient.CreateSender(QueueName);
 
             var messageModel = new MessageModel()
             {
@@ -32,19 +33,19 @@ namespace NCS.DSS.Customer.ServiceBus
                 TouchpointId = customer.LastModifiedTouchpointId
             };
 
-            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
+            var msg = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
             {
                 ContentType = "application/json",
                 MessageId = customer.CustomerId + " " + DateTime.UtcNow
             };
 
             await AutoSubscribeCustomer(customer);
-            await queueClient.SendAsync(msg);
+            await serviceBusSender.SendMessageAsync(msg);
         }
 
         public async Task SendPatchMessageAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl)
         {
-            var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            var serviceBusSender = _serviceBusClient.CreateSender(QueueName);
 
             var messageModel = new MessageModel
             {
@@ -62,13 +63,13 @@ namespace NCS.DSS.Customer.ServiceBus
                 DeleteDigitalIdentity = customerPatch.DeleteDigitalIdentity
             };
 
-            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
+            var msg = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
             {
                 ContentType = "application/json",
                 MessageId = customerId + " " + DateTime.UtcNow
             };
 
-            await queueClient.SendAsync(msg);
+            await serviceBusSender.SendMessageAsync(msg);
 
         }
 

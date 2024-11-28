@@ -22,13 +22,13 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         private IPostCustomerHttpTriggerService _customerHttpTriggerService;
         private Mock<ICosmosDBProvider> _documentDbProvider;
         private Models.Customer _customer;
-        private Mock<IServiceBusClient> _sbus;
+        private Mock<ICustomerServiceBusClient> _sbus;
 
         [SetUp]
         public void Setup()
         {
             _documentDbProvider = new Mock<ICosmosDBProvider>();
-            _sbus = new Mock<IServiceBusClient>();
+            _sbus = new Mock<ICustomerServiceBusClient>();
             _customerHttpTriggerService = new PostCustomerHttpTriggerService(_documentDbProvider.Object, _sbus.Object);
             _customer = new Models.Customer();
         }
