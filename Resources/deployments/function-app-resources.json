@@ -14,6 +14,12 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
+    "cosmosDbEndpoint": {
+      "type": "string"
+    },
+    "cosmosDbKey": {
+      "type": "string"
+    },
     "customerConnectionString": {
       "type": "string"
     },
@@ -70,7 +76,7 @@
               "name": "FUNCTIONS_EXTENSION_VERSION",
               "value": "~4"
             },
-            { 
+            {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "dotnet-isolated"
             },
@@ -101,6 +107,14 @@
             {
               "name": "DatabaseId",
               "value": "[parameters('cosmosDbDatabaseId')]"
+            },
+            {
+              "name": "Endpoint",
+              "value": "[parameters('cosmosDbEndpoint')]"
+            },
+            {
+              "name": "Key",
+              "value": "[parameters('cosmosDbKey')]"
             },
             {
               "name": "ServiceBusConnectionString",

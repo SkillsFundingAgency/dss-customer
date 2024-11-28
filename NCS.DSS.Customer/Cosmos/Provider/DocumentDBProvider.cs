@@ -13,10 +13,10 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         private readonly string _databaseId = Environment.GetEnvironmentVariable("DatabaseId");
         private readonly string _containerId = Environment.GetEnvironmentVariable("CollectionId");
         private readonly ILogger<DocumentDBProvider> _logger;
-        public DocumentDBProvider(CosmosClient cosmosClient,ILogger<DocumentDBProvider> logger)
+        public DocumentDBProvider(CosmosClient cosmosClient)
         {
             _container = cosmosClient.GetContainer(_databaseId, _containerId);
-            _logger = logger;
+            //_logger = logger;
         }
         public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
@@ -30,7 +30,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+               // _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
             
@@ -48,7 +48,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}", customerId, ce.Message);
+               // _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
         }
@@ -70,7 +70,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
+                //_logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
                 
                 throw;
             }
@@ -88,7 +88,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+               // _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }            
         }
@@ -105,7 +105,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
+               // _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}", customerId, ce.Message);
                 throw;
             }
         }

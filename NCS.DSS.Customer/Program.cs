@@ -1,6 +1,7 @@
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,7 +38,15 @@ namespace NCS.DSS.Customer
                     services.AddScoped<IPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService>();
                     services.AddScoped<ICustomerPatchService, CustomerPatchService>();
                     services.AddScoped<IServiceBusClient, ServiceBusClient>();
-                    services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
+                    services.AddTransient<IDocumentDBProvider, DocumentDBProvider>();
+                    services.AddSingleton(s =>
+                    {
+                        var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
+                        var cosmosEndpoint = Environment.GetEnvironmentVariable("Endpoint");
+                        var cosmosKey = Environment.GetEnvironmentVariable("Key");
+
+                        return new CosmosClient(cosmosEndpoint, cosmosKey, options);
+                    });
                     services.AddSingleton<IDynamicHelper, DynamicHelper>();
                     services.Configure<LoggerFilterOptions>(options =>
                     {
