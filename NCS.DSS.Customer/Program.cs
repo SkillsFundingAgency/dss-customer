@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
@@ -41,6 +42,11 @@ namespace NCS.DSS.Customer
                         var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
                         var connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
                         return new CosmosClient(connectionString, options);
+                    });
+                    services.AddSingleton(s =>
+                    {
+                        var serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+                        return new ServiceBusClient(serviceBusConnectionString);
                     });
                     services.AddSingleton<IDynamicHelper, DynamicHelper>();
                     services.Configure<LoggerFilterOptions>(options =>

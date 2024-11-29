@@ -67,15 +67,15 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                var response = new BadRequestObjectResult(400);
-                log.LogWarning("Response status code: {StatusCode}. Unable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
+                log.LogWarning("Response status code: {StatusCode}. Unable to locate 'TouchpointId' in request header", response.StatusCode);
                 return response;
             }
 
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {
-                var response = new BadRequestObjectResult(400);
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
                 log.LogWarning("Response status code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
                 return response;
             }

@@ -22,12 +22,6 @@
     },
     "workspaceResourceGroup": {
       "value": "__sharedLogAnalyticsResourceGroup__"
-    },
-    "cosmosDbEndpoint": {
-      "value": "__cosmosDbEndpoint__"
-    },
-    "cosmosDbKey": {
-      "value": "__cosmosDbKey__"
     }
   }
 }

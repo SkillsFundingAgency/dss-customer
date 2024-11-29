@@ -125,7 +125,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
         public async Task<ItemResponse<Models.Customer>> CreateCustomerAsync(Models.Customer customer)
         {
-            return await _container.CreateItemAsync(customer, null);
+            return await _container.CreateItemAsync<Models.Customer>(customer, null);
 
         }
 
@@ -168,7 +168,6 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 TouchPointId = customer.LastModifiedTouchpointId,
                 Subscribe = true,
                 LastModifiedDate = customer.LastModifiedDate,
-
             };
 
             if (!customer.LastModifiedDate.HasValue)
