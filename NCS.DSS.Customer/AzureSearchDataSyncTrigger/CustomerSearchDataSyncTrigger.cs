@@ -17,7 +17,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         public async Task RunAsync(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<string> documents)
+            IReadOnlyList<Models.CustomerSearch> documents)
         {
             var functionName = nameof(CustomerSearchDataSyncTrigger);
             _logger.LogInformation("Function {functionName} has been invoked", functionName);
@@ -29,34 +29,34 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             _logger.LogInformation("Initializing search service client");
             var client = SearchHelper.GetSearchServiceClient();
             _logger.LogInformation("Attempting to process {Count} document(s)", documents.Count);
-            // Deserialize documents into strongly-typed CustomerSearch models
-            var customers = documents.Select(doc =>
-            {
-                try
-                {
-                    var options = new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    };
-                    return JsonSerializer.Deserialize<Models.CustomerSearch>(doc, options);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogError(ex, "Failed to deserialize document: {Document}", doc);
-                    return null;
-                }
-            })
-            .Where(customer => customer != null)
-            .ToList();
-            if (customers.Count == 0)
+            //// Deserialize documents into strongly-typed CustomerSearch models
+            //var customers = documents.Select(doc =>
+            //{
+            //    try
+            //    {
+            //        var options = new JsonSerializerOptions
+            //        {
+            //            PropertyNameCaseInsensitive = true
+            //        };
+            //        return JsonSerializer.Deserialize<Models.CustomerSearch>(doc, options);
+            //    }
+            //    catch (JsonException ex)
+            //    {
+            //        _logger.LogError(ex, "Failed to deserialize document: {Document}", doc);
+            //        return null;
+            //    }
+            //})
+            //.Where(customer => customer != null)
+            //.ToList();
+            if (documents.Count == 0)
             {
                 _logger.LogWarning("No valid documents to process after deserialization");
                 return;
             }
-            var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+            var batch = IndexDocumentsBatch.MergeOrUpload(documents);
             try
             {
-                _logger.LogInformation("Merging or uploading document batch for indexing with {Count} document(s)", customers.Count);
+                _logger.LogInformation("Merging or uploading document batch for indexing with {Count} document(s)", documents.Count);
                 var results = await client.IndexDocumentsAsync(batch);
                 var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
                 if (failed.Count > 0)
