@@ -98,7 +98,7 @@ namespace NCS.DSS.Customer.Models
         [Newtonsoft.Json.JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string CreatedBy { get; set; }
 
         public void SetDefaultValues()

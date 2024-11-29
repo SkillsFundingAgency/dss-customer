@@ -112,7 +112,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 while (queryCust.HasMoreResults)
                 {
                     var response = await queryCust.ReadNextAsync();
-                    return response.Resource.FirstOrDefault().ToString();
+                    return JsonSerializer.Serialize<Models.Customer>(response.Resource.FirstOrDefault());
                 }
                 return null;
             }
