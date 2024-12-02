@@ -62,17 +62,13 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                             if (Enum.IsDefined(typeof(Title), title))
                                 cust.Title =(Title) title;
 
-                            var dob = DateTime.Now;
-                            if (Enum.TryParse(root.GetProperty("DateofBirth").GetString(), out dob))
-                                cust.DateofBirth = dob;
+                            cust.DateofBirth = root.GetProperty("DateofBirth").GetDateTime();
 
                             var gen = root.GetProperty("Gender").GetInt32();
                             if (Enum.IsDefined(typeof(Gender), gen))
                                 cust.Gender = (Gender) gen;
 
-                            var dot = DateTime.Now;
-                            if (Enum.TryParse(root.GetProperty("DateOfTermination").GetString(), out dot))
-                                cust.DateOfTermination = dot;
+                           cust.DateOfTermination = root.GetProperty("DateOfTermination").GetDateTime();
 
                             var rot = root.GetProperty("ReasonForTermination").GetInt32();
                             if (Enum.IsDefined(typeof(ReasonForTermination), gen))
@@ -81,10 +77,8 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                             var intro = root.GetProperty("IntroducedBy").GetInt32();
                             if (Enum.IsDefined(typeof(IntroducedBy), intro))
                                 cust.IntroducedBy = (IntroducedBy) intro;
-
-                            var lmd = DateTime.Now;
-                            if (Enum.TryParse(root.GetProperty("LastModifiedDate").GetString(), out lmd))
-                                cust.LastModifiedDate = lmd;
+                            
+                            cust.LastModifiedDate = root.GetProperty("LastModifiedDate").GetDateTime();
 
                             customers.Add(cust);
 
