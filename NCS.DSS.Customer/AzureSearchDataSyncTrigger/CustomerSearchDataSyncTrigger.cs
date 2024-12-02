@@ -1,5 +1,6 @@
 using Azure;
 using Azure.Search.Documents.Models;
+using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
@@ -41,48 +42,58 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     foreach (var doc in documents)
                     {                        
                         var root = doc.RootElement;
-                        var cust = new Models.CustomerSearch()
+                        try
                         {
-                            CustomerId = root.GetProperty("id").GetGuid(),                                
-                            DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),                            
-                            GivenName = root.GetProperty("GivenName").GetString(),
-                            FamilyName = root.GetProperty("FamilyName").GetString(),
-                            UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
-                            OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
-                            OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
-                            IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
-                            LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
-                        };
+                            _logger.LogInformation("Retrieving data from customer with id {id}", root.GetProperty("id").GetString());
+                            var cust = new Models.CustomerSearch()
+                            {
+                                CustomerId = root.GetProperty("id").GetGuid(),
+                                DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),
+                                GivenName = root.GetProperty("GivenName").GetString(),
+                                FamilyName = root.GetProperty("FamilyName").GetString(),
+                                UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
+                                OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
+                                OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
+                                IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
+                                LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
+                            };
 
-                        var title = Title.NotProvided;
-                        if(Enum.TryParse(root.GetProperty("Title").GetString(), out title))
-                            cust.Title = title;
+                            var title = Title.NotProvided;
+                            if (Enum.TryParse(root.GetProperty("Title").GetString(), out title))
+                                cust.Title = title;
 
-                        var dob = DateTime.Now;
-                        if (Enum.TryParse(root.GetProperty("DateofBirth").GetString(), out dob))
-                            cust.DateofBirth = dob;
+                            var dob = DateTime.Now;
+                            if (Enum.TryParse(root.GetProperty("DateofBirth").GetString(), out dob))
+                                cust.DateofBirth = dob;
 
-                        var gen = Gender.NotProvided;
-                        if (Enum.TryParse(root.GetProperty("Gender").GetString(), out gen))
-                            cust.Gender = gen;
+                            var gen = Gender.NotProvided;
+                            if (Enum.TryParse(root.GetProperty("Gender").GetString(), out gen))
+                                cust.Gender = gen;
 
-                        var dot = DateTime.Now;
-                        if (Enum.TryParse(root.GetProperty("DateOfTermination").GetString(), out dot))
-                            cust.DateOfTermination = dot;
+                            var dot = DateTime.Now;
+                            if (Enum.TryParse(root.GetProperty("DateOfTermination").GetString(), out dot))
+                                cust.DateOfTermination = dot;
 
-                        var rot = ReasonForTermination.CustomerChoice;
-                        if (Enum.TryParse(root.GetProperty("ReasonForTermination").GetString(), out rot))
-                            cust.ReasonForTermination = rot;
+                            var rot = ReasonForTermination.CustomerChoice;
+                            if (Enum.TryParse(root.GetProperty("ReasonForTermination").GetString(), out rot))
+                                cust.ReasonForTermination = rot;
 
-                        var intro = IntroducedBy.NotProvided;
-                        if (Enum.TryParse(root.GetProperty("IntroducedBy").GetString(), out intro))
-                            cust.IntroducedBy = intro;
+                            var intro = IntroducedBy.NotProvided;
+                            if (Enum.TryParse(root.GetProperty("IntroducedBy").GetString(), out intro))
+                                cust.IntroducedBy = intro;
 
-                        var lmd = DateTime.Now;
-                        if (Enum.TryParse(root.GetProperty("LastModifiedDate").GetString(), out lmd))
-                            cust.LastModifiedDate = lmd;
+                            var lmd = DateTime.Now;
+                            if (Enum.TryParse(root.GetProperty("LastModifiedDate").GetString(), out lmd))
+                                cust.LastModifiedDate = lmd;
 
-                        customers.Add(cust);                        
+                            customers.Add(cust);
+
+                            _logger.LogInformation("Completed retrieving data from customer with id {id}", root.GetProperty("id").GetString());
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("Failed to retrieve data from customer with id {id} {error}", root.GetProperty("id").GetString(),ex.StackTrace);
+                        }                        
                     }
 
                     var batch = IndexDocumentsBatch.MergeOrUpload(customers);
@@ -103,8 +114,8 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Request failed Excpetion with {error}", e.Message);
-
+                    _logger.LogError("Request failed Excpetion with {error} {stacktrace}", e.Message, e.StackTrace);
+                    throw;
                 }               
             } 
             _logger.LogInformation("{functionName} existed", nameof(CustomerSearchDataSyncTrigger));
