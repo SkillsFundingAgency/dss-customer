@@ -20,7 +20,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         public async Task RunAsync(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Models.CustomerSearch> documents)
+            IReadOnlyList<JsonDocument> documents)
         {
             var correlationId = Guid.NewGuid();
 
@@ -39,30 +39,55 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             { 
                 try
                 {
-                    //var customers = documents.Select(doc => new Models.CustomerSearch()
-                    //{
-                    //    CustomerId = doc.RootElement.GetProperty("id").GetGuid(),
-                    //    DateOfRegistration = doc.RootElement.GetProperty("DateOfRegistration").GetDateTime(),
-                    //    Title = Enum.Parse<Title>(doc.RootElement.GetProperty("Title").GetString()),
-                    //    GivenName = doc.RootElement.GetProperty("GivenName").GetString(),
-                    //    FamilyName = doc.RootElement.GetProperty("FamilyName").GetString(),
-                    //    DateofBirth = Enum.Parse<DateTime>(doc.RootElement.GetProperty("DateofBirth").GetString()),
-                    //    Gender = Enum.Parse<Gender>(doc.RootElement.GetProperty("Gender").GetString()),
-                    //    UniqueLearnerNumber = doc.RootElement.GetProperty("UniqueLearnerNumber").GetString(),
-                    //    OptInUserResearch = doc.RootElement.GetProperty("OptInUserResearch").GetBoolean(),
-                    //    OptInMarketResearch = doc.RootElement.GetProperty("OptInMarketResearch").GetBoolean(),
-                    //    DateOfTermination = Enum.Parse<DateTime>(doc.RootElement.GetProperty("DateOfTermination").GetString()),
-                    //    ReasonForTermination = Enum.Parse<ReasonForTermination>(doc.RootElement.GetProperty("ReasonForTermination").GetString()),
-                    //    IntroducedBy = Enum.Parse<IntroducedBy>(doc.RootElement.GetProperty("IntroducedBy").GetString()),
-                    //    IntroducedByAdditionalInfo = doc.RootElement.GetProperty("IntroducedByAdditionalInfo").GetString(),
-                    //    LastModifiedDate = Enum.Parse<DateTime>(doc.RootElement.GetProperty("LastModifiedDate").GetString()),
-                    //    LastModifiedTouchpointId = doc.RootElement.GetProperty("LastModifiedTouchpointId").GetString()
-                    //})
-                    //    .ToList();
+                    var customers = new List<Models.CustomerSearch>();
+                    foreach (var doc in documents)
+                    {                        
+                        var root = doc.RootElement;
+                        var cust = new Models.CustomerSearch()
+                        {
+                            CustomerId = root.GetProperty("id").GetGuid(),                                
+                            DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),                            
+                            GivenName = root.GetProperty("GivenName").GetString(),
+                            FamilyName = root.GetProperty("FamilyName").GetString(),
+                            UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
+                            OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
+                            OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
+                            IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
+                            LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
+                        };
 
-                    var batch = IndexDocumentsBatch.MergeOrUpload(documents);
+                        var title = Title.NotProvided;
+                        if(Enum.TryParse(root.GetProperty("Title").GetString(), out title))
+                            cust.Title = title;
 
+                        var dob = DateTime.Now;
+                        if (Enum.TryParse(root.GetProperty("DateofBirth").GetString(), out dob))
+                            cust.DateofBirth = dob;
 
+                        var gen = Gender.NotProvided;
+                        if (Enum.TryParse(root.GetProperty("Gender").GetString(), out gen))
+                            cust.Gender = gen;
+
+                        var dot = DateTime.Now;
+                        if (Enum.TryParse(root.GetProperty("DateOfTermination").GetString(), out dot))
+                            cust.DateOfTermination = dot;
+
+                        var rot = ReasonForTermination.CustomerChoice;
+                        if (Enum.TryParse(root.GetProperty("ReasonForTermination").GetString(), out rot))
+                            cust.ReasonForTermination = rot;
+
+                        var intro = IntroducedBy.NotProvided;
+                        if (Enum.TryParse(root.GetProperty("IntroducedBy").GetString(), out intro))
+                            cust.IntroducedBy = intro;
+
+                        var lmd = DateTime.Now;
+                        if (Enum.TryParse(root.GetProperty("LastModifiedDate").GetString(), out lmd))
+                            cust.LastModifiedDate = lmd;
+
+                        customers.Add(cust);                        
+                    }
+
+                    var batch = IndexDocumentsBatch.MergeOrUpload(customers);
 
                     _logger.LogInformation("attempting to merge docs to azure search");
 
@@ -82,9 +107,9 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 {
                     _logger.LogError("{correlationId} Request failed Excpetion with {error}", correlationId, e.Message);
 
-                }
-                _logger.LogInformation("{functionName} existed", nameof(CustomerSearchDataSyncTrigger));
-            }
+                }               
+            } 
+            _logger.LogInformation("{functionName} existed", nameof(CustomerSearchDataSyncTrigger));
         }
     }
 }
