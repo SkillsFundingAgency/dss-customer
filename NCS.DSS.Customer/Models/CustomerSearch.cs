@@ -1,9 +1,11 @@
 ﻿using NCS.DSS.Customer.ReferenceData;
+using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.Models
 {
     public class CustomerSearch
     {
+        [JsonProperty(PropertyName = "id")]
         public Guid? CustomerId { get; set; }
 
         public DateTime? DateOfRegistration { get; set; }
