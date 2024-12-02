@@ -22,18 +22,16 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
             IReadOnlyList<JsonDocument> documents)
         {
-            var correlationId = Guid.NewGuid();
-
             _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
             var client = SearchHelper.GetSearchServiceClient();
 
-            _logger.LogInformation("{correlationId} get search service client",correlationId);
+            _logger.LogInformation("get search service client");
 
 
-            _logger.LogInformation("{correlationId} get index client", correlationId);
+            _logger.LogInformation("get index client");
 
-            _logger.LogInformation("{correlationId} Documents modified {count}", correlationId,documents.Count);
+            _logger.LogInformation("Documents modified {count}",documents.Count);
 
             if (documents.Count > 0)
             { 
@@ -97,7 +95,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                     if (failed.Count > 0)
                     {
-                        _logger.LogInformation("{correlationId} Failed to index some of the documents: {errors}", correlationId, string.Join(", ", failed));
+                        _logger.LogInformation("Failed to index some of the documents: {errors}", string.Join(", ", failed));
                     }
 
                     _logger.LogInformation("successfully merged docs to azure search");
@@ -105,7 +103,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("{correlationId} Request failed Excpetion with {error}", correlationId, e.Message);
+                    _logger.LogError("Request failed Excpetion with {error}", e.Message);
 
                 }               
             } 
