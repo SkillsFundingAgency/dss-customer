@@ -58,29 +58,29 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                                 LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
                             };
 
-                            var title = Title.NotProvided;
-                            if (Enum.TryParse(root.GetProperty("Title").GetString(), out title))
-                                cust.Title = title;
+                            var title = root.GetProperty("Title").GetInt32();
+                            if (Enum.IsDefined(typeof(Title), title))
+                                cust.Title =(Title) title;
 
                             var dob = DateTime.Now;
                             if (Enum.TryParse(root.GetProperty("DateofBirth").GetString(), out dob))
                                 cust.DateofBirth = dob;
 
-                            var gen = Gender.NotProvided;
-                            if (Enum.TryParse(root.GetProperty("Gender").GetString(), out gen))
-                                cust.Gender = gen;
+                            var gen = root.GetProperty("Gender").GetInt32();
+                            if (Enum.IsDefined(typeof(Gender), gen))
+                                cust.Gender = (Gender) gen;
 
                             var dot = DateTime.Now;
                             if (Enum.TryParse(root.GetProperty("DateOfTermination").GetString(), out dot))
                                 cust.DateOfTermination = dot;
 
-                            var rot = ReasonForTermination.CustomerChoice;
-                            if (Enum.TryParse(root.GetProperty("ReasonForTermination").GetString(), out rot))
-                                cust.ReasonForTermination = rot;
+                            var rot = root.GetProperty("ReasonForTermination").GetInt32();
+                            if (Enum.IsDefined(typeof(ReasonForTermination), gen))
+                                cust.ReasonForTermination =(ReasonForTermination) rot;
 
-                            var intro = IntroducedBy.NotProvided;
-                            if (Enum.TryParse(root.GetProperty("IntroducedBy").GetString(), out intro))
-                                cust.IntroducedBy = intro;
+                            var intro = root.GetProperty("IntroducedBy").GetInt32();
+                            if (Enum.IsDefined(typeof(IntroducedBy), intro))
+                                cust.IntroducedBy = (IntroducedBy) intro;
 
                             var lmd = DateTime.Now;
                             if (Enum.TryParse(root.GetProperty("LastModifiedDate").GetString(), out lmd))
