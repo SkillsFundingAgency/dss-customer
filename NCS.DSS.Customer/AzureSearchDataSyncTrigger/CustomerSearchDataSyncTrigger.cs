@@ -1,74 +1,88 @@
-using System.Text.Json;
 using Azure;
 using Azure.Search.Documents.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.ReferenceData;
+using System.Text.Json;
+
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 {
     public class CustomerSearchDataSyncTrigger
     {
         private readonly ILogger<CustomerSearchDataSyncTrigger> _logger;
-        public CustomerSearchDataSyncTrigger(ILogger<CustomerSearchDataSyncTrigger> logger)
+        public CustomerSearchDataSyncTrigger( ILogger<CustomerSearchDataSyncTrigger> logger)
         {
             _logger = logger;
         }
+
         [Function("SyncDataForCustomerSearchTrigger")]
-        public async Task RunAsync(
+        public async Task Run(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Models.CustomerSearch> documents)
+            IReadOnlyList<JsonDocument> documents)
         {
-            var functionName = nameof(CustomerSearchDataSyncTrigger);
-            _logger.LogInformation("Function {functionName} has been invoked", functionName);
-            if (documents.Count == 0)
-            {
-                _logger.LogInformation("No documents to process");
-                return;
-            }
-            _logger.LogInformation("Initializing search service client");
+            var correlationId = Guid.NewGuid();
+
+            _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
+
             var client = SearchHelper.GetSearchServiceClient();
-            _logger.LogInformation("Attempting to process {Count} document(s)", documents.Count);
-            //// Deserialize documents into strongly-typed CustomerSearch models
-            //var customers = documents.Select(doc =>
-            //{
-            //    try
-            //    {
-            //        var options = new JsonSerializerOptions
-            //        {
-            //            PropertyNameCaseInsensitive = true
-            //        };
-            //        return JsonSerializer.Deserialize<Models.CustomerSearch>(doc, options);
-            //    }
-            //    catch (JsonException ex)
-            //    {
-            //        _logger.LogError(ex, "Failed to deserialize document: {Document}", doc);
-            //        return null;
-            //    }
-            //})
-            //.Where(customer => customer != null)
-            //.ToList();
-            if (documents.Count == 0)
+
+            _logger.LogInformation("{correlationId} get search service client",correlationId);
+
+
+            _logger.LogInformation("{correlationId} get index client", correlationId);
+
+            _logger.LogInformation("{correlationId} Documents modified {count}", correlationId,documents.Count);
+
+            if (documents.Count > 0)
             {
-                _logger.LogWarning("No valid documents to process after deserialization");
-                return;
-            }
-            var batch = IndexDocumentsBatch.MergeOrUpload(documents);
-            try
-            {
-                _logger.LogInformation("Merging or uploading document batch for indexing with {Count} document(s)", documents.Count);
-                var results = await client.IndexDocumentsAsync(batch);
-                var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
-                if (failed.Count > 0)
+                var customers = documents.Select(doc => new Models.CustomerSearch()
                 {
-                    _logger.LogWarning("Failed to index some of the documents: {FailedDocuments}", string.Join(", ", failed));
+                    CustomerId = doc.RootElement.GetProperty("id").GetGuid(),
+                    DateOfRegistration = doc.RootElement.GetProperty("DateOfRegistration").GetDateTime(),
+                    Title =  Enum.Parse<Title>(doc.RootElement.GetProperty("Title").GetString()),
+                    GivenName = doc.RootElement.GetProperty("GivenName").GetString(),
+                    FamilyName = doc.RootElement.GetProperty("FamilyName").GetString(),
+                    DateofBirth = Enum.Parse<DateTime>(doc.RootElement.GetProperty("DateofBirth").GetString()),
+                    Gender = Enum.Parse<Gender>(doc.RootElement.GetProperty("Gender").GetString()),
+                    UniqueLearnerNumber = doc.RootElement.GetProperty("UniqueLearnerNumber").GetString(),
+                    OptInUserResearch = doc.RootElement.GetProperty("OptInUserResearch").GetBoolean(),
+                    OptInMarketResearch = doc.RootElement.GetProperty("OptInMarketResearch").GetBoolean(),
+                    DateOfTermination = Enum.Parse<DateTime>(doc.RootElement.GetProperty("DateOfTermination").GetString()),
+                    ReasonForTermination = Enum.Parse<ReasonForTermination>(doc.RootElement.GetProperty("ReasonForTermination").GetString()),
+                    IntroducedBy = Enum.Parse<IntroducedBy>(doc.RootElement.GetProperty("IntroducedBy").GetString()),
+                    IntroducedByAdditionalInfo = doc.RootElement.GetProperty("IntroducedByAdditionalInfo").GetString(),
+                    LastModifiedDate = Enum.Parse<DateTime>(doc.RootElement.GetProperty("LastModifiedDate").GetString()),
+                    LastModifiedTouchpointId = doc.RootElement.GetProperty("LastModifiedTouchpointId").GetString()
+                })
+                    .ToList();
+
+                var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+
+
+                try
+                {
+                    _logger.LogInformation("attempting to merge docs to azure search");
+
+                    var results = await client.IndexDocumentsAsync(batch);
+
+                    var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
+
+                    if (failed.Count > 0)
+                    {
+                        _logger.LogInformation("{correlationId} Failed to index some of the documents: {errors}", correlationId, string.Join(", ", failed));
+                    }
+
+                    _logger.LogInformation("successfully merged docs to azure search");
+
                 }
-                _logger.LogInformation("Function {functionName} has finished processing successfully", functionName);
-            }
-            catch (RequestFailedException ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred in {functionName}. Exception: {exMessage}", functionName, ex.Message);
-                throw;
+                catch (RequestFailedException e)
+                {
+                    _logger.LogError("{correlationId} Request failed Excpetion with {error}",correlationId, e.Message);
+
+                }
+                _logger.LogInformation("{functionName} existed", nameof(CustomerSearchDataSyncTrigger));
             }
         }
     }
