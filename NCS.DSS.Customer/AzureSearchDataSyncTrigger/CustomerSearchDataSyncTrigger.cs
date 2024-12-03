@@ -94,6 +94,8 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                     _logger.LogInformation("attempting to merge docs to azure search");
 
+                    _logger.LogInformation("Document IDs : {Ids}",string.Join(',', documents.Select(d => d.CustomerId).ToArray()));
+
                     var results = await client.IndexDocumentsAsync(batch);
 
                     var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
