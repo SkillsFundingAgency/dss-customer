@@ -5,7 +5,8 @@ namespace NCS.DSS.Customer.Models
 {
     public class CustomerSearch
     {
-        [JsonProperty(PropertyName = "id")]
+        public Guid? id { get; set; }
+
         public Guid? CustomerId { get; set; }
 
         public DateTime? DateOfRegistration { get; set; }

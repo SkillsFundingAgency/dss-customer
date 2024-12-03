@@ -1,5 +1,6 @@
 using Azure;
 using Azure.Search.Documents.Models;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -37,66 +38,25 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             if (documents.Count > 0)
             { 
                 try
-                {
-                    //var customers = new List<Models.CustomerSearch>();
-                    //foreach (var doc in documents)
-                    //{                        
-                    //    var root = doc.RootElement;
-                    //    try
-                    //    {
-                    //        _logger.LogInformation("Retrieving data from customer with id {id}", root.GetProperty("id").GetString());
-                    //        var cust = new Models.CustomerSearch()
-                    //        {
-                    //            CustomerId = root.GetProperty("id").GetGuid(),
-                    //            DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),
-                    //            GivenName = root.GetProperty("GivenName").GetString(),
-                    //            FamilyName = root.GetProperty("FamilyName").GetString(),
-                    //            UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
-                    //            OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
-                    //            OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
-                    //            IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
-                    //            LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
-                    //        };
-
-                    //        var title = root.GetProperty("Title").GetInt32();
-                    //        if (Enum.IsDefined(typeof(Title), title))
-                    //            cust.Title =(Title) title;
-
-                    //        cust.DateofBirth = root.GetProperty("DateofBirth").GetDateTime();
-
-                    //        var gen = root.GetProperty("Gender").GetInt32();
-                    //        if (Enum.IsDefined(typeof(Gender), gen))
-                    //            cust.Gender = (Gender) gen;
-
-                    //       cust.DateOfTermination = root.GetProperty("DateOfTermination").GetDateTime();
-
-                    //        var rot = root.GetProperty("ReasonForTermination").GetInt32();
-                    //        if (Enum.IsDefined(typeof(ReasonForTermination), gen))
-                    //            cust.ReasonForTermination =(ReasonForTermination) rot;
-
-                    //        var intro = root.GetProperty("IntroducedBy").GetInt32();
-                    //        if (Enum.IsDefined(typeof(IntroducedBy), intro))
-                    //            cust.IntroducedBy = (IntroducedBy) intro;
-                            
-                    //        cust.LastModifiedDate = root.GetProperty("LastModifiedDate").GetDateTime();
-
-                    //        customers.Add(cust);
-
-                    //        _logger.LogInformation("Completed retrieving data from customer with id {id}", root.GetProperty("id").GetString());
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        _logger.LogError("Failed to retrieve data from customer with id {id} {error}", root.GetProperty("id").GetString(),ex.StackTrace);
-                    //    }                        
-                    //}
-                    var customers = documents.Where(d => d.CustomerId != null);
-                    if (customers.Count() > 0)
+                {      
+                    var customers = new List<Models.CustomerSearch>();
+                    foreach (var doc in documents)
                     {
-                        var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+                        var customer = doc;
+                        if(doc.CustomerId == null && doc.id != null)
+                            customer.CustomerId = doc.id;
+                        if(doc.id == null && doc.CustomerId != null)
+                            customer.id = doc.CustomerId;
+                        customers.Add(customer);
+                    }
+                    var custFiltered = customers.Where(d => d.CustomerId != null && d.id != null);
+                    if (custFiltered.Count() > 0)
+                    {
+                        var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
 
                         _logger.LogInformation("attempting to merge docs to azure search");
 
-                        _logger.LogInformation("Document IDs : {Ids}", string.Join(',', customers.Select(d => d.CustomerId).ToArray()));
+                        _logger.LogInformation("Document IDs : {Ids}", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
 
 
                         var results = await client.IndexDocumentsAsync(batch);
@@ -110,10 +70,11 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                         _logger.LogInformation("successfully merged docs to azure search");
                     }
-                    else
+                    var custFailed = customers.Where(d => d.CustomerId == null && d.id == null);
+                    if (custFailed.Count() > 0)
                     {
                         _logger.LogInformation("Below list of documents can't be processed as they are missing with Document Key");
-                        foreach (var doc in documents.Where(d => d.CustomerId == null))
+                        foreach (var doc in custFailed.Where(d => d.CustomerId == null))
                         {
                             _logger.LogInformation(JsonSerializer.Serialize(doc));
                         }
@@ -125,7 +86,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     throw;
                 }               
             } 
-            _logger.LogInformation("{functionName} existed", nameof(CustomerSearchDataSyncTrigger));
+            _logger.LogInformation("{functionName} exited", nameof(CustomerSearchDataSyncTrigger));
         }
     }
 }
