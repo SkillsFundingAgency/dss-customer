@@ -89,24 +89,35 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     //        _logger.LogError("Failed to retrieve data from customer with id {id} {error}", root.GetProperty("id").GetString(),ex.StackTrace);
                     //    }                        
                     //}
-
-                    var batch = IndexDocumentsBatch.MergeOrUpload(documents);
-
-                    _logger.LogInformation("attempting to merge docs to azure search");
-
-                    _logger.LogInformation("Document IDs : {Ids}",string.Join(',', documents.Select(d => d.CustomerId).ToArray()));
-
-                    var results = await client.IndexDocumentsAsync(batch);
-
-                    var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
-
-                    if (failed.Count > 0)
+                    var customers = documents.Where(d => d.CustomerId != null);
+                    if (customers.Count() > 0)
                     {
-                        _logger.LogInformation("Failed to index some of the documents: {errors}", string.Join(", ", failed));
+                        var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+
+                        _logger.LogInformation("attempting to merge docs to azure search");
+
+                        _logger.LogInformation("Document IDs : {Ids}", string.Join(',', customers.Select(d => d.CustomerId).ToArray()));
+
+
+                        var results = await client.IndexDocumentsAsync(batch);
+
+                        var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
+
+                        if (failed.Count > 0)
+                        {
+                            _logger.LogInformation("Failed to index some of the documents: {errors}", string.Join(", ", failed));
+                        }
+
+                        _logger.LogInformation("successfully merged docs to azure search");
                     }
-
-                    _logger.LogInformation("successfully merged docs to azure search");
-
+                    else
+                    {
+                        _logger.LogInformation("Below list of documents can't be processed as they are missing with Document Key");
+                        foreach (var doc in documents.Where(d => d.CustomerId == null))
+                        {
+                            _logger.LogInformation(JsonSerializer.Serialize(doc));
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
