@@ -22,14 +22,11 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         {
             _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
+            _logger.LogInformation("Attempting get Search Service Client");
+
             var client = SearchHelper.GetSearchServiceClient();
 
-            _logger.LogInformation("get search service client");
-
-
-            _logger.LogInformation("get index client");
-
-            _logger.LogInformation("Documents modified {count}",documents.Count);
+            _logger.LogInformation("Number of Documents modified in Cosmos DB : {count}",documents.Count);
 
             if (documents.Count > 0)
             { 
@@ -50,31 +47,28 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     var custFiltered = customers.Where(d => d.CustomerId != null);
                     if (custFiltered.Any())
                     {
+
+                        _logger.LogInformation("Attempting to Merge / Upload documents with IDs ({Ids}) to azure search", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
                         var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
 
-                        _logger.LogInformation("attempting to merge docs to azure search");
-
-                        _logger.LogInformation("Document IDs : {Ids}", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
-
-
+                        _logger.LogInformation("Attempting to Index documents to azure search");
                         var results = await client.IndexDocumentsAsync(batch);
 
                         var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
 
                         if (failed.Count > 0)
                         {
-                            _logger.LogInformation("Failed to index some of the documents: {errors}", string.Join(", ", failed));
+                            _logger.LogInformation("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
                         }
 
-                        _logger.LogInformation("successfully merged docs to azure search");
+                        _logger.LogInformation("Successfully Merged and Indexed documnets to azure search");
                     }
                     var custFailed = customers.Where(d => d.CustomerId == null);
                     if (custFailed.Any())
                     {
-                        _logger.LogInformation("Below list of documents can't be processed as they are missing with Document Key");
                         foreach (var doc in custFailed.Where(d => d.CustomerId == null))
                         {
-                            _logger.LogInformation(JsonSerializer.Serialize(doc));
+                            _logger.LogWarning("{Doc} missing Document Key (CustomerId) ", JsonSerializer.Serialize(doc));
                         }
                     }
                 }
