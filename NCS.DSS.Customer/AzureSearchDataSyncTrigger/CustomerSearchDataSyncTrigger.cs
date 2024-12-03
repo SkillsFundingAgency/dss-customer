@@ -21,7 +21,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         public async Task RunAsync(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<JsonDocument> documents)
+            IReadOnlyList<Models.CustomerSearch> documents)
         {
             _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
@@ -38,59 +38,59 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
             { 
                 try
                 {
-                    var customers = new List<Models.CustomerSearch>();
-                    foreach (var doc in documents)
-                    {                        
-                        var root = doc.RootElement;
-                        try
-                        {
-                            _logger.LogInformation("Retrieving data from customer with id {id}", root.GetProperty("id").GetString());
-                            var cust = new Models.CustomerSearch()
-                            {
-                                CustomerId = root.GetProperty("id").GetGuid(),
-                                DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),
-                                GivenName = root.GetProperty("GivenName").GetString(),
-                                FamilyName = root.GetProperty("FamilyName").GetString(),
-                                UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
-                                OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
-                                OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
-                                IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
-                                LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
-                            };
+                    //var customers = new List<Models.CustomerSearch>();
+                    //foreach (var doc in documents)
+                    //{                        
+                    //    var root = doc.RootElement;
+                    //    try
+                    //    {
+                    //        _logger.LogInformation("Retrieving data from customer with id {id}", root.GetProperty("id").GetString());
+                    //        var cust = new Models.CustomerSearch()
+                    //        {
+                    //            CustomerId = root.GetProperty("id").GetGuid(),
+                    //            DateOfRegistration = root.GetProperty("DateOfRegistration").GetDateTime(),
+                    //            GivenName = root.GetProperty("GivenName").GetString(),
+                    //            FamilyName = root.GetProperty("FamilyName").GetString(),
+                    //            UniqueLearnerNumber = root.GetProperty("UniqueLearnerNumber").GetString(),
+                    //            OptInUserResearch = root.GetProperty("OptInUserResearch").GetBoolean(),
+                    //            OptInMarketResearch = root.GetProperty("OptInMarketResearch").GetBoolean(),
+                    //            IntroducedByAdditionalInfo = root.GetProperty("IntroducedByAdditionalInfo").GetString(),
+                    //            LastModifiedTouchpointId = root.GetProperty("LastModifiedTouchpointId").GetString()
+                    //        };
 
-                            var title = root.GetProperty("Title").GetInt32();
-                            if (Enum.IsDefined(typeof(Title), title))
-                                cust.Title =(Title) title;
+                    //        var title = root.GetProperty("Title").GetInt32();
+                    //        if (Enum.IsDefined(typeof(Title), title))
+                    //            cust.Title =(Title) title;
 
-                            cust.DateofBirth = root.GetProperty("DateofBirth").GetDateTime();
+                    //        cust.DateofBirth = root.GetProperty("DateofBirth").GetDateTime();
 
-                            var gen = root.GetProperty("Gender").GetInt32();
-                            if (Enum.IsDefined(typeof(Gender), gen))
-                                cust.Gender = (Gender) gen;
+                    //        var gen = root.GetProperty("Gender").GetInt32();
+                    //        if (Enum.IsDefined(typeof(Gender), gen))
+                    //            cust.Gender = (Gender) gen;
 
-                           cust.DateOfTermination = root.GetProperty("DateOfTermination").GetDateTime();
+                    //       cust.DateOfTermination = root.GetProperty("DateOfTermination").GetDateTime();
 
-                            var rot = root.GetProperty("ReasonForTermination").GetInt32();
-                            if (Enum.IsDefined(typeof(ReasonForTermination), gen))
-                                cust.ReasonForTermination =(ReasonForTermination) rot;
+                    //        var rot = root.GetProperty("ReasonForTermination").GetInt32();
+                    //        if (Enum.IsDefined(typeof(ReasonForTermination), gen))
+                    //            cust.ReasonForTermination =(ReasonForTermination) rot;
 
-                            var intro = root.GetProperty("IntroducedBy").GetInt32();
-                            if (Enum.IsDefined(typeof(IntroducedBy), intro))
-                                cust.IntroducedBy = (IntroducedBy) intro;
+                    //        var intro = root.GetProperty("IntroducedBy").GetInt32();
+                    //        if (Enum.IsDefined(typeof(IntroducedBy), intro))
+                    //            cust.IntroducedBy = (IntroducedBy) intro;
                             
-                            cust.LastModifiedDate = root.GetProperty("LastModifiedDate").GetDateTime();
+                    //        cust.LastModifiedDate = root.GetProperty("LastModifiedDate").GetDateTime();
 
-                            customers.Add(cust);
+                    //        customers.Add(cust);
 
-                            _logger.LogInformation("Completed retrieving data from customer with id {id}", root.GetProperty("id").GetString());
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Failed to retrieve data from customer with id {id} {error}", root.GetProperty("id").GetString(),ex.StackTrace);
-                        }                        
-                    }
+                    //        _logger.LogInformation("Completed retrieving data from customer with id {id}", root.GetProperty("id").GetString());
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _logger.LogError("Failed to retrieve data from customer with id {id} {error}", root.GetProperty("id").GetString(),ex.StackTrace);
+                    //    }                        
+                    //}
 
-                    var batch = IndexDocumentsBatch.MergeOrUpload(customers);
+                    var batch = IndexDocumentsBatch.MergeOrUpload(documents);
 
                     _logger.LogInformation("attempting to merge docs to azure search");
 
