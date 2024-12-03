@@ -1,11 +1,7 @@
-using Azure;
 using Azure.Search.Documents.Models;
-using Microsoft.ApplicationInsights.DependencyCollector;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
-using NCS.DSS.Customer.ReferenceData;
 using System.Text.Json;
 
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
@@ -22,7 +18,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         public async Task RunAsync(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Models.CustomerSearch> documents)
+            IReadOnlyList<Models.CustomerDocument> documents)
         {
             _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
@@ -42,14 +38,16 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     var customers = new List<Models.CustomerSearch>();
                     foreach (var doc in documents)
                     {
-                        var customer = doc;
+                        var custJson = JsonSerializer.Serialize(doc);
+                        var customer = JsonSerializer.Deserialize<Models.CustomerSearch>(custJson);
                         if(doc.CustomerId == null && doc.id != null)
                             customer.CustomerId = doc.id;
-                        if(doc.id == null && doc.CustomerId != null)
-                            customer.id = doc.CustomerId;
+                        else if(doc.id == null && doc.CustomerId != null)
+                            customer.CustomerId = doc.CustomerId;
+
                         customers.Add(customer);
                     }
-                    var custFiltered = customers.Where(d => d.CustomerId != null && d.id != null);
+                    var custFiltered = customers.Where(d => d.CustomerId != null);
                     if (custFiltered.Any())
                     {
                         var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
@@ -70,7 +68,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                         _logger.LogInformation("successfully merged docs to azure search");
                     }
-                    var custFailed = customers.Where(d => d.CustomerId == null && d.id == null);
+                    var custFailed = customers.Where(d => d.CustomerId == null);
                     if (custFailed.Any())
                     {
                         _logger.LogInformation("Below list of documents can't be processed as they are missing with Document Key");
