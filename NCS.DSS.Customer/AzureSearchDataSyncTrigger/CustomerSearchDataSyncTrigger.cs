@@ -50,7 +50,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                         customers.Add(customer);
                     }
                     var custFiltered = customers.Where(d => d.CustomerId != null && d.id != null);
-                    if (custFiltered.Count() > 0)
+                    if (custFiltered.Any())
                     {
                         var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
 
@@ -71,7 +71,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                         _logger.LogInformation("successfully merged docs to azure search");
                     }
                     var custFailed = customers.Where(d => d.CustomerId == null && d.id == null);
-                    if (custFailed.Count() > 0)
+                    if (custFailed.Any())
                     {
                         _logger.LogInformation("Below list of documents can't be processed as they are missing with Document Key");
                         foreach (var doc in custFailed.Where(d => d.CustomerId == null))
