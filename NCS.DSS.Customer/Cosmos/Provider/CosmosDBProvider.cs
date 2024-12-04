@@ -29,15 +29,18 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 while (queryCust.HasMoreResults)
                 {
                     var response = await queryCust.ReadNextAsync();
-                    _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
-                    return true;
+                    if (response != null)
+                    {
+                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        return true;
+                    }                    
                 }
                 _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return false;
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message,ce.StackTrace);
+                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }
             
@@ -61,7 +64,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to get DateOfTermination for {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to get DateOfTermination for {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }
         }
@@ -84,7 +87,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to get Customer data. Exception {Exception}", ce.Message);
+                _logger.LogError(ce,"Failed to get Customer data. Exception {Exception}", ce.Message);
                 
                 throw;
             }
@@ -99,15 +102,18 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 while (queryCust.HasMoreResults)
                 {
                     var response = await queryCust.ReadNextAsync();
-                    _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
-                    return response.Resource.FirstOrDefault();
+                    if (response != null)
+                    {
+                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        return response.Resource.FirstOrDefault();
+                    }                    
                 }
                 _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return null;
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }            
         }
@@ -121,16 +127,19 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 while (queryCust.HasMoreResults)
                 {
                     var response = await queryCust.ReadNextAsync();
-                    var customerJson = JsonSerializer.Serialize(response.Resource.FirstOrDefault());
-                    _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
-                    return customerJson;
+                    if (response != null)
+                    {
+                        var customerJson = JsonSerializer.Serialize(response.Resource.FirstOrDefault());
+                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        return customerJson;
+                    }
                 }
                 _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return null;
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message,ce.StackTrace);
+                _logger.LogError(ce,"Failed to find the Customer Record for update in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }
         }
@@ -140,17 +149,21 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             try
             {
                 var response = await _container.CreateItemAsync(customer, null);
-                if(response.StatusCode == HttpStatusCode.Created)
-                    _logger.LogInformation("Customer Record Created in Cosmos DB for {CustomerID}",customer.CustomerId);
+                if (response.StatusCode == HttpStatusCode.Created)
+                { 
+                    _logger.LogInformation("Customer Record Created in Cosmos DB for {CustomerID}", customer.CustomerId);
+                }
+                else
+                {
+                    _logger.LogError("Failed and returned {StatusCode} to Create Customer Record in Cosmos DB for {CustomerID}", response.StatusCode, customer.CustomerId);
+                }
                 return response;
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to Create Customer Record in Cosmos DB {CustomerID}. Exception {Exception}. {StackTrace}",customer.CustomerId, ce.Message,ce.StackTrace);
+                _logger.LogError(ce,"Failed to Create Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.",customer.CustomerId, ce.Message);
                 throw;
             }
-            
-
         }
 
         public async Task<ItemResponse<Models.Customer>> UpdateCustomerAsync(string customerJson, Guid customerId)
@@ -165,17 +178,15 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 }
                 else
                 {
-                    _logger.LogInformation("Failed and returned {StatusCode} to Update Customer Record in Cosmos DB for {CustomerID}",response.StatusCode, customer.CustomerId);
-                }
-                    
+                    _logger.LogError("Failed and returned {StatusCode} to Update Customer Record in Cosmos DB for {CustomerID}",response.StatusCode, customer.CustomerId);
+                }                    
                 return response;
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to Update Customer Record in Cosmos DB {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to Update Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
-            }
-           
+            }           
         }
 
         public async Task<Subscriptions> CreateSubscriptionsAsync(Models.Customer customer)
@@ -211,7 +222,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to Create Subscription Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}. {StackTrace}", customer.CustomerId, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to Create Subscription Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}.", customer.CustomerId, ce.Message);
                 throw;
             }
         }
@@ -239,7 +250,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to Retrieve Digital Identity Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}. {StackTrace}", customerId, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to Retrieve Digital Identity Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }
             
@@ -262,7 +273,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to Update Digital Identity Record in Cosmos DB with ID {DigId}. Exception {Exception}. {StackTrace}", digitalIdentity.IdentityID, ce.Message, ce.StackTrace);
+                _logger.LogError(ce,"Failed to Update Digital Identity Record in Cosmos DB with ID {DigId}. Exception {Exception}.", digitalIdentity.IdentityID, ce.Message);
 
                 throw;
             }
