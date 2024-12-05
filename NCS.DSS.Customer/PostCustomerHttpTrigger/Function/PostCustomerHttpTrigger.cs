@@ -106,7 +106,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 }
                 else
                 {
-                    log.LogError("Response status code: {StatusCode}. JsonSerializationException error:{Error} ", response.StatusCode, ex.Message);
+                    log.LogError(ex,"Response status code: {StatusCode}. JsonSerializationException error:{Error} ", response.StatusCode, ex.Message);
                 }
                 return response;
             }

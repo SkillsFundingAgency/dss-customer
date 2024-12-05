@@ -71,7 +71,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (string.IsNullOrEmpty(touchpointId))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("UResponse Status Code: {StatusCode}. nable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
+                log.LogWarning("Response Status Code: {StatusCode}. Unable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
                 return response;
             }
 
@@ -79,7 +79,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (string.IsNullOrEmpty(ApimURL))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("UResponse Status Code: {StatusCode}. nable to locate 'apimurl' in request header", response.StatusCode);
+                log.LogWarning("Response Status Code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
                 return response;
             }
 
@@ -106,7 +106,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             catch (Exception ex)
             {
                 var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
-                log.LogError("Response Status Code: {StatusCode}. Unable to retrieve body from req. {Exception}", response.StatusCode, ex.Message);
+                log.LogError(ex,"Response Status Code: {StatusCode}. Unable to retrieve body from req. {Exception}", response.StatusCode, ex.Message);
                 return response;
             }
 

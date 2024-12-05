@@ -58,10 +58,11 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 
                         if (failed.Count > 0)
                         {
-                            _logger.LogInformation("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
+                            _logger.LogWarning("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
                         }
-
-                        _logger.LogInformation("Successfully Merged and Indexed documnets to azure search");
+                        else { 
+                            _logger.LogInformation("Successfully Merged and Indexed documnets to azure search");
+                        }                        
                     }
                     var custFailed = customers.Where(d => d.CustomerId == null);
                     if (custFailed.Any())
@@ -74,7 +75,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Request failed Excpetion with {error} {stacktrace}", e.Message, e.StackTrace);
+                    _logger.LogError(e,"Request failed Excpetion with {error}", e.Message);
                     throw;
                 }               
             } 

@@ -40,7 +40,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             }
             catch (CosmosException ce)
             {
-                _logger.LogError("Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
+                _logger.LogError(ce,"Failed to find the Customer Record in Cosmos DB {CustomerID}. Exception {Exception}.", customerId, ce.Message);
                 throw;
             }
             

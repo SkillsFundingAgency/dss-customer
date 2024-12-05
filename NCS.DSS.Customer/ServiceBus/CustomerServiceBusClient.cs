@@ -55,7 +55,7 @@ namespace NCS.DSS.Customer.ServiceBus
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Failed to Send Service Bus Message for Customer with ID {CustomerID}. Exception Raised with {Message}. {StackTrace}", customer.CustomerId, ex.Message,ex.StackTrace);
+                _logger.LogError(ex,"Failed to Send Service Bus Message for Customer with ID {CustomerID}. Exception Raised with {Message}.", customer.CustomerId, ex.Message);
                 throw;
             }            
         }
@@ -98,7 +98,7 @@ namespace NCS.DSS.Customer.ServiceBus
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Failed to Send Service Bus Message for Customer with ID {CustomerID}. Exception Raised with {Message}. {StackTrace}", customerId, ex.Message, ex.StackTrace);
+                _logger.LogError(ex,"Failed to Send Service Bus Message for Customer with ID {CustomerID}. Exception Raised with {Message}.", customerId, ex.Message);
                 throw;
             }
         }
