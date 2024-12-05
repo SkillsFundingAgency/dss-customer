@@ -4,12 +4,15 @@ using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service;
 using NCS.DSS.Customer.Helpers;
+using NCS.DSS.Customer.Models;
 using NCS.DSS.Customer.PatchCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.PostCustomerHttpTrigger.Service;
 using NCS.DSS.Customer.ServiceBus;
@@ -22,8 +25,18 @@ namespace NCS.DSS.Customer
         {
             var host = new HostBuilder()
                 .ConfigureFunctionsWebApplication()
-                .ConfigureServices(services =>
+                .ConfigureAppConfiguration(configBuilder =>
                 {
+                    configBuilder.SetBasePath(Environment.CurrentDirectory)
+                        .AddJsonFile("local.settings.json", optional: true,
+                            reloadOnChange: false)
+                        .AddEnvironmentVariables();
+                })
+                .ConfigureServices((context,services) =>
+                {
+                    var configuration = context.Configuration;
+                    services.AddOptions<CustomerConfigurationSettings>()
+                        .Bind(configuration);
                     services.AddLogging();
                     services.AddApplicationInsightsTelemetryWorkerService(); 
                     services.ConfigureFunctionsApplicationInsights();
@@ -37,16 +50,19 @@ namespace NCS.DSS.Customer
                     services.AddScoped<ICustomerPatchService, CustomerPatchService>();
                     services.AddScoped<ICustomerServiceBusClient, CustomerServiceBusClient>();
                     services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
-                    services.AddSingleton(s =>
+                    services.AddSingleton(sp =>
                     {
-                        var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
-                        var connectionString = Environment.GetEnvironmentVariable("CustomerConnectionString");
-                        return new CosmosClient(connectionString, options);
+                        var settings = sp.GetRequiredService<IOptions<CustomerConfigurationSettings>>().Value;
+                        var options = new CosmosClientOptions()
+                        {
+                            ConnectionMode = ConnectionMode.Gateway
+                        };
+                        return new CosmosClient(settings.CustomerConnectionString, options);
                     });
-                    services.AddSingleton(s =>
+                    services.AddSingleton(serviceProvider =>
                     {
-                        var serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
-                        return new ServiceBusClient(serviceBusConnectionString);
+                        var settings = serviceProvider.GetRequiredService<IOptions<CustomerConfigurationSettings>>().Value;
+                        return new ServiceBusClient(settings.ServiceBusConnectionString);
                     });
                     services.AddSingleton<IDynamicHelper, DynamicHelper>();
                     services.Configure<LoggerFilterOptions>(options =>

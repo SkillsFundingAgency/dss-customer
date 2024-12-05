@@ -2,6 +2,7 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NCS.DSS.Customer.Models;
 using System.Net;
 using System.Text.Json;
@@ -12,14 +13,21 @@ namespace NCS.DSS.Customer.Cosmos.Provider
     public class CosmosDBProvider : ICosmosDBProvider
     {
         private readonly Container _container;
-        private readonly string _databaseId = Environment.GetEnvironmentVariable("DatabaseId");
-        private readonly string _containerId = Environment.GetEnvironmentVariable("CollectionId");
+        private readonly Container _subscriptionContainer;
+        private readonly Container _digialIdentityContainer;
         private readonly ILogger<CosmosDBProvider> _logger;
-        public CosmosDBProvider(CosmosClient cosmosClient,ILogger<CosmosDBProvider> logger)
+        public CosmosDBProvider(CosmosClient cosmosClient,
+            IOptions<CustomerConfigurationSettings> configOptions,
+            ILogger<CosmosDBProvider> logger)
         {
-            _container = cosmosClient.GetContainer(_databaseId, _containerId);
+            var config = configOptions.Value;
+            _container = GetContainer(cosmosClient, config.DatabaseId,config.CollectionId);
+            _subscriptionContainer = GetContainer(cosmosClient, config.SubscriptionDatabaseId, config.SubscriptionCollectionId); 
+            _digialIdentityContainer = GetContainer(cosmosClient, config.DigitalIdentityDatabaseId, config.DigitalIdentityCollectionId);
             _logger = logger;
         }
+        private static Container GetContainer(CosmosClient cosmosClient, string databaseId, string collectionId)
+            => cosmosClient.GetContainer(databaseId, collectionId);
         public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
             try
@@ -208,7 +216,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
 
                 if (!customer.LastModifiedDate.HasValue)
                     subscription.LastModifiedDate = DateTime.Now;
-                var response = await _container.CreateItemAsync(subscription, null);
+                var response = await _subscriptionContainer.CreateItemAsync(subscription, null);
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
                     _logger.LogInformation("Subscription Record Created in Cosmos DB for Customer with ID {CustomerID}", customer.CustomerId);
@@ -231,7 +239,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         {
             try
             {
-                var query = _container.GetItemLinqQueryable<DigitalIdentity>()
+                var query = _digialIdentityContainer.GetItemLinqQueryable<DigitalIdentity>()
                                 .Where(x => x.CustomerId == customerId)
                                 .ToFeedIterator();
                 if (query == null)
@@ -260,7 +268,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
         {
             try
             {
-                var response = await _container.ReplaceItemAsync(digitalIdentity, digitalIdentity.IdentityID.ToString());
+                var response = await _digialIdentityContainer.ReplaceItemAsync(digitalIdentity, digitalIdentity.IdentityID.ToString());
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     _logger.LogInformation("Digital Identity Record Updated in Cosmos DB for {DigiID}", digitalIdentity.IdentityID);
