@@ -104,10 +104,10 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 log.LogInformation($"Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
-            catch (Exception ex)
+            catch
             {
-                var response = new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, ["TargetSite"]));
-                log.LogError($"Response Status Code: [{response.StatusCode}]. Unable to retrieve body from req", ex);
+                var response = new UnprocessableEntityObjectResult(req);
+                log.LogWarning($"Response Status Code: [{response.StatusCode}]. Unable to retrieve the body from the request");
                 return response;
             }
 
