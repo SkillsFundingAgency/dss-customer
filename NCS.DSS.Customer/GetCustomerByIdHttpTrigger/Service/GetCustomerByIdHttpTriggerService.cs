@@ -4,8 +4,8 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Service
 {
     public class GetCustomerByIdHttpTriggerService : IGetCustomerByIdHttpTriggerService
     {
-        private readonly IDocumentDBProvider _documentDbProvider;
-        public GetCustomerByIdHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        private readonly ICosmosDBProvider _documentDbProvider;
+        public GetCustomerByIdHttpTriggerService(ICosmosDBProvider documentDbProvider)
         {
             _documentDbProvider = documentDbProvider;
         }
