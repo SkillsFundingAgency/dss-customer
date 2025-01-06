@@ -1,6 +1,7 @@
 ﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.ReferenceData;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -10,7 +11,7 @@ namespace NCS.DSS.Customer.Models
     {
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
+        [JsonProperty(PropertyName = "id")]
         public Guid? CustomerId { get; set; }
 
         [Display(Description = "Date and time the customer was first recognised by the National Careers Service")]
@@ -97,7 +98,7 @@ namespace NCS.DSS.Customer.Models
         [Newtonsoft.Json.JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string CreatedBy { get; set; }
 
         public void SetDefaultValues()

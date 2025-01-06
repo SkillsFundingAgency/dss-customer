@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Moq;
 using NCS.DSS.Customer.Cosmos.Provider;
@@ -21,8 +22,8 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
     {
         private IPatchCustomerHttpTriggerService _patchCustomerHttpTrigger;
         private Mock<ICustomerPatchService> _customerPatchService;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
-        private Mock<IServiceBusClient> _sbus;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
+        private Mock<ICustomerServiceBusClient> _sbus;
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
         private string _json;
@@ -33,9 +34,9 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _customerPatchService = new Mock<ICustomerPatchService>();
-            _sbus = new Mock<IServiceBusClient>();
+            _sbus = new Mock<ICustomerServiceBusClient>();
             _patchCustomerHttpTrigger = new PatchCustomerHttpTriggerService(_customerPatchService.Object, _documentDbProvider.Object, _sbus.Object);
             _customer = new Models.Customer();
             _customerPatch = new CustomerPatch();
@@ -70,7 +71,7 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsNullWhenResourceCannotBeUpdated()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult<ResourceResponse<Document>>(null));
+            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult<ItemResponse<Models.Customer>>(null));
 
             // Act
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
@@ -82,30 +83,12 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
         [Test]
         public async Task PatchCustomerHttpTriggerServiceTests_UpdateCosmosAsync_ReturnsResourceWhenUpdated()
         {
-            // Arrange
-            const string documentServiceResponseClass = "Microsoft.Azure.Documents.DocumentServiceResponse, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
-            const string dictionaryNameValueCollectionClass = "Microsoft.Azure.Documents.Collections.DictionaryNameValueCollection, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
-
-            var resourceResponse = new ResourceResponse<Document>(new Document());
-            var documentServiceResponseType = Type.GetType(documentServiceResponseClass);
-
-            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
-
-            var headers = new NameValueCollection { { "x-ms-request-charge", "0" } };
-
-            var headersDictionaryType = Type.GetType(dictionaryNameValueCollectionClass);
-
-            var headersDictionaryInstance = Activator.CreateInstance(headersDictionaryType, headers);
-
-            var arguments = new[] { Stream.Null, headersDictionaryInstance, HttpStatusCode.OK, null };
-
-            var documentServiceResponse = documentServiceResponseType.GetTypeInfo().GetConstructors(flags)[0].Invoke(arguments);
-
-            var responseField = typeof(ResourceResponse<Document>).GetTypeInfo().GetField("response", flags);
-
-            responseField?.SetValue(resourceResponse, documentServiceResponse);
-
-            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult(resourceResponse));
+            //Arrange
+            var resourceResponse = new Mock<ItemResponse<Models.Customer>>();
+            resourceResponse.Setup(x => x.Resource).Returns(_customer);
+            resourceResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.OK);
+            
+            _documentDbProvider.Setup(x => x.UpdateCustomerAsync(_customerString, _customerId)).Returns(Task.FromResult(resourceResponse.Object));
 
             // Act
             var result = await _patchCustomerHttpTrigger.UpdateCosmosAsync(_customerString, _customerId);
