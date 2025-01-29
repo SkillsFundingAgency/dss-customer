@@ -62,7 +62,7 @@
         "SubscriptionCollectionId": "subscriptions",
         "SubscriptionDatabaseId": "subscriptions",
         "DigitalIdentityDatabaseId": "digitalidentities",
-        "DigitalIdentityCollectionId": "digitalidentities",
+        "DigitalIdentityCollectionId": "digitalidentities"
       },
       "copy": {
         "name": "FunctionAppSettingsCopy",
