@@ -1,6 +1,6 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "environmentName": {
       "value": "__environmentName__"
@@ -9,7 +9,10 @@
       "value": []
     },
     "appInsightsInstrumentationKey": {
-      "value": "__appInsightsInstrumentationKey__" 
+      "value": "__appInsightsInstrumentationKey__"
+    },
+    "keyVaultName": {
+      "value": "__SharedKeyVaultName__"
     }
   }
 }
