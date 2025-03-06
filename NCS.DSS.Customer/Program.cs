@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -57,7 +58,9 @@ namespace NCS.DSS.Customer
                         {
                             ConnectionMode = ConnectionMode.Gateway
                         };
-                        return new CosmosClient(settings.CustomerConnectionString, options);
+
+                        var credential = new DefaultAzureCredential();
+                        return new CosmosClient(configuration["cosmosDbEndpoint"], credential, options);
                     });
                     services.AddSingleton(serviceProvider =>
                     {
