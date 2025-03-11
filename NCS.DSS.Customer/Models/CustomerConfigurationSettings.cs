@@ -8,6 +8,7 @@ namespace NCS.DSS.Customer.Models
 {
     public class CustomerConfigurationSettings
     {
+        public required string CosmosDbEndpoint { get; set; }
         public required string CustomerConnectionString { get; set; }
         public required string QueueName { get; set; }
         public required string ServiceBusConnectionString { get; set; }

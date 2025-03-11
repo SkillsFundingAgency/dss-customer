@@ -53,14 +53,14 @@ namespace NCS.DSS.Customer
                     services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton(sp =>
                     {
-                        var settings = sp.GetRequiredService<IOptions<CustomerConfigurationSettings>>().Value;
-                        var options = new CosmosClientOptions()
+                        var cosmosDbEndpoint = configuration["CosmosDbEndpoint"];
+                        if (string.IsNullOrEmpty(cosmosDbEndpoint))
                         {
-                            ConnectionMode = ConnectionMode.Gateway
-                        };
+                            throw new InvalidOperationException("CosmosDbEndpoint is not configured.");
+                        }
 
-                        var credential = new DefaultAzureCredential();
-                        return new CosmosClient(configuration["cosmosDbEndpoint"], credential, options);
+                        var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
+                        return new CosmosClient(cosmosDbEndpoint, new DefaultAzureCredential(), options);
                     });
                     services.AddSingleton(serviceProvider =>
                     {

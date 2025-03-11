@@ -40,6 +40,9 @@
     },
     "keyVaultName": {
       "type": "string"
+    },
+    "CosmosDbEndpoint": {
+      "type": "string"
     }
   },
   "resources": [
@@ -65,7 +68,8 @@
         "SubscriptionCollectionId": "subscriptions",
         "SubscriptionDatabaseId": "subscriptions",
         "DigitalIdentityDatabaseId": "digitalidentities",
-        "DigitalIdentityCollectionId": "digitalidentities"
+        "DigitalIdentityCollectionId": "digitalidentities",
+        "CosmosDbEndpoint": "[parameters('CosmosDbEndpoint')]"
       },
       "copy": {
         "name": "FunctionAppSettingsCopy",
