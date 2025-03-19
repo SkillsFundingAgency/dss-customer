@@ -15,7 +15,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
         }
 
         [Function("SyncDataForCustomerSearchTrigger")]
-        public async Task RunAsync(
+        public async Task Run(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
             IReadOnlyList<Models.CustomerDocument> documents)
