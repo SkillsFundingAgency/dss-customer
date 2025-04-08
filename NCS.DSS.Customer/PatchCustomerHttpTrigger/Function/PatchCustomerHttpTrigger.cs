@@ -75,6 +75,17 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 return response;
             }
 
+            //get last 3 letters of string
+            var substr = touchpointId.Substring(touchpointId.Length - 3);
+
+            //check if first letter of new string is 1 and return badrequest
+            if (substr[0] == '1')
+            {
+                var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
+                log.LogWarning("Response status code: {StatusCode}. Invaled 'TouchpointId' used in request header", response.StatusCode);
+                return response;
+            }
+
             var ApimURL = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(ApimURL))
             {

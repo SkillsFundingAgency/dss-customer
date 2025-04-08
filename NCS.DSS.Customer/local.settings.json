@@ -1,0 +1,28 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    //Cosmos DB
+    "CollectionId": "customers",
+    "DatabaseId": "customers",
+    "SubscriptionDatabaseId": "subscriptions",
+    "SubscriptionCollectionId": "subscriptions",
+    "DigitalIdentityDatabaseId": "digitalidentities",
+    "DigitalIdentityCollectionId": "digitalidentities",
+    //Change Feed
+    "LeaseCollectionName": "customer-lease",
+    "LeaseCollectionPrefix": "customerChangeFeedPrefix",
+    "ChangeFeedQueueName": "dss.changefeedqueue",
+    //Service Bus
+    "QueueName": "dss.contentqueue",
+    "ServiceBusConnectionString": "Endpoint=sb://dss-at-shared-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=82ub212310",
+    //Azure Search
+    "SearchServiceName": "dss-at-shared-sch",
+    "SearchServiceAdminApiKey": "83ssif92",
+    "CustomerSearchIndexName": "customer-search-index",
+    //ConnectionStrings
+    "CustomerConnectionString": "AccountEndpoint=https://dss-at-shared-cdb.documents.azure.com:443/;AccountKey=2823u12323djjd2923;Database=customers;"
+  }
+}
