@@ -13,14 +13,14 @@ namespace NCS.DSS.Customer.Tests.ServiceTests
     {
 
         private IGetCustomerByIdHttpTriggerService _customerByIdHttpTriggerService;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
         private Models.Customer _customer;
         private readonly Guid _customerId = Guid.Parse("58b43e3f-4a50-4900-9c82-a14682ee90fa");
 
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _customerByIdHttpTriggerService = new GetCustomerByIdHttpTriggerService(_documentDbProvider.Object);
             _customer = new Models.Customer();
         }

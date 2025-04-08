@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 
 namespace NCS.DSS.Customer.Models
 {
-    public class CustomerSearch
+    public class CustomerDocument
     {
+        public Guid? id { get; set; }
+
         public Guid? CustomerId { get; set; }
 
         public DateTime? DateOfRegistration { get; set; }

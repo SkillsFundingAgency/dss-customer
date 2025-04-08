@@ -2,7 +2,7 @@
 
 namespace NCS.DSS.Customer.ServiceBus
 {
-    public interface IServiceBusClient
+    public interface ICustomerServiceBusClient
     {
         Task SendPostMessageAsync(Models.Customer customer, string reqUrl);
         Task SendPatchMessageAsync(CustomerPatch customerPatch, Guid customerId, string reqUrl);

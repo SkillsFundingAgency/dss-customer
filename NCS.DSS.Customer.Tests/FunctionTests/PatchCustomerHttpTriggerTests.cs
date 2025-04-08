@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Customer.Cosmos.Helper;
 using NCS.DSS.Customer.Cosmos.Provider;
 using NCS.DSS.Customer.Helpers;
 using NCS.DSS.Customer.Models;
@@ -26,9 +25,9 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
     {
         private const string ValidCustomerId = "7E467BDB-213F-407A-B86A-1954053D3C24";
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
-        private Mock<ILogger> _log;
+       
         private HttpRequest _request;
-        private Mock<IResourceHelper> _resourceHelper;
+        private Mock<ICosmosDBProvider> _cosmosProvider;
         private IValidate _validate;
         private Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>> _logger;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
@@ -38,7 +37,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         private Models.Customer _customer;
         private CustomerPatch _customerPatch;
         private string _customerString;
-        private Mock<IDocumentDBProvider> _provider;
+        private Mock<ICosmosDBProvider> _provider;
         private PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger _function;
         private Mock<IDynamicHelper> _dynamicHelper;
 
@@ -49,8 +48,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _customerPatch = new CustomerPatch();
             _request = new DefaultHttpContext().Request;
 
-            _log = new Mock<ILogger>();
-            _resourceHelper = new Mock<IResourceHelper>();
+            _cosmosProvider = new Mock<ICosmosDBProvider>();
             _validate = new Validate();
             _logger = new Mock<ILogger<PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger>>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
@@ -58,11 +56,11 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _jsonHelper = new JsonHelper();
             _patchCustomerHttpTriggerService = new Mock<IPatchCustomerHttpTriggerService>();
             _customerString = JsonConvert.SerializeObject(_customer);
-            _provider = new Mock<IDocumentDBProvider>();
+            _provider = new Mock<ICosmosDBProvider>();
             _dynamicHelper = new Mock<IDynamicHelper>();
 
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
-                _resourceHelper.Object,
+                _cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 _validate,
                 _patchCustomerHttpTriggerService.Object,
@@ -107,7 +105,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             var val = new Mock<IValidate>();
             val.Setup(x => x.ValidateResource(It.IsAny<CustomerPatch>(), It.IsAny<bool>())).Returns(validationResults);
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
-                _resourceHelper.Object,
+                _cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
                 _patchCustomerHttpTriggerService.Object,
@@ -115,7 +113,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
                 _logger.Object,
                 _provider.Object,
                 _dynamicHelper.Object);
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -147,7 +145,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExist()
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -163,7 +161,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExistWhenCalledByService()
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -180,7 +178,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeBadRequest_WhenUnableToUpdateCustomerRecord()
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -198,7 +196,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsValid()
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -220,7 +218,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             // Arrange
             _customerPatch = new CustomerPatch { IntroducedByAdditionalInfo = additionalInfo };
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -247,7 +245,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             // Arrange
             _customerPatch = new CustomerPatch { IntroducedByAdditionalInfo = additionalInfo };
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<CustomerPatch>(_request)).Returns(Task.FromResult(_customerPatch));
@@ -267,7 +265,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenSubcontractorIdRequestIsInValid(string subcontractorId)
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
@@ -293,7 +291,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
         public async Task PatchCustomerHttpTrigger_ReturnsStatusCodeOK_WhenSubcontractorIdRequestIsValid(string subcontractorId)
         {
             // Arrange
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _cosmosProvider.Setup(x => x.DoesCustomerResourceExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns(subcontractorId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");

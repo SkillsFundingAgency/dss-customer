@@ -1,91 +1,85 @@
-using Azure;
 using Azure.Search.Documents.Models;
-using DFC.Common.Standard.Logging;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Customer.Helpers;
-using NCS.DSS.Customer.ReferenceData;
-using Document = Microsoft.Azure.Documents.Document;
+using System.Text.Json;
 
 namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
 {
     public class CustomerSearchDataSyncTrigger
     {
-        private readonly ILoggerHelper _loggerHelper;
-        private readonly ILogger<CustomerSearchDataSyncTrigger> _log;
-        public CustomerSearchDataSyncTrigger(ILoggerHelper loggerHelper, ILogger<CustomerSearchDataSyncTrigger> log)
+        private readonly ILogger<CustomerSearchDataSyncTrigger> _logger;
+        public CustomerSearchDataSyncTrigger( ILogger<CustomerSearchDataSyncTrigger> logger)
         {
-            _loggerHelper = loggerHelper;
-            _log = log;
+            _logger = logger;
         }
 
         [Function("SyncDataForCustomerSearchTrigger")]
         public async Task Run(
             [CosmosDBTrigger("customers", "customers", ConnectionStringSetting = "CustomerConnectionString",
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Document> documents)
+            IReadOnlyList<Models.CustomerDocument> documents)
         {
-            var correlationId = Guid.NewGuid();
+            _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
-            _loggerHelper.LogMethodEnter(_log);
+            _logger.LogInformation("Attempting get Search Service Client");
 
             var client = SearchHelper.GetSearchServiceClient();
 
-            _loggerHelper.LogInformationMessage(_log, correlationId, "get search service client");
-
-
-            _loggerHelper.LogInformationMessage(_log, correlationId, "get index client");
-
-            _loggerHelper.LogInformationMessage(_log, correlationId, "Documents modified " + documents.Count);
+            _logger.LogInformation("Number of Documents modified in Cosmos DB : {count}",documents.Count);
 
             if (documents.Count > 0)
-            {
-                var customers = documents.Select(doc => new Models.CustomerSearch()
-                {
-                    CustomerId = doc.GetPropertyValue<Guid?>("id"),
-                    DateOfRegistration = doc.GetPropertyValue<DateTime?>("DateOfRegistration"),
-                    Title = doc.GetPropertyValue<Title>("Title"),
-                    GivenName = doc.GetPropertyValue<string>("GivenName"),
-                    FamilyName = doc.GetPropertyValue<string>("FamilyName"),
-                    DateofBirth = doc.GetPropertyValue<DateTime?>("DateofBirth"),
-                    Gender = doc.GetPropertyValue<Gender?>("Gender"),
-                    UniqueLearnerNumber = doc.GetPropertyValue<string>("UniqueLearnerNumber"),
-                    OptInUserResearch = doc.GetPropertyValue<bool?>("OptInUserResearch"),
-                    OptInMarketResearch = doc.GetPropertyValue<bool?>("OptInMarketResearch"),
-                    DateOfTermination = doc.GetPropertyValue<DateTime?>("DateOfTermination"),
-                    ReasonForTermination = doc.GetPropertyValue<ReasonForTermination?>("ReasonForTermination"),
-                    IntroducedBy = doc.GetPropertyValue<IntroducedBy?>("IntroducedBy"),
-                    IntroducedByAdditionalInfo = doc.GetPropertyValue<string>("IntroducedByAdditionalInfo"),
-                    LastModifiedDate = doc.GetPropertyValue<DateTime?>("LastModifiedDate"),
-                    LastModifiedTouchpointId = doc.GetPropertyValue<string>("LastModifiedTouchpointId")
-                })
-                    .ToList();
-
-                var batch = IndexDocumentsBatch.MergeOrUpload(customers);
-
-
+            { 
                 try
-                {
-                    _log.LogInformation("attempting to merge docs to azure search");
-
-                    var results = await client.IndexDocumentsAsync(batch);
-
-                    var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
-
-                    if (failed.Count > 0)
+                {      
+                    var customers = new List<Models.CustomerSearch>();
+                    foreach (var doc in documents)
                     {
-                        _loggerHelper.LogInformationMessage(_log, correlationId, string.Format("Failed to index some of the documents: {0}", string.Join(", ", failed)));
+                        var custJson = JsonSerializer.Serialize(doc);
+                        var customer = JsonSerializer.Deserialize<Models.CustomerSearch>(custJson);
+                        if(doc.CustomerId == null && doc.id != null)
+                            customer.CustomerId = doc.id;
+                        else if(doc.id == null && doc.CustomerId != null)
+                            customer.CustomerId = doc.CustomerId;
+
+                        customers.Add(customer);
                     }
+                    var custFiltered = customers.Where(d => d.CustomerId != null);
+                    if (custFiltered.Any())
+                    {
 
-                    _log.LogInformation("successfully merged docs to azure search");
+                        _logger.LogInformation("Attempting to Merge / Upload documents with IDs ({Ids}) to azure search", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
+                        var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
 
+                        _logger.LogInformation("Attempting to Index documents to azure search");
+                        var results = await client.IndexDocumentsAsync(batch);
+
+                        var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
+
+                        if (failed.Count > 0)
+                        {
+                            _logger.LogWarning("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
+                        }
+                        else { 
+                            _logger.LogInformation("Successfully Merged and Indexed documnets to azure search");
+                        }                        
+                    }
+                    var custFailed = customers.Where(d => d.CustomerId == null);
+                    if (custFailed.Any())
+                    {
+                        foreach (var doc in custFailed.Where(d => d.CustomerId == null))
+                        {
+                            _logger.LogWarning("{Doc} missing Document Key (CustomerId) ", JsonSerializer.Serialize(doc));
+                        }
+                    }
                 }
-                catch (RequestFailedException e)
+                catch (Exception e)
                 {
-                    _loggerHelper.LogException(_log, correlationId, e);
-
-                }
-            }
+                    _logger.LogError(e,"Request failed Excpetion with {error}", e.Message);
+                    throw;
+                }               
+            } 
+            _logger.LogInformation("{functionName} exited", nameof(CustomerSearchDataSyncTrigger));
         }
     }
 }
