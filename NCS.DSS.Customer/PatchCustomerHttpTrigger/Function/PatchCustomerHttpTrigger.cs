@@ -191,23 +191,6 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                     await _provider.UpdateIdentityAsync(di);
                 }
 
-                //only interested in digitial identities that have a identitystoreid
-                //e.g. ones that have had their corresponding accounts created in Azure B2C
-                if (di.IdentityStoreId.HasValue)
-                {
-                    //mark patch request as a di account
-                    customerPatchRequest.SetUpdateDigitalAccount(di.IdentityStoreId.Value);
-
-                    var updated = await _provider.UpdateIdentityAsync(di);
-
-                    //if digital identity was updated successfully, then mark request as a di
-                    //so that it can be queued up for deletetion on azure service bus.
-                    if (updated != null && customerPatchRequest.DateOfTermination.HasValue)
-                    {
-                        customerPatchRequest.SetDeleteDigitalIdentity();
-                    }
-                }
-
             }
 
             if (updatedCustomer != null)
