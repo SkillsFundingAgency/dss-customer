@@ -14,6 +14,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
     {
         private readonly Container _container;
         private readonly Container _subscriptionContainer;
+        private readonly Container _digialIdentityContainer;
         private readonly ILogger<CosmosDBProvider> _logger;
         public CosmosDBProvider(CosmosClient cosmosClient,
             IOptions<CustomerConfigurationSettings> configOptions,
@@ -22,6 +23,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             var config = configOptions.Value;
             _container = GetContainer(cosmosClient, config.DatabaseId,config.CollectionId);
             _subscriptionContainer = GetContainer(cosmosClient, config.SubscriptionDatabaseId, config.SubscriptionCollectionId); 
+            _digialIdentityContainer = GetContainer(cosmosClient, config.DigitalIdentityDatabaseId, config.DigitalIdentityCollectionId);
             _logger = logger;
         }
         private static Container GetContainer(CosmosClient cosmosClient, string databaseId, string collectionId)
@@ -229,6 +231,58 @@ namespace NCS.DSS.Customer.Cosmos.Provider
             catch (CosmosException ce)
             {
                 _logger.LogError(ce,"Failed to Create Subscription Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}.", customer.CustomerId, ce.Message);
+                throw;
+            }
+        }
+
+        public async Task<DigitalIdentity> GetIdentityForCustomerAsync(Guid customerId)
+        {
+            try
+            {
+                var query = _digialIdentityContainer.GetItemLinqQueryable<DigitalIdentity>()
+                                .Where(x => x.CustomerId == customerId)
+                                .ToFeedIterator();
+                if (query == null)
+                    return null;
+                if (query.HasMoreResults)
+                {
+                    var digitalIdentity = await query.ReadNextAsync();
+                    _logger.LogInformation("Digital Identity Record found in Cosmos DB for Customer with ID {CustomerID}", customerId);
+                    return digitalIdentity?.FirstOrDefault();
+                }
+                else
+                {
+                    _logger.LogError("Failed to Retrieve Digital Identity Record in Cosmos DB for Customer with ID {CustomerID}", customerId);
+                    return null;
+                }
+            }
+            catch (CosmosException ce)
+            {
+                _logger.LogError(ce,"Failed to Retrieve Digital Identity Record in Cosmos DB for Customer with ID {CustomerID}. Exception {Exception}.", customerId, ce.Message);
+                throw;
+            }
+            
+        }
+
+        public async Task<DigitalIdentity> UpdateIdentityAsync(DigitalIdentity digitalIdentity)
+        {
+            try
+            {
+                var response = await _digialIdentityContainer.ReplaceItemAsync(digitalIdentity, digitalIdentity.IdentityID.ToString());
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    _logger.LogInformation("Digital Identity Record Updated in Cosmos DB for {DigiID}", digitalIdentity.IdentityID);
+                }
+                else
+                {
+                    _logger.LogInformation("Failed and returned {StatusCode} to Update Digital Identity Record in Cosmos DB for {DigiID}", response.StatusCode, digitalIdentity.IdentityID);
+                }
+                return response.Resource;
+            }
+            catch (CosmosException ce)
+            {
+                _logger.LogError(ce,"Failed to Update Digital Identity Record in Cosmos DB with ID {DigId}. Exception {Exception}.", digitalIdentity.IdentityID, ce.Message);
+
                 throw;
             }
         }

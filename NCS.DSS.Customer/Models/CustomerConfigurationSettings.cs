@@ -13,6 +13,8 @@ namespace NCS.DSS.Customer.Models
         public required string ServiceBusConnectionString { get; set; }
         public required string DatabaseId { get; set; }
         public required string CollectionId { get; set; }
+        public required string DigitalIdentityDatabaseId { get; set; }
+        public required string DigitalIdentityCollectionId { get; set; }
         public required string SubscriptionCollectionId { get; set; }
         public required string SubscriptionDatabaseId { get; set; }
     }
