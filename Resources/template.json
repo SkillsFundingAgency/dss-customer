@@ -63,9 +63,7 @@
         "SearchServiceName": "[parameters('searchServiceName')]",
         "SearchServiceAdminApiKey": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedSearchAdminKey)', parameters('keyVaultName'))]",
         "SubscriptionCollectionId": "subscriptions",
-        "SubscriptionDatabaseId": "subscriptions",
-        "DigitalIdentityDatabaseId": "digitalidentities",
-        "DigitalIdentityCollectionId": "digitalidentities"
+        "SubscriptionDatabaseId": "subscriptions"
       },
       "copy": {
         "name": "FunctionAppSettingsCopy",
