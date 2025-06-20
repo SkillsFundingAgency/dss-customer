@@ -53,7 +53,6 @@ namespace NCS.DSS.Customer
                     services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton(sp =>
                     {
-                        var configuration = sp.GetRequiredService<IConfiguration>();
                         var logger = sp.GetRequiredService<ILogger<Program>>();
 
                         var connectionString = configuration["CustomerConnectionString"];
