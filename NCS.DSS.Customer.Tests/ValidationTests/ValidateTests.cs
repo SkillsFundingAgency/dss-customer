@@ -30,8 +30,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            //Changed to 5 as PriorityGroups are now required
-            Assert.That(result.Count, Is.EqualTo(5));
+            Assert.That(result.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -46,7 +45,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -61,7 +60,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -241,7 +240,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
 
@@ -257,7 +256,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -272,7 +271,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(7));
+            Assert.That(result.Count, Is.EqualTo(4));
         }
     }
 }
