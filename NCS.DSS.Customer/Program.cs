@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -52,12 +53,30 @@ namespace NCS.DSS.Customer
                     services.AddTransient<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton(sp =>
                     {
-                        var settings = sp.GetRequiredService<IOptions<CustomerConfigurationSettings>>().Value;
-                        var options = new CosmosClientOptions()
+                        var logger = sp.GetRequiredService<ILogger<Program>>();
+
+                        var connectionString = configuration["CustomerConnectionString"];
+                        var endpoint = configuration["CosmosDbEndpoint"];
+
+                        var options = new CosmosClientOptions
                         {
                             ConnectionMode = ConnectionMode.Gateway
                         };
-                        return new CosmosClient(settings.CustomerConnectionString, options);
+
+                        if (!string.IsNullOrWhiteSpace(endpoint))
+                        {
+                            logger.LogInformation("Using DefaultAzureCredential for Cosmos DB (managed identity)");
+                            return new CosmosClient(endpoint, new DefaultAzureCredential(), options);
+                        }
+                        else if (!string.IsNullOrWhiteSpace(connectionString))
+                        {
+                            logger.LogInformation("No managed identity found: using Cosmos DB connection string (local development)");
+                            return new CosmosClient(connectionString, options);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Neither CosmosDbEndpoint or a ConnectionString are configured");
+                        }
                     });
                     services.AddSingleton(serviceProvider =>
                     {
