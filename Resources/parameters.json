@@ -1,27 +1,21 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
-    "templateBaseUrl": {
-      "value": "https://raw.githubusercontent.com/SkillsFundingAgency/cdh-central/master/Resources/"
-    },
     "environmentName": {
-      "value": ""
+      "value": "__environmentName__"
     },
     "functionAppNames": {
       "value": []
     },
-    "sharedAppServicePlanName": {
-      "value": ""
+    "appInsightsInstrumentationKey": {
+      "value": "__appInsightsInstrumentationKey__"
     },
-    "sharedAppServicePlanResourceGroup": {
-      "value": ""
+    "keyVaultName": {
+      "value": "__SharedKeyVaultName__"
     },
-    "workspaceName": {
-      "value": "__sharedLogAnalyticsWorkspace__"
-    },
-    "workspaceResourceGroup": {
-      "value": "__sharedLogAnalyticsResourceGroup__"
+    "CosmosDbEndpoint": {
+      "value": "__CosmosDbEndpoint__"
     }
   }
 }

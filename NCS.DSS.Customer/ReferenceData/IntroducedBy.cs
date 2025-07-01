@@ -54,6 +54,10 @@ namespace NCS.DSS.Customer.ReferenceData
         WorldSkillsUKLive = 24,
         [Description("NationalRetrainingScheme")]
         NationalRetrainingScheme = 25,
+        [Description("Job Centre Plus WITH Data")]
+        JCPWithData = 27,
+        [Description("Job Centre Plus WITHOUT Data")]
+        JCPWithoutData = 28,
         [Description("Other")]
         Other = 98,
         [Description("Not provided")]
