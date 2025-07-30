@@ -76,12 +76,8 @@ namespace NCS.DSS.Customer.ServiceBus
                     URL = reqUrl,
                     IsNewCustomer = false,
                     TouchpointId = customerPatch.LastModifiedTouchpointId,
-                    IsDigitalAccount = customerPatch.IsDigitalAccount,
-                    UpdateDigitalIdentity = customerPatch.UpdateDigitalIdentity,
                     FirstName = customerPatch.GivenName,
                     LastName = customerPatch.FamilyName,
-                    IdentityStoreId = customerPatch.IdentityStoreId,
-                    DeleteDigitalIdentity = customerPatch.DeleteDigitalIdentity
                 };
 
                 var msg = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
@@ -111,12 +107,8 @@ namespace NCS.DSS.Customer.ServiceBus
             public string URL { get; set; }
             public bool IsNewCustomer { get; set; }
             public string TouchpointId { get; set; }
-            public bool? IsDigitalAccount { get; set; }
-            public bool? UpdateDigitalIdentity { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
-            public Guid? IdentityStoreId { get; set; }
-            public bool? DeleteDigitalIdentity { get; set; }
         }
 
         private async Task AutoSubscribeCustomer(Models.Customer customer)
