@@ -87,15 +87,6 @@ namespace NCS.DSS.Customer.Models
         [JsonConverter(typeof(PriorityGroupConverter))]
         public List<PriorityCustomer> PriorityGroups { get; set; }
 
-        [JsonIgnore]
-        public bool? IsDigitalAccount { get; private set; }
-        [JsonIgnore]
-        public bool? DeleteDigitalIdentity { get; private set; }
-        [JsonIgnore]
-        public bool? UpdateDigitalIdentity { get; private set; }
-        [JsonIgnore]
-        public Guid? IdentityStoreId { get; private set; }
-
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
@@ -103,19 +94,6 @@ namespace NCS.DSS.Customer.Models
 
             if (DateOfTermination.HasValue && ReasonForTermination == null)
                 ReasonForTermination = ReferenceData.ReasonForTermination.Other;
-        }
-
-        public void SetDeleteDigitalIdentity()
-        {
-            UpdateDigitalIdentity = false;
-            DeleteDigitalIdentity = true;
-        }
-
-        public void SetUpdateDigitalAccount(Guid identityStoreId)
-        {
-            IsDigitalAccount = true;
-            UpdateDigitalIdentity = true;
-            IdentityStoreId = identityStoreId;
         }
 
         public void SetIds(string touchpointId, string subcontractorId)
