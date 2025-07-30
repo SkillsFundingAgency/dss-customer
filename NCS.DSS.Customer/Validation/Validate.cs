@@ -23,19 +23,6 @@ namespace NCS.DSS.Customer.Validation
             if (customerResource == null)
                 return;
 
-            if (validateModelForPost)
-            {
-                if (string.IsNullOrWhiteSpace(customerResource.FamilyName))
-                    results.Add(new ValidationResult("Family Name is a required field", new[] { "FamilyName" }));
-
-                if (string.IsNullOrWhiteSpace(customerResource.GivenName))
-                    results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
-            }
-
-
-            if (!customerResource.IntroducedBy.HasValue)
-                results.Add(new ValidationResult("Introduced By is a required field", new[] { "IntroducedBy" }));
-
             if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
                 results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));
 
