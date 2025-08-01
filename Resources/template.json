@@ -40,6 +40,9 @@
     },
     "keyVaultName": {
       "type": "string"
+    },
+    "CosmosDbEndpoint": {
+      "type": "string"
     }
   },
   "resources": [
@@ -61,11 +64,9 @@
         "ServiceBusConnectionString": "[parameters('serviceBusConnectionString')]",
         "QueueName": "[parameters('serviceBusQueueName')]",
         "SearchServiceName": "[parameters('searchServiceName')]",
-        "SearchServiceAdminApiKey": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedStorageAccountConnectionString)', parameters('keyVaultName'))]",
+        "SearchServiceAdminApiKey": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedSearchAdminKey)', parameters('keyVaultName'))]",
         "SubscriptionCollectionId": "subscriptions",
-        "SubscriptionDatabaseId": "subscriptions",
-        "DigitalIdentityDatabaseId": "digitalidentities",
-        "DigitalIdentityCollectionId": "digitalidentities"
+        "SubscriptionDatabaseId": "subscriptions"
       },
       "copy": {
         "name": "FunctionAppSettingsCopy",
