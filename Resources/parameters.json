@@ -13,6 +13,9 @@
     },
     "keyVaultName": {
       "value": "__SharedKeyVaultName__"
+    },
+    "CosmosDbEndpoint": {
+      "value": "__CosmosDbEndpoint__"
     }
   }
 }

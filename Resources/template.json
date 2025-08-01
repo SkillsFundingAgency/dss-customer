@@ -40,6 +40,9 @@
     },
     "keyVaultName": {
       "type": "string"
+    },
+    "CosmosDbEndpoint": {
+      "type": "string"
     }
   },
   "resources": [
