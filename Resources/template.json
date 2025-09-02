@@ -11,9 +11,6 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
-    "customerConnectionString": {
-      "type": "string"
-    },
     "environmentName": {
       "type": "string"
     },
@@ -58,7 +55,6 @@
         "AzureWebJobsStorage": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedStorageAccountConnectionString)', parameters('keyVaultName'))]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[parameters('appInsightsInstrumentationKey')]",
         "CollectionId": "[parameters('cosmosDbCollectionId')]",
-        "CustomerConnectionString": "[parameters('customerConnectionString')]",
         "CustomerSearchIndexName": "customer-search-index-v2",
         "DatabaseId": "[parameters('cosmosDbDatabaseId')]",
         "ServiceBusConnectionString": "[parameters('serviceBusConnectionString')]",
