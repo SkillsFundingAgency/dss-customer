@@ -26,9 +26,9 @@ namespace NCS.DSS.Customer.ServiceBus
         {
             try
             {
-                _logger.LogInformation("Attempting to Create Sender for Service Bus Client");
+                _logger.LogTrace("Attempting to Create Sender for Service Bus Client");
                 var serviceBusSender = _serviceBusClient.CreateSender(QueueName);
-                _logger.LogInformation("Preparing Message for Service Bus");
+                _logger.LogTrace("Preparing Message for Service Bus");
                 var messageModel = new MessageModel()
                 {
                     TitleMessage = "New Customer record {" + customer.CustomerId + "} added at " + DateTime.UtcNow,
@@ -45,12 +45,12 @@ namespace NCS.DSS.Customer.ServiceBus
                     MessageId = customer.CustomerId + " " + DateTime.UtcNow
                 };
 
-                _logger.LogInformation("Attempting to Auto Subscribe Customer with ID {CustomerID}",customer.CustomerId);
+                _logger.LogTrace("Attempting to Auto Subscribe Customer with ID {CustomerID}",customer.CustomerId);
                 await AutoSubscribeCustomer(customer);
 
-                _logger.LogInformation("Attempting to Send Service Bus Message for Customer with ID {CustomerID}", customer.CustomerId);
+                _logger.LogTrace("Attempting to Send Service Bus Message for Customer with ID {CustomerID}", customer.CustomerId);
                 await serviceBusSender.SendMessageAsync(msg);
-                _logger.LogInformation("Service Bus Message for Customer with ID {CustomerID} has been sent successfully", customer.CustomerId);
+                _logger.LogTrace("Service Bus Message for Customer with ID {CustomerID} has been sent successfully", customer.CustomerId);
 
             }
             catch (Exception ex)
@@ -64,9 +64,9 @@ namespace NCS.DSS.Customer.ServiceBus
         {
             try
             {
-                _logger.LogInformation("Attempting to Create Sender for Service Bus Client");
+                _logger.LogTrace("Attempting to Create Sender for Service Bus Client");
                 var serviceBusSender = _serviceBusClient.CreateSender(QueueName);
-                _logger.LogInformation("Preparing Message for Service Bus");
+                _logger.LogTrace("Preparing Message for Service Bus");
 
                 var messageModel = new MessageModel
                 {
@@ -86,9 +86,9 @@ namespace NCS.DSS.Customer.ServiceBus
                     MessageId = customerId + " " + DateTime.UtcNow
                 };
 
-                _logger.LogInformation("Attempting to Send Service Bus Message for Customer with ID {CustomerID}", customerId);
+                _logger.LogTrace("Attempting to Send Service Bus Message for Customer with ID {CustomerID}", customerId);
                 await serviceBusSender.SendMessageAsync(msg);
-                _logger.LogInformation("Service Bus Message for Customer with ID {CustomerID} has been sent successfully", customerId);
+                _logger.LogTrace("Service Bus Message for Customer with ID {CustomerID} has been sent successfully", customerId);
 
 
             }

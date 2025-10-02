@@ -20,13 +20,13 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                 LeaseCollectionName = "customers-leases", CreateLeaseCollectionIfNotExists = true)]
             IReadOnlyList<Models.CustomerDocument> documents)
         {
-            _logger.LogInformation("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
+            _logger.LogTrace("{functionName} started",nameof(CustomerSearchDataSyncTrigger));
 
-            _logger.LogInformation("Attempting get Search Service Client");
+            _logger.LogTrace("Attempting get Search Service Client");
 
             var client = SearchHelper.GetSearchServiceClient();
 
-            _logger.LogInformation("Number of Documents modified in Cosmos DB : {count}",documents.Count);
+            _logger.LogTrace("Number of Documents modified in Cosmos DB : {count}",documents.Count);
 
             if (documents.Count > 0)
             { 
@@ -48,20 +48,20 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     if (custFiltered.Any())
                     {
 
-                        _logger.LogInformation("Attempting to Merge / Upload documents with IDs ({Ids}) to azure search", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
+                        _logger.LogTrace("Attempting to Merge / Upload documents with IDs ({Ids}) to azure search", string.Join(',', custFiltered.Select(d => d.CustomerId).ToArray()));
                         var batch = IndexDocumentsBatch.MergeOrUpload(custFiltered);
 
-                        _logger.LogInformation("Attempting to Index documents to azure search");
+                        _logger.LogTrace("Attempting to Index documents to azure search");
                         var results = await client.IndexDocumentsAsync(batch);
 
                         var failed = results.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key).ToList();
 
                         if (failed.Count > 0)
                         {
-                            _logger.LogWarning("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
+                            _logger.LogInformation("Failed to Index some of the documents: {errors}", string.Join(", ", failed));
                         }
                         else { 
-                            _logger.LogInformation("Successfully Merged and Indexed documnets to azure search");
+                            _logger.LogTrace("Successfully Merged and Indexed documnets to azure search");
                         }                        
                     }
                     var custFailed = customers.Where(d => d.CustomerId == null);
@@ -79,7 +79,7 @@ namespace NCS.DSS.Customer.AzureSearchDataSyncTrigger
                     throw;
                 }               
             } 
-            _logger.LogInformation("{functionName} exited", nameof(CustomerSearchDataSyncTrigger));
+            _logger.LogTrace("{functionName} exited", nameof(CustomerSearchDataSyncTrigger));
         }
     }
 }

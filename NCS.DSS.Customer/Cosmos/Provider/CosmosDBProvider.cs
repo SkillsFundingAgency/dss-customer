@@ -37,11 +37,11 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                     var response = await queryCust.ReadNextAsync();
                     if (response != null)
                     {
-                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        _logger.LogTrace("Customer Record found in Cosmos DB for {CustomerID}", customerId);
                         return true;
                     }                    
                 }
-                _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
+                _logger.LogInformation("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return false;
             }
             catch (CosmosException ce)
@@ -62,10 +62,10 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 {
                     var response = await queryCust.ReadNextAsync();    
                     var tDate = response.Resource.FirstOrDefault().DateOfTermination;
-                    _logger.LogInformation("Customer with {CustomerID} Have a termination date of {tDate} ", customerId,tDate);
+                    _logger.LogTrace("Customer with {CustomerID} Have a termination date of {tDate} ", customerId,tDate);
                     return tDate.HasValue;
                 }
-                _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
+                _logger.LogInformation("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return false;
             }
             catch (CosmosException ce)
@@ -87,7 +87,7 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                     var response = await queryCust.ReadNextAsync();
                     customers.AddRange(response);
                 }
-                _logger.LogInformation("Number of Customer Records found {Count} ", customers.Count);
+                _logger.LogTrace("Number of Customer Records found {Count} ", customers.Count);
 
                 return customers.Count != 0 ? customers : null;
             }
@@ -110,11 +110,11 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                     var response = await queryCust.ReadNextAsync();
                     if (response != null)
                     {
-                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        _logger.LogTrace("Customer Record found in Cosmos DB for {CustomerID}", customerId);
                         return response.Resource.FirstOrDefault();
                     }                    
                 }
-                _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
+                _logger.LogInformation("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return null;
             }
             catch (CosmosException ce)
@@ -136,11 +136,11 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                     if (response != null)
                     {
                         var customerJson = JsonSerializer.Serialize(response.Resource.FirstOrDefault());
-                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        _logger.LogTrace("Customer Record found in Cosmos DB for {CustomerID}", customerId);
                         return customerJson;
                     }
                 }
-                _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
+                _logger.LogInformation("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return null;
             }
             catch (CosmosException ce)
@@ -157,11 +157,11 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 var response = await _container.CreateItemAsync(customer, null);
                 if (response.StatusCode == HttpStatusCode.Created)
                 { 
-                    _logger.LogInformation("Customer Record Created in Cosmos DB for {CustomerID}", customer.CustomerId);
+                    _logger.LogTrace("Customer Record Created in Cosmos DB for {CustomerID}", customer.CustomerId);
                 }
                 else
                 {
-                    _logger.LogError("Failed and returned {StatusCode} to Create Customer Record in Cosmos DB for {CustomerID}", response.StatusCode, customer.CustomerId);
+                    _logger.LogWarning("Failed and returned {StatusCode} to Create Customer Record in Cosmos DB for {CustomerID}", response.StatusCode, customer.CustomerId);
                 }
                 return response;
             }
@@ -180,11 +180,11 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 var response = await _container.ReplaceItemAsync(customer, customerId.ToString());
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    _logger.LogInformation("Customer Record Updated in Cosmos DB for {CustomerID}", customer.CustomerId);
+                    _logger.LogTrace("Customer Record Updated in Cosmos DB for {CustomerID}", customer.CustomerId);
                 }
                 else
                 {
-                    _logger.LogError("Failed and returned {StatusCode} to Update Customer Record in Cosmos DB for {CustomerID}",response.StatusCode, customer.CustomerId);
+                    _logger.LogWarning("Failed and returned {StatusCode} to Update Customer Record in Cosmos DB for {CustomerID}",response.StatusCode, customer.CustomerId);
                 }                    
                 return response;
             }
@@ -217,12 +217,12 @@ namespace NCS.DSS.Customer.Cosmos.Provider
                 var response = await _subscriptionContainer.CreateItemAsync(subscription, null);
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
-                    _logger.LogInformation("Subscription Record Created in Cosmos DB for Customer with ID {CustomerID}", customer.CustomerId);
+                    _logger.LogTrace("Subscription Record Created in Cosmos DB for Customer with ID {CustomerID}", customer.CustomerId);
                     return response.Resource;
                 }
                 else
                 {
-                    _logger.LogError("Failed to Create Subscription Record in Cosmos DB for Customer with ID {CustomerID}. Response Code {StatusCode}. ", customer.CustomerId, response.StatusCode);
+                    _logger.LogWarning("Failed to Create Subscription Record in Cosmos DB for Customer with ID {CustomerID}. Response Code {StatusCode}. ", customer.CustomerId, response.StatusCode);
                     return null;
                 }                                    
             }
