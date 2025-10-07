@@ -44,48 +44,45 @@ namespace NCS.DSS.Customer.GetCustomerByIdHttpTrigger.Function
         {
             var functionName = nameof(GetCustomerByIdHttpTrigger);
 
-            _logger.LogInformation("Function {FunctionName} has been invoked", functionName);
+            _logger.LogTrace("Function {FunctionName} has been invoked", functionName);
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
-            if (string.IsNullOrEmpty(correlationId))
-                _logger.LogWarning("Unable to locate 'DssCorrelationId; in request header");
-
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
-                _logger.LogWarning("Unable to Parse 'DssCorrelationId' to a Guid");
+                _logger.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
                 correlationGuid = Guid.NewGuid();
             }
 
-            _logger.LogInformation("DssCorrelationId: [{correlationGuid}]", correlationGuid);
+            _logger.LogTrace("DssCorrelationId: [{correlationGuid}]", correlationGuid);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _logger.LogError("{CorrelationID} Unable to locate 'APIM-TouchpointId' in request header", correlationGuid);
+                _logger.LogInformation("{CorrelationID} Unable to locate 'APIM-TouchpointId' in request header", correlationGuid);
                 return new BadRequestObjectResult(HttpStatusCode.BadRequest);;
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _logger.LogError("{CorrelationID} Unable to parse 'customerId' to a Guid: {customerId}", correlationGuid, customerId);
+                _logger.LogInformation("{CorrelationID} Unable to parse 'customerId' to a Guid: {customerId}", correlationGuid, customerId);
                 return new BadRequestObjectResult(customerGuid);;
             }
 
-            _logger.LogInformation("{CorrelationID} Attempting to get customer {customerId}",correlationGuid, customerId);
+            _logger.LogTrace("{CorrelationID} Attempting to get customer {customerId}",correlationGuid, customerId);
             var customer = await _customerByIdService.GetCustomerAsync(customerGuid);
 
             if (customer == null)
             {
-                _logger.LogError("{CorrelationID} Customer not found {customerId}", correlationGuid, customerId);
+                _logger.LogInformation("{CorrelationID} Customer not found {customerId}", correlationGuid, customerId);
                 return new NoContentResult();;
             }
 
-            _logger.LogInformation("Function {FunctionName} has finished invoking", functionName);
+            _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
             var response = new JsonResult(customer, new JsonSerializerOptions())
             {
                 StatusCode = (int)HttpStatusCode.OK
             };
-            _logger.LogInformation("Response Status Code: {StatusCode}. Get customer succeeded", response.StatusCode);
+            _logger.LogTrace("Response Status Code: {StatusCode}. Get customer succeeded", response.StatusCode);
             return response;
 
         }

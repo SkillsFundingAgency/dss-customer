@@ -53,22 +53,19 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
         public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/")] HttpRequest req)
         {
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
-            if (string.IsNullOrEmpty(correlationId))
-                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
-
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
                 log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
                 correlationGuid = Guid.NewGuid();
             }
 
-            log.LogInformation("DssCorrelationId: {correlationGuid}",correlationId);
+            log.LogTrace("DssCorrelationId: {correlationGuid}",correlationId);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("Response status code: {StatusCode}. Unable to locate 'TouchpointId' in request header", response.StatusCode);
+                log.LogInformation("Response status code: {StatusCode}. Unable to locate 'TouchpointId' in request header", response.StatusCode);
                 return response;
             }
 
@@ -76,23 +73,23 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             if (string.IsNullOrEmpty(ApimURL))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("Response status code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
+                log.LogInformation("Response status code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
                 return response;
             }
 
-            log.LogInformation("Apimurl:  " + ApimURL);
+            log.LogTrace("Apimurl:  " + ApimURL);
 
             var subContractorId = _httpRequestHelper.GetDssSubcontractorId(req);
             if (string.IsNullOrEmpty(subContractorId))
                 log.LogInformation("Unable to locate 'SubContractorId' in request header");
 
-            log.LogInformation("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
+            log.LogTrace("C# HTTP trigger function Post Customer processed a request. By Touchpoint " + touchpointId);
 
             Models.Customer customerRequest;
 
             try
             {
-                log.LogInformation("Attempt to get resource from body of the request");
+                log.LogTrace("Attempt to get resource from body of the request");
                 customerRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Customer>(req);
 
             }
@@ -102,7 +99,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 if (ex.Message.Contains("IntroducedBy"))
                 {
                     response = new UnprocessableEntityObjectResult("Please supply a valid Introduced By value.");
-                    log.LogWarning("Response status code: {StatusCode}. Please supply a valid Introduced By value.", response.StatusCode);
+                    log.LogInformation("Response status code: {StatusCode}. Please supply a valid Introduced By value.", response.StatusCode);
                 }
                 else
                 {
@@ -118,7 +115,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return response;
             }
 
-            log.LogInformation("Attempt to set id's for action plan patch");
+            log.LogTrace("Attempt to set id's for action plan patch");
             customerRequest.SetIds(touchpointId, subContractorId);
 
             var errors = _validate.ValidateResource(customerRequest, true);
@@ -130,19 +127,19 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 return response;
             }
 
-            log.LogInformation("Attempt to create a new Customer");
+            log.LogTrace("Attempt to create a new Customer");
             var customer = await _customerPostService.CreateNewCustomerAsync(customerRequest);
 
 
             if (customer != null)
             {
-                log.LogInformation("Attempt to send to service bus");
+                log.LogTrace("Attempt to send to service bus");
                 await _customerPostService.SendToServiceBusQueueAsync(customer, ApimURL.ToString());
             }
             if (customer == null)
             {
                 var response = new BadRequestObjectResult(400);
-                log.LogWarning("Response status code: {StatusCode}. Post a customer failed.", response.StatusCode);
+                log.LogInformation("Response status code: {StatusCode}. Post a customer failed.", response.StatusCode);
                 return response;
             }
             else
@@ -151,7 +148,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
                 {
                     StatusCode = (int)HttpStatusCode.Created
                 };
-                log.LogInformation("Response status code: {StatusCode}. Post a customer succeeded",response.StatusCode);
+                log.LogTrace("Response status code: {StatusCode}. Post a customer succeeded",response.StatusCode);
                 return response;
             }
         }
