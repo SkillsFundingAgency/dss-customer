@@ -60,8 +60,7 @@
             "SearchServiceAdminApiKey": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedSearchAdminKey)', parameters('keyVaultName'))]",
             "SubscriptionCollectionId": "subscriptions",
             "SubscriptionDatabaseId": "subscriptions",
-            "CosmosDbEndpoint": "[parameters('cosmosDbEndpoint')]",
-            "CustomerConnectionString": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=CosmosDBConnectionString)', parameters('keyVaultName'))]"
+            "CosmosDbEndpoint": "[parameters('cosmosDbEndpoint')]"
         },
       "copy": {
         "name": "FunctionAppSettingsCopy",
