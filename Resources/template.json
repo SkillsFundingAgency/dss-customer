@@ -22,10 +22,7 @@
     },
     "searchServiceAdminApiKey": {
       "type": "string"
-    },
-    "serviceBusConnectionString": {
-      "type": "string"
-    },
+    },   
     "serviceBusQueueName": {
       "type": "string"
     },
@@ -57,13 +54,14 @@
             "CollectionId": "[parameters('cosmosDbCollectionId')]",
             "CustomerSearchIndexName": "customer-search-index-v2",
             "DatabaseId": "[parameters('cosmosDbDatabaseId')]",
-            "ServiceBusConnectionString": "[parameters('serviceBusConnectionString')]",
+            "ServiceBusConnectionString": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=ServiceBusConnectionString)', parameters('keyVaultName'))]",
             "QueueName": "[parameters('serviceBusQueueName')]",
             "SearchServiceName": "[parameters('searchServiceName')]",
             "SearchServiceAdminApiKey": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedSearchAdminKey)', parameters('keyVaultName'))]",
             "SubscriptionCollectionId": "subscriptions",
             "SubscriptionDatabaseId": "subscriptions",
-            "CosmosDbEndpoint": "[parameters('cosmosDbEndpoint')]"
+            "CosmosDbEndpoint": "[parameters('cosmosDbEndpoint')]",
+            "CustomerConnectionString": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=CosmosDBConnectionString)', parameters('keyVaultName'))]"
         },
       "copy": {
         "name": "FunctionAppSettingsCopy",
