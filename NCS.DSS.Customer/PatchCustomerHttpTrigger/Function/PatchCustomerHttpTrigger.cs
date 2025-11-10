@@ -57,21 +57,18 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
         {
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
-            if (string.IsNullOrEmpty(correlationId))
-                log.LogInformation("Unable to locate 'DssCorrelationId; in request header");
-
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
                 log.LogInformation("Unable to Parse 'DssCorrelationId' to a Guid");
                 correlationGuid = Guid.NewGuid();
             }
-            log.LogInformation("DssCorrelationId: {correlationGuid}",correlationGuid);
+            log.LogTrace("DssCorrelationId: {correlationGuid}",correlationGuid);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("Response Status Code: {StatusCode}. Unable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
+                log.LogInformation("Response Status Code: {StatusCode}. Unable to locate 'APIM-TouchpointId' in request header", response.StatusCode);
                 return response;
             }
 
@@ -79,16 +76,16 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (string.IsNullOrEmpty(ApimURL))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                log.LogWarning("Response Status Code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
+                log.LogInformation("Response Status Code: {StatusCode}. Unable to locate 'apimurl' in request header", response.StatusCode);
                 return response;
             }
 
-            log.LogInformation("C# HTTP trigger function Patch Customer processed a request. By Touchpoint {touchpointId}",touchpointId);
+            log.LogTrace("C# HTTP trigger function Patch Customer processed a request. By Touchpoint {touchpointId}",touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
                 var response = new BadRequestObjectResult(customerGuid);
-                log.LogWarning("Response Status Code: {StatusCode}. Unable to parse 'customerId' to a Guid: {customerId}", response.StatusCode,customerId);
+                log.LogInformation("Response Status Code: {StatusCode}. Unable to parse 'customerId' to a Guid: {customerId}", response.StatusCode,customerId);
                 return response;
             }
 
@@ -100,7 +97,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
             try
             {
-                log.LogInformation("Attempt to get resource from body of the request");
+                log.LogTrace("Attempt to get resource from body of the request");
                 customerPatchRequest = await _httpRequestHelper.GetResourceFromRequest<Models.CustomerPatch>(req);
             }
             catch
@@ -113,41 +110,41 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             if (customerPatchRequest == null)
             {
                 var response = new UnprocessableEntityObjectResult(req);
-                log.LogWarning("Response Status Code: {StatusCode}. customer patch request is null", response.StatusCode);
+                log.LogInformation("Response Status Code: {StatusCode}. customer patch request is null", response.StatusCode);
                 return response;
             }
 
-            log.LogInformation("Attempt to set id's for action plan patch");
+            log.LogTrace("Attempt to set id's for action plan patch");
             customerPatchRequest.SetIds(touchpointId, subContractorId);
 
 
-            log.LogInformation("Attempting to see if customer exists {customerId}",customerId);
+            log.LogTrace("Attempting to see if customer exists {customerId}",customerId);
             var doesCustomerExist = await _cosmosProvider.DoesCustomerResourceExist(customerGuid);
 
             if (!doesCustomerExist)
             {
                 var response = new NoContentResult();
-                log.LogWarning("Response Status Code: {StatusCode}. Customer does not exist {customerGuid}", response.StatusCode,customerGuid);
+                log.LogInformation("Response Status Code: {StatusCode}. Customer does not exist {customerGuid}", response.StatusCode,customerGuid);
                 return response;
             }
 
-            log.LogInformation("Attempting to see if this is a read only customer {customerGuid}",customerGuid);
+            log.LogTrace("Attempting to see if this is a read only customer {customerGuid}",customerGuid);
             var isCustomerReadOnly = await _cosmosProvider.DoesCustomerHaveATerminationDate(customerGuid);
 
             if (isCustomerReadOnly)
             {
                 var response = new StatusCodeResult((int)HttpStatusCode.Forbidden);
-                log.LogWarning("Response Status Code: {StatusCode}. Customer is readonly {customerGuid}", response.StatusCode,customerGuid);
+                log.LogInformation("Response Status Code: {StatusCode}. Customer is readonly {customerGuid}", response.StatusCode,customerGuid);
                 return response;
             }
 
-            log.LogInformation("Attempting to get Customer {customerGuid}",customerGuid);
+            log.LogTrace("Attempting to get Customer {customerGuid}",customerGuid);
             var customer = await _customerPatchService.GetCustomerByIdAsync(customerGuid);
 
             if (customer == null)
             {
                 var response = new NoContentResult();
-                log.LogWarning("Response Status Code: {StatusCode}. Unable to get Customer resource {customerGuid}", response.StatusCode,customerGuid);
+                log.LogInformation("Response Status Code: {StatusCode}. Unable to get Customer resource {customerGuid}", response.StatusCode,customerGuid);
                 return response;
             }
 
@@ -156,7 +153,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 customerPatchRequest.IntroducedBy = data.IntroducedBy;
 
 
-            log.LogInformation("Attempt to validate resource");
+            log.LogTrace("Attempt to validate resource");
             var errors = _validate.ValidateResource(customerPatchRequest, false);
 
             if (errors != null && errors.Any())
@@ -167,15 +164,15 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
             }
 
 
-            log.LogInformation("Attempting to patch customer resource {customerGuid}",customerGuid);
+            log.LogTrace("Attempting to patch customer resource {customerGuid}",customerGuid);
             var patchedCustomer = _customerPatchService.PatchResource(customer, customerPatchRequest);
 
-            log.LogInformation("Attempting to update Customer {customerGuid}",customerGuid);
+            log.LogTrace("Attempting to update Customer {customerGuid}",customerGuid);
             var updatedCustomer = await _customerPatchService.UpdateCosmosAsync(patchedCustomer, customerGuid);
 
             if (updatedCustomer != null)
             {
-                log.LogInformation("attempting to send to service bus {customerGuid}",customerGuid);
+                log.LogTrace("attempting to send to service bus {customerGuid}",customerGuid);
                 await _customerPatchService.SendToServiceBusQueueAsync(customerPatchRequest, customerGuid, ApimURL);
             }
 
@@ -192,7 +189,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
                 {
                     StatusCode = (int)HttpStatusCode.OK
                 };
-                log.LogInformation("Response Status Code: {StatusCode}. Update customer succeeded",response.StatusCode);
+                log.LogTrace("Response Status Code: {StatusCode}. Update customer succeeded",response.StatusCode);
                 return response;
             }
 
