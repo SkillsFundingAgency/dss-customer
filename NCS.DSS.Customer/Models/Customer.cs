@@ -70,7 +70,6 @@ namespace NCS.DSS.Customer.Models
         [Example(Description = "12345")]
         public IntroducedBy? IntroducedBy { get; set; }
 
-        [RegularExpression(@"^[^<>]+$")]
         [Display(Description = "Additional information on how the customer was introduced to the National Careers Service")]
         [Example(Description = "Customer was introduced to NCS by party X on date Y")]
         [StringLength(100)]
