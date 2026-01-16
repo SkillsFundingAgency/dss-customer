@@ -6,19 +6,19 @@ namespace NCS.DSS.Customer.Validation
 {
     public class Validate : IValidate
     {
-        public List<ValidationResult> ValidateResource(ICustomer resource, bool validateModelForPost)
+        public List<ValidationResult> ValidateResource(ICustomer resource)
         {
             var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
             Validator.TryValidateObject(resource, context, results, true);
 
-            ValidateCustomerRules(resource, results, validateModelForPost);
+            ValidateCustomerRules(resource, results);
 
             return results;
         }
 
-        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results, bool validateModelForPost)
+        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results)
         {
             if (customerResource == null)
                 return;

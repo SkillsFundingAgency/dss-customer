@@ -81,7 +81,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
             var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
             var val = new Mock<IValidate>();
-            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>())).Returns(validationResults);
             _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
@@ -123,7 +123,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
             var validationResults = new List<ValidationResult>();
             var val = new Mock<IValidate>();
-            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>())).Returns(validationResults);
             _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
@@ -148,7 +148,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
             var validationResults = new List<ValidationResult>();
             var val = new Mock<IValidate>();
-            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>(), It.IsAny<bool>())).Returns(validationResults);
+            val.Setup(x => x.ValidateResource(It.IsAny<Models.Customer>())).Returns(validationResults);
             _function = new PostCustomerHttpTrigger.Function.PostCustomerHttpTrigger(_cosmosProvider.Object,
                 _httpRequestHelper.Object,
                 val.Object,
