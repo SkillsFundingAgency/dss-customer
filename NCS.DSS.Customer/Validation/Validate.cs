@@ -6,35 +6,22 @@ namespace NCS.DSS.Customer.Validation
 {
     public class Validate : IValidate
     {
-        public List<ValidationResult> ValidateResource(ICustomer resource, bool validateModelForPost)
+        public List<ValidationResult> ValidateResource(ICustomer resource)
         {
             var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
             Validator.TryValidateObject(resource, context, results, true);
 
-            ValidateCustomerRules(resource, results, validateModelForPost);
+            ValidateCustomerRules(resource, results);
 
             return results;
         }
 
-        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results, bool validateModelForPost)
+        private void ValidateCustomerRules(ICustomer customerResource, List<ValidationResult> results)
         {
             if (customerResource == null)
                 return;
-
-            if (validateModelForPost)
-            {
-                if (string.IsNullOrWhiteSpace(customerResource.FamilyName))
-                    results.Add(new ValidationResult("Family Name is a required field", new[] { "FamilyName" }));
-
-                if (string.IsNullOrWhiteSpace(customerResource.GivenName))
-                    results.Add(new ValidationResult("Given Name is a required field", new[] { "GivenName" }));
-            }
-
-
-            if (!customerResource.IntroducedBy.HasValue)
-                results.Add(new ValidationResult("Introduced By is a required field", new[] { "IntroducedBy" }));
 
             if (customerResource.DateOfTermination == null && customerResource.ReasonForTermination.HasValue)
                 results.Add(new ValidationResult("Please enter a Termination Date", new[] { "DateOfTermination" }));

@@ -118,7 +118,7 @@ namespace NCS.DSS.Customer.PostCustomerHttpTrigger.Function
             log.LogTrace("Attempt to set id's for action plan patch");
             customerRequest.SetIds(touchpointId, subContractorId);
 
-            var errors = _validate.ValidateResource(customerRequest, true);
+            var errors = _validate.ValidateResource(customerRequest);
 
             if (errors != null && errors.Any())
             {
