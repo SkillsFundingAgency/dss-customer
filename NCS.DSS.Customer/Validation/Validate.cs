@@ -91,6 +91,12 @@ namespace NCS.DSS.Customer.Validation
                     if (!Enum.IsDefined(typeof(PriorityCustomer), claimedPriorityGroup))
                         results.Add(new ValidationResult("Please supply a valid Priority Group", new[] { "PriorityCustomer" }));
                 }
+
+                //Can't have duplicate priority groups
+                if (customerResource.PriorityGroups.Distinct().Count() != customerResource.PriorityGroups.Count)
+                {
+                    results.Add(new ValidationResult("Can not have duplicate priority groups", new[] { "PriorityCustomer" }));
+                }
             }
         }
 

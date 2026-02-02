@@ -273,5 +273,80 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(4));
         }
+
+        [Test]
+        public void ValidateTests_ReturnValidationResult_WhenPriorityGroupsContains99AndAnyOther()
+        {
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.NotAPriorityCustomer, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+
+            // Act
+            var result = _validate.ValidateResource(customer, true);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ValidateTests_ReturnValidationResult_WhenPriorityGroupsContains98AndAnyOther()
+        {
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.NotKnown, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+
+            // Act
+            var result = _validate.ValidateResource(customer, true);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ValidateTests_ReturnValidationResult_WhenPriorityGroupsContains1And6()
+        {
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.EighteenToTwentyfourNotInEducationEmploymentOrTraining, PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment } };
+
+            // Act
+            var result = _validate.ValidateResource(customer, true);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ValidateTests_ReturnValidationResult_WhenPriorityGroupsContainsInvalidPriorityGroup()
+        {
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { (PriorityCustomer)999 } };
+
+            // Act
+            var result = _validate.ValidateResource(customer, true);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ValidateTests_ReturnValidationResult_WhenPriorityGroupsContainsDuplicatePriorityGroup()
+        {
+            // Arrange
+            var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
+
+            // Act
+            var result = _validate.ValidateResource(customer, true);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
     }
 }
