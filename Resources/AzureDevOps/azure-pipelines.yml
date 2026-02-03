@@ -68,7 +68,7 @@ jobs:
       BuildPlatform: $(BuildPlatform)
       BuildConfiguration: $(BuildConfiguration)
       GitVersionVersion: 5.12.x
-      DotNetCoreVersion: 8.x
+      DotNetCoreVersion: 10.x
 
 
 
