@@ -1,0 +1,557 @@
+{
+  "settings": {
+    "components": {
+      "code": false,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-02-09T16:30:16.7688128Z",
+  "analysisEndTime": "2026-02-09T16:30:21.2368074Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 2,
+      "issues": 5,
+      "incidents": 17,
+      "effort": 19
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 3,
+        "Optional": 2,
+        "Potential": 12,
+        "Information": 0
+      },
+      "category": {
+        "AzureFunctionsUpgrade": 1,
+        "NuGet": 11,
+        "Project": 2,
+        "Api": 3
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+      "startingProject": true,
+      "issues": 5,
+      "storyPoints": 17,
+      "properties": {
+        "appName": "NCS.DSS.Customer",
+        "projectKind": "AzureFunctions",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 36,
+        "numberOfCodeFiles": 36,
+        "linesTotal": 2129,
+        "linesOfCode": 2129,
+        "totalApiScanned": 3013,
+        "minLinesOfCodeToChange": 3,
+        "maxLinesOfCodeToChange": 3
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "c2d11a33-65c6-4423-9c2c-8c0c20fa51cc",
+          "ruleId": "AzureFunctionsUpgrade.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj"
+          }
+        },
+        {
+          "incidentId": "eb2ffe90-2413-4c82-aa5d-65b69399ab59",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService 2.23.0",
+              "protected": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService 2.23.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService 2.23.0",
+            "protectedSnippet": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService 2.23.0",
+            "label": "Microsoft.ApplicationInsights.WorkerService 2.22.0",
+            "properties": {
+              "PackageId": "Microsoft.ApplicationInsights.WorkerService",
+              "PackageVersion": "2.22.0",
+              "PackageNewVersion": "2.23.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "7a7a89e7-f817-45a9-abec-8e56dbd69041",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker.ApplicationInsights, 2.0.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.ApplicationInsights, and replace with new package Microsoft.Azure.Functions.Worker.ApplicationInsights 2.50.0",
+              "protected": "Microsoft.Azure.Functions.Worker.ApplicationInsights, 2.0.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.ApplicationInsights, and replace with new package Microsoft.Azure.Functions.Worker.ApplicationInsights 2.50.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker.ApplicationInsights, 2.0.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.ApplicationInsights, and replace with new package Microsoft.Azure.Functions.Worker.ApplicationInsights 2.50.0",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker.ApplicationInsights, 2.0.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.ApplicationInsights, and replace with new package Microsoft.Azure.Functions.Worker.ApplicationInsights 2.50.0",
+            "label": "Microsoft.Azure.Functions.Worker.ApplicationInsights 2.0.0",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker.ApplicationInsights",
+              "PackageVersion": "2.0.0",
+              "PackageNewVersion": "2.50.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "4e9542c4-c04d-4bee-9d2b-11eb346f95cf",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+              "protected": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+            "protectedSnippet": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+            "label": "Microsoft.Extensions.DependencyInjection 9.0.0",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.DependencyInjection",
+              "PackageVersion": "9.0.0",
+              "PackageNewVersion": "10.0.2",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "fe52fa77-86d6-44b0-96f4-d282cd9333df",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker.Extensions.Http, 3.2.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http 3.3.0",
+              "protected": "Microsoft.Azure.Functions.Worker.Extensions.Http, 3.2.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http 3.3.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker.Extensions.Http, 3.2.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http 3.3.0",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker.Extensions.Http, 3.2.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http 3.3.0",
+            "label": "Microsoft.Azure.Functions.Worker.Extensions.Http 3.2.0",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker.Extensions.Http",
+              "PackageVersion": "3.2.0",
+              "PackageNewVersion": "3.3.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "c6a1d80c-e7fc-418c-ba7f-d33bc55cde3e",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker.Sdk, 1.17.4\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Sdk, and replace with new package Microsoft.Azure.Functions.Worker.Sdk 2.0.7",
+              "protected": "Microsoft.Azure.Functions.Worker.Sdk, 1.17.4\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Sdk, and replace with new package Microsoft.Azure.Functions.Worker.Sdk 2.0.7"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker.Sdk, 1.17.4\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Sdk, and replace with new package Microsoft.Azure.Functions.Worker.Sdk 2.0.7",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker.Sdk, 1.17.4\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Sdk, and replace with new package Microsoft.Azure.Functions.Worker.Sdk 2.0.7",
+            "label": "Microsoft.Azure.Functions.Worker.Sdk 1.17.4",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker.Sdk",
+              "PackageVersion": "1.17.4",
+              "PackageNewVersion": "2.0.7",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "9c830484-c834-4cba-9c25-abcf46b2d32e",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker, 1.22.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker, and replace with new package Microsoft.Azure.Functions.Worker 2.51.0",
+              "protected": "Microsoft.Azure.Functions.Worker, 1.22.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker, and replace with new package Microsoft.Azure.Functions.Worker 2.51.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker, 1.22.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker, and replace with new package Microsoft.Azure.Functions.Worker 2.51.0",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker, 1.22.0\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker, and replace with new package Microsoft.Azure.Functions.Worker 2.51.0",
+            "label": "Microsoft.Azure.Functions.Worker 1.22.0",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker",
+              "PackageVersion": "1.22.0",
+              "PackageNewVersion": "2.51.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "4c357359-b39a-405f-8a84-ee586a7c7ba7",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, 3.0.9\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.CosmosDB 4.14.0",
+              "protected": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, 3.0.9\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.CosmosDB 4.14.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, 3.0.9\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.CosmosDB 4.14.0",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, 3.0.9\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.CosmosDB, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.CosmosDB 4.14.0",
+            "label": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB 3.0.9",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker.Extensions.CosmosDB",
+              "PackageVersion": "3.0.9",
+              "PackageNewVersion": "4.14.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "4ce4a728-b8e9-43b6-a081-eb34991b9a43",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, 1.3.2\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore 2.1.0",
+              "protected": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, 1.3.2\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore 2.1.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, 1.3.2\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore 2.1.0",
+            "protectedSnippet": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, 1.3.2\n\nRecommendation:\n\nRemove Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore, and replace with new package Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore 2.1.0",
+            "label": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore 1.3.2",
+            "properties": {
+              "PackageId": "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore",
+              "PackageVersion": "1.3.2",
+              "PackageNewVersion": "2.1.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "0310d3ae-3e44-4a95-b0f5-3d7dd9f27199",
+          "ruleId": "NuGet.0005",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nThis version is deprecated. Please use the most recent version.\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService, 3.0.0",
+              "protected": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nThis version is deprecated. Please use the most recent version.\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService, 3.0.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nThis version is deprecated. Please use the most recent version.\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService, 3.0.0",
+            "protectedSnippet": "Microsoft.ApplicationInsights.WorkerService, 2.22.0\n\nRecommendation:\n\nThis version is deprecated. Please use the most recent version.\nRemove Microsoft.ApplicationInsights.WorkerService, and replace with new package Microsoft.ApplicationInsights.WorkerService, 3.0.0",
+            "label": "Microsoft.ApplicationInsights.WorkerService 2.22.0",
+            "properties": {
+              "PackageId": "Microsoft.ApplicationInsights.WorkerService",
+              "PackageVersion": "2.22.0",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "27c5e0c3-3b6a-4573-a5d7-c39d9c60e3f9",
+          "ruleId": "NuGet.0005",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Identity.Client, 4.61.3\n\nRecommendation:\n\nThese packages have an API comment with an URL with a typo, which does not belong to Microsoft and which can lead to typo-squatting. The packages are flagged by antiviruses.\nRemove Microsoft.Identity.Client, and replace with new package Microsoft.Identity.Client, 4.82.1",
+              "protected": "Microsoft.Identity.Client, 4.61.3\n\nRecommendation:\n\nThese packages have an API comment with an URL with a typo, which does not belong to Microsoft and which can lead to typo-squatting. The packages are flagged by antiviruses.\nRemove Microsoft.Identity.Client, and replace with new package Microsoft.Identity.Client, 4.82.1"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Microsoft.Identity.Client, 4.61.3\n\nRecommendation:\n\nThese packages have an API comment with an URL with a typo, which does not belong to Microsoft and which can lead to typo-squatting. The packages are flagged by antiviruses.\nRemove Microsoft.Identity.Client, and replace with new package Microsoft.Identity.Client, 4.82.1",
+            "protectedSnippet": "Microsoft.Identity.Client, 4.61.3\n\nRecommendation:\n\nThese packages have an API comment with an URL with a typo, which does not belong to Microsoft and which can lead to typo-squatting. The packages are flagged by antiviruses.\nRemove Microsoft.Identity.Client, and replace with new package Microsoft.Identity.Client, 4.82.1",
+            "label": "Microsoft.Identity.Client 4.61.3",
+            "properties": {
+              "PackageId": "Microsoft.Identity.Client",
+              "PackageVersion": "4.61.3",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "06d9ea5a-eab8-4d66-be0a-1ec7f47eafc2",
+          "ruleId": "Project.0002",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "f033c785-6a67-4c8d-9b36-ec65deae848f",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_client = new SearchClient(new Uri($\u0022https://{SearchServiceName}.search.windows.net\u0022), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\Helpers\\SearchHelper.cs",
+            "snippet": "_client = new SearchClient(new Uri($\u0022https://{SearchServiceName}.search.windows.net\u0022), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 21,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "17326947-6c96-4fc1-a296-88e4de427faf",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_client = new SearchClient(new Uri($\u0022https://{SearchServiceName}.search.windows.net\u0022), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\Helpers\\SearchHelper.cs",
+            "snippet": "_client = new SearchClient(new Uri($\u0022https://{SearchServiceName}.search.windows.net\u0022), SearchServiceIndexName, new AzureKeyCredential(SearchServiceKey));",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 21,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "b0b670ea-0dd5-48d8-a18d-4cbdd8f1b4e4",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: HostBuilder enables ValidateOnBuild/ValidateScopes in development environment ",
+          "projectPath": "NCS.DSS.Customer\\NCS.DSS.Customer.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var host = new HostBuilder()\r\n                .ConfigureFunctionsWebApplication()\r\n                .ConfigureAppConfiguration(configBuilder =\u003E\r\n                {\r\n                    configBuilder.SetBasePath(Environment.CurrentDirectory)\r\n                        .AddJsonFile(\u0022local.settings.json\u0022, optional: true,\r\n                            reloadOnChange: false)\r\n                        .AddEnvironmentVariables();\r\n                })\r\n                .ConfigureServices((context,services) =\u003E\r\n                {\r\n                    var configuration = context.Configuration;\r\n                    services.AddOptions\u003CCustomerConfigurationSettings\u003E()\r\n                        .Bind(configuration);\r\n                    services.AddLogging();\r\n                    services.AddApplicationInsightsTelemetryWorkerService(); \r\n                    services.ConfigureFunctionsApplicationInsights();\r\n                    services.AddSingleton\u003CIValidate, Validate\u003E();        \r\n                    services.AddSingleton\u003CIHttpRequestHelper, HttpRequestHelper\u003E();\r\n                    services.AddSingleton\u003CIJsonHelper, JsonHelper\u003E();\r\n                    services.AddScoped\u003CISwaggerDocumentGenerator, SwaggerDocumentGenerator\u003E();\r\n                    services.AddScoped\u003CIGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CIPostCustomerHttpTriggerService, PostCustomerHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CIPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CICustomerPatchService, CustomerPatchService\u003E();\r\n                    services.AddScoped\u003CICustomerServiceBusClient, CustomerServiceBusClient\u003E();\r\n                    services.AddTransient\u003CICosmosDBProvider, CosmosDBProvider\u003E();\r\n                    services.AddSingleton(sp =\u003E\r\n                    {\r\n                        var logger = sp.GetRequiredService\u003CILogger\u003CProgram\u003E\u003E();\r\n\r\n                        var connectionString = configuration[\u0022CustomerConnectionString\u0022];\r\n                        var endpoint = configuration[\u0022CosmosDbEndpoint\u0022];\r\n\r\n                        var options = new CosmosClientOptions\r\n                        {\r\n                            ConnectionMode = ConnectionMode.Gateway\r\n                        };\r\n\r\n                        if (!string.IsNullOrWhiteSpace(endpoint))\r\n                        {\r\n                            logger.LogInformation(\u0022Using DefaultAzureCredential for Cosmos DB (managed identity)\u0022);\r\n                            return new CosmosClient(endpoint, new DefaultAzureCredential(), options);\r\n                        }\r\n                        else if (!string.IsNullOrWhiteSpace(connectionString))\r\n                        {\r\n                            logger.LogInformation(\u0022No managed identity found: using Cosmos DB connection string (local development)\u0022);\r\n                            return new CosmosClient(connectionString, options);\r\n                        }\r\n                        else\r\n                        {\r\n                            throw new InvalidOperationException(\u0022Neither CosmosDbEndpoint or a ConnectionString are configured\u0022);\r\n                        }\r\n                    });\r\n                    services.AddSingleton(serviceProvider =\u003E\r\n                    {\r\n                        var settings = serviceProvider.GetRequiredService\u003CIOptions\u003CCustomerConfigurationSettings\u003E\u003E().Value;\r\n                        return new ServiceBusClient(settings.ServiceBusConnectionString);\r\n                    });\r\n                    services.AddSingleton\u003CIDynamicHelper, DynamicHelper\u003E();\r\n                    services.Configure\u003CLoggerFilterOptions\u003E(options =\u003E\r\n                    {\r\n                        LoggerFilterRule toRemove = options.Rules.FirstOrDefault(rule =\u003E rule.ProviderName\r\n                            == \u0022Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider\u0022);\r\n                        options.AddFilter(\u0022Microsoft.AspNetCore\u0022, LogLevel.Warning);\r\n                        if (toRemove is not null)\r\n                        {\r\n                            options.Rules.Remove(toRemove);\r\n                        }\r\n                    });\r\n                })\r\n                .Build();",
+              "protected": "T:Microsoft.Extensions.Hosting.HostBuilder"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer\\Program.cs",
+            "snippet": "var host = new HostBuilder()\r\n                .ConfigureFunctionsWebApplication()\r\n                .ConfigureAppConfiguration(configBuilder =\u003E\r\n                {\r\n                    configBuilder.SetBasePath(Environment.CurrentDirectory)\r\n                        .AddJsonFile(\u0022local.settings.json\u0022, optional: true,\r\n                            reloadOnChange: false)\r\n                        .AddEnvironmentVariables();\r\n                })\r\n                .ConfigureServices((context,services) =\u003E\r\n                {\r\n                    var configuration = context.Configuration;\r\n                    services.AddOptions\u003CCustomerConfigurationSettings\u003E()\r\n                        .Bind(configuration);\r\n                    services.AddLogging();\r\n                    services.AddApplicationInsightsTelemetryWorkerService(); \r\n                    services.ConfigureFunctionsApplicationInsights();\r\n                    services.AddSingleton\u003CIValidate, Validate\u003E();        \r\n                    services.AddSingleton\u003CIHttpRequestHelper, HttpRequestHelper\u003E();\r\n                    services.AddSingleton\u003CIJsonHelper, JsonHelper\u003E();\r\n                    services.AddScoped\u003CISwaggerDocumentGenerator, SwaggerDocumentGenerator\u003E();\r\n                    services.AddScoped\u003CIGetCustomerByIdHttpTriggerService, GetCustomerByIdHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CIPostCustomerHttpTriggerService, PostCustomerHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CIPatchCustomerHttpTriggerService, PatchCustomerHttpTriggerService\u003E();\r\n                    services.AddScoped\u003CICustomerPatchService, CustomerPatchService\u003E();\r\n                    services.AddScoped\u003CICustomerServiceBusClient, CustomerServiceBusClient\u003E();\r\n                    services.AddTransient\u003CICosmosDBProvider, CosmosDBProvider\u003E();\r\n                    services.AddSingleton(sp =\u003E\r\n                    {\r\n                        var logger = sp.GetRequiredService\u003CILogger\u003CProgram\u003E\u003E();\r\n\r\n                        var connectionString = configuration[\u0022CustomerConnectionString\u0022];\r\n                        var endpoint = configuration[\u0022CosmosDbEndpoint\u0022];\r\n\r\n                        var options = new CosmosClientOptions\r\n                        {\r\n                            ConnectionMode = ConnectionMode.Gateway\r\n                        };\r\n\r\n                        if (!string.IsNullOrWhiteSpace(endpoint))\r\n                        {\r\n                            logger.LogInformation(\u0022Using DefaultAzureCredential for Cosmos DB (managed identity)\u0022);\r\n                            return new CosmosClient(endpoint, new DefaultAzureCredential(), options);\r\n                        }\r\n                        else if (!string.IsNullOrWhiteSpace(connectionString))\r\n                        {\r\n                            logger.LogInformation(\u0022No managed identity found: using Cosmos DB connection string (local development)\u0022);\r\n                            return new CosmosClient(connectionString, options);\r\n                        }\r\n                        else\r\n                        {\r\n                            throw new InvalidOperationException(\u0022Neither CosmosDbEndpoint or a ConnectionString are configured\u0022);\r\n                        }\r\n                    });\r\n                    services.AddSingleton(serviceProvider =\u003E\r\n                    {\r\n                        var settings = serviceProvider.GetRequiredService\u003CIOptions\u003CCustomerConfigurationSettings\u003E\u003E().Value;\r\n                        return new ServiceBusClient(settings.ServiceBusConnectionString);\r\n                    });\r\n                    services.AddSingleton\u003CIDynamicHelper, DynamicHelper\u003E();\r\n                    services.Configure\u003CLoggerFilterOptions\u003E(options =\u003E\r\n                    {\r\n                        LoggerFilterRule toRemove = options.Rules.FirstOrDefault(rule =\u003E rule.ProviderName\r\n                            == \u0022Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider\u0022);\r\n                        options.AddFilter(\u0022Microsoft.AspNetCore\u0022, LogLevel.Warning);\r\n                        if (toRemove is not null)\r\n                        {\r\n                            options.Rules.Remove(toRemove);\r\n                        }\r\n                    });\r\n                })\r\n                .Build();",
+            "protectedSnippet": "T:Microsoft.Extensions.Hosting.HostBuilder",
+            "label": "T:Microsoft.Extensions.Hosting.HostBuilder",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/9.0/hostbuilder-validation.md",
+                "isCustom": false
+              }
+            ],
+            "line": 26,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "NCS.DSS.Customer.Tests\\NCS.DSS.Customer.Tests.csproj",
+      "startingProject": true,
+      "issues": 2,
+      "storyPoints": 2,
+      "properties": {
+        "appName": "NCS.DSS.Customer.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 12,
+        "numberOfCodeFiles": 10,
+        "linesTotal": 3459,
+        "linesOfCode": 1674,
+        "totalApiScanned": 3198,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "60801781-fabb-49d1-b5b5-f3ff6e0b77c4",
+          "ruleId": "NuGet.0002",
+          "projectPath": "NCS.DSS.Customer.Tests\\NCS.DSS.Customer.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+              "protected": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer.Tests\\NCS.DSS.Customer.Tests.csproj",
+            "snippet": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+            "protectedSnippet": "Microsoft.Extensions.DependencyInjection, 9.0.0\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection, and replace with new package Microsoft.Extensions.DependencyInjection 10.0.2",
+            "label": "Microsoft.Extensions.DependencyInjection 9.0.0",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.DependencyInjection",
+              "PackageVersion": "9.0.0",
+              "PackageNewVersion": "10.0.2",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "0fbceda6-7745-4ae5-8980-df715e9824a2",
+          "ruleId": "Project.0002",
+          "projectPath": "NCS.DSS.Customer.Tests\\NCS.DSS.Customer.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "NCS.DSS.Customer.Tests\\NCS.DSS.Customer.Tests.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "AzureFunctionsUpgrade.0002": {
+      "id": "AzureFunctionsUpgrade.0002",
+      "isFeature": true,
+      "description": "When migrating from in-proc to isolated, enable the use of the V2 model for Azure Functions projects and enable Application Insights.",
+      "label": "Enable the use of the V2 model for Azure Functions projects and enable Application Insights.",
+      "severity": "Mandatory",
+      "effort": 3,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2342114",
+          "isCustom": false
+        },
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2341915",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0002": {
+      "id": "NuGet.0002",
+      "isFeature": false,
+      "description": "NuGet package upgrade is recommended for selected target framework.\n\nStandard .NET packages are recommended to have versions matching version of .NET that project targets.\n\nSome other packages also are known to work better for selected target frameworks.",
+      "label": "NuGet package upgrade is recommended",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262530",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0005": {
+      "id": "NuGet.0005",
+      "isFeature": false,
+      "description": "NuGet package is deprecated.\n\nGo to its documentation and if there is a guidance for replacement of functionality provided by this package.",
+      "label": "NuGet package is deprecated",
+      "severity": "Optional",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262531",
+          "isCustom": false
+        }
+      ]
+    },
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Project\u0027s target framework(s) needs to be changed to the new target framework that you selected for this upgrade.\n\nDuring upgrade target framework will be adjusted to corresponding platform when applicable. In some cases project would result in multiple target frameworks after the upgrade if it was using features that now have their own platforms in modern .NET frameworks (windows, iOS, Android etc).",
+      "label": "Project\u0027s target framework(s) needs to be changed",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Overview of porting from .NET Framework to .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET project SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0003": {
+      "id": "Api.0003",
+      "isFeature": false,
+      "description": "API has a behavioral change in selected .NET version: code and binaries may behave differently at runtime without needing recompilation, but the new behavior might be undesirable and require updates.",
+      "label": "Behavioral change in selected .NET version",
+      "severity": "Potential",
+      "effort": 1
+    }
+  }
+}
