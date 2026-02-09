@@ -281,7 +281,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.NotAPriorityCustomer, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
             // Act
-            var result = _validate.ValidateResource(customer, true);
+            var result = _validate.ValidateResource(customer);
 
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
@@ -296,7 +296,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.NotKnown, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
             // Act
-            var result = _validate.ValidateResource(customer, true);
+            var result = _validate.ValidateResource(customer);
 
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
@@ -311,7 +311,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.EighteenToTwentyfourNotInEducationEmploymentOrTraining, PriorityCustomer.AdultsAged50YearsOrOverWhoAreUnemployedOrAtDemonstrableRiskOfUnemployment } };
 
             // Act
-            var result = _validate.ValidateResource(customer, true);
+            var result = _validate.ValidateResource(customer);
 
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
@@ -326,7 +326,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { (PriorityCustomer)999 } };
 
             // Act
-            var result = _validate.ValidateResource(customer, true);
+            var result = _validate.ValidateResource(customer);
 
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
@@ -341,7 +341,7 @@ namespace NCS.DSS.Customer.Tests.ValidationTests
             var customer = new Models.Customer { GivenName = "John", FamilyName = "Smith", IntroducedBy = IntroducedBy.CareersFairActivity, PriorityGroups = new List<PriorityCustomer> { PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months, PriorityCustomer.AdultsWhoHaveBeenUnemployedForMoreThan12Months } };
 
             // Act
-            var result = _validate.ValidateResource(customer, true);
+            var result = _validate.ValidateResource(customer);
 
             // Assert
             Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
