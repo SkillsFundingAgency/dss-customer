@@ -163,7 +163,32 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             Assert.That(result, Is.InstanceOf<JsonResult>());
             Assert.That(responseResult.StatusCode, Is.EqualTo((int)HttpStatusCode.Created));
         }
-                
+
+        [TestCase("<script>alert(1)</script>")]
+        [TestCase("Isobel.testing@dwp.gov.uk <script> Bridgewater JC")]
+        public async Task PostCustomerHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenIntroducedByAdditionalInfoRequestIsInValid(string additionalInfo)
+        {
+            // Arrange
+            _customer = new Models.Customer { IntroducedByAdditionalInfo = additionalInfo };
+
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns("http://localhost:7071/");
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Customer>(_request)).Returns(Task.FromResult(_customer));
+
+
+            // Act
+            var result = await RunFunction(ValidCustomerId);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+
+            var unprocessableResult = result as UnprocessableEntityObjectResult;
+            var errorList = unprocessableResult.Value as List<ValidationResult>;
+            var error = errorList.FirstOrDefault(t => t.ErrorMessage.Contains("The field IntroducedByAdditionalInfo must match the regular expression")).ErrorMessage;
+
+            Assert.That(error.Contains("The field IntroducedByAdditionalInfo must match the regular expression"), Is.True);
+        }
+
         [TestCase("Universal Credit work coach holly")]
         [TestCase("Isobel.testing@dwp.gov.uk Bridgewater PC")]
         public async Task PostCustomerHttpTrigger_ReturnsStatusCodeCreated_WhenIntroducedByAdditionalInfoRequestIsValid(string additionalInfo)
