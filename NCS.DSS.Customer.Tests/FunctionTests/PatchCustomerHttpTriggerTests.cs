@@ -103,7 +103,7 @@ namespace NCS.DSS.Customer.Tests.FunctionTests
             // Arrange
             var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
             var val = new Mock<IValidate>();
-            val.Setup(x => x.ValidateResource(It.IsAny<CustomerPatch>())).Returns(validationResults);
+            val.Setup(x => x.ValidateResource(It.IsAny<CustomerPatch>(), It.IsAny<bool>())).Returns(validationResults);
             _function = new PatchCustomerHttpTrigger.Function.PatchCustomerHttpTrigger(
                 _cosmosProvider.Object,
                 _httpRequestHelper.Object,

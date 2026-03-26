@@ -154,7 +154,7 @@ namespace NCS.DSS.Customer.PatchCustomerHttpTrigger.Function
 
 
             log.LogTrace("Attempt to validate resource");
-            var errors = _validate.ValidateResource(customerPatchRequest);
+            var errors = _validate.ValidateResource(customerPatchRequest, false);
 
             if (errors != null && errors.Any())
             {
